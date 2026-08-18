@@ -1429,6 +1429,41 @@ namespace EasyCommerce\API {
         {
         }
     }
+    class Importer
+    {
+        use \EasyCommerce\Traits\Rest;
+        use \EasyCommerce\Traits\Cleaner;
+        public function upload_csv($request)
+        {
+        }
+        public function map_columns($request)
+        {
+        }
+        public function import_products($request)
+        {
+        }
+        private function create_product($row)
+        {
+        }
+        private function get_img_ids($urls)
+        {
+        }
+        private function build_variations($variation_data, $has_multiple_variations, $key = 0)
+        {
+        }
+    }
+    class Notice
+    {
+        /**
+         * Get notice status information
+         *
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
+         */
+        public function pro_notice_status($request)
+        {
+        }
+    }
     class Option
     {
         use \EasyCommerce\Traits\Rest;
@@ -1603,7 +1638,7 @@ namespace EasyCommerce\Models {
         /**
          * Set the status of the order.
          *
-         * @return string
+         * @return bool|int
          */
         public function set_status($status)
         {
@@ -1619,7 +1654,7 @@ namespace EasyCommerce\Models {
         /**
          * Set the fulfillment status of the order.
          *
-         * @return string
+         * @return bool|int
          */
         public function set_fulfillment_status($fulfill_status)
         {
@@ -1654,7 +1689,7 @@ namespace EasyCommerce\Models {
          * Update the order.
          *
          * @param array $data Updated order data.
-         * @return bool True on success, false on failure.
+         * @return bool|int Number of affected rows on success, false on failure.
          */
         public function update($data)
         {
@@ -1760,8 +1795,8 @@ namespace EasyCommerce\API {
         /**
          * Create a new order.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function create($request)
         {
@@ -1769,8 +1804,8 @@ namespace EasyCommerce\API {
         /**
          * Get a specific order.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function get($request)
         {
@@ -1778,8 +1813,8 @@ namespace EasyCommerce\API {
         /**
          * Update an existing order.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function update($request)
         {
@@ -1790,8 +1825,8 @@ namespace EasyCommerce\API {
         /**
          * Delete an order.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function delete_order($request)
         {
@@ -1799,8 +1834,8 @@ namespace EasyCommerce\API {
         /**
          * Refund an order.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function refund($request)
         {
@@ -1808,8 +1843,8 @@ namespace EasyCommerce\API {
         /**
          * Add an order note.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function add_note($request)
         {
@@ -1817,8 +1852,8 @@ namespace EasyCommerce\API {
         /**
          * Get order notes.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function get_notes($request)
         {
@@ -1826,8 +1861,8 @@ namespace EasyCommerce\API {
         /**
          * Delete an order note.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function delete_note($request)
         {
@@ -1835,8 +1870,8 @@ namespace EasyCommerce\API {
         /**
          * Send an email.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function email($request)
         {
@@ -1844,8 +1879,8 @@ namespace EasyCommerce\API {
         /**
          * List orders with optional filters such as per_page, page, status, customer_id and customer_email.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function get_all($request)
         {
@@ -2875,6 +2910,14 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Gets the primary key
+         *
+         * @return string $primary_key The primary key for the table.
+         */
+        public function get_primary_key()
+        {
+        }
+        /**
          * Gets table data
          *
          * @return array $data Table data
@@ -3237,7 +3280,7 @@ namespace EasyCommerce\Abstracts {
         /**
          * Process transaction
          *
-         * @param string $transaction_id Transaction ID.
+         * @param mixed $transaction_id Transaction ID.
          * @param int $order_id Order ID.
          * @param float $total_amount Total amount.
          * @param int $customer_id Customer ID.
@@ -3279,6 +3322,14 @@ namespace EasyCommerce\Abstracts {
         {
         }
         /**
+         * Get payment method name
+         *
+         * @return string Payment method name.
+         */
+        public function get_method_name()
+        {
+        }
+        /**
          * Get payment method description
          *
          * @return string Payment method description.
@@ -3294,17 +3345,24 @@ namespace EasyCommerce\Abstracts {
         public function get_icon()
         {
         }
+        public function is_enabled()
+        {
+        }
+        public function is_available()
+        {
+        }
         public function refund($order_id, $reason, $amount)
         {
         }
         /**
-         * Check for physical product
+         * Check payment method availability
          *
          * @param bool $unset Unset flag.
          * @param bool $has_physical Flag for physical product.
+         *
          * @return bool Updated unset flag.
          */
-        public function check_for_physical_product($unset, $has_physical)
+        public function validate_availability($unset, $has_physical)
         {
         }
         /**
@@ -3312,7 +3370,7 @@ namespace EasyCommerce\Abstracts {
          *
          * @param bool $supports Supports recurring payments.
          * @return bool Updated supports flag.
-         * 
+         *
          */
         public function supports_recurring($supports, $payment_id, $cart)
         {
@@ -3627,6 +3685,14 @@ namespace EasyCommerce\Bootstrap {
         public function register_thumbnails()
         {
         }
+        /**
+         * Deactivates conflicting plugins if they are active.
+         *
+         * @return void
+         */
+        public function deactivate_conflicting_plugins()
+        {
+        }
     }
 }
 namespace EasyCommerce\Bootstrap\Activator {
@@ -3763,6 +3829,9 @@ namespace EasyCommerce\Bootstrap {
          * @return void
          */
         private function load_common_controllers()
+        {
+        }
+        private function load_payment_controllers()
         {
         }
     }
@@ -3971,9 +4040,24 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         /**
+         * Handles the AJAX request to dismiss the notice and record the time
+         */
+        public function dismiss_pro_notice()
+        {
+        }
+        /**
+         * Show the EasyCommerce Pro admin notice for BFCM campaign
+         */
+        private function show_easycommerce_pro_notice()
+        {
+        }
+        /**
          * Handles secure file downloads for customers.
          */
         public function secure_download()
+        {
+        }
+        public function show_plugin_notice($plugin_file)
         {
         }
         public function add_page_labels($post_states, $post)
@@ -4290,6 +4374,18 @@ namespace EasyCommerce\Controllers\Common {
          * Register Email Placeholder-related API endpoints
          */
         private function register_email_placeholder_endpoints()
+        {
+        }
+        /**
+         * Register Notice-related API endpoints
+         */
+        private function register_notice_endpoints()
+        {
+        }
+        /**
+         * Register Importer-related API endpoints
+         */
+        private function register_importer_endpoints()
         {
         }
     }
@@ -4642,6 +4738,594 @@ namespace EasyCommerce\Controllers\Front {
         {
         }
         public function show_payment_methods($cart_obj)
+        {
+        }
+    }
+}
+namespace EasyCommerce\Controllers\Payment\Stripe\API {
+    class PaymentIntent
+    {
+        use \EasyCommerce\Traits\Rest;
+        protected \Stripe\StripeClient $api_client;
+        protected \EasyCommerce\Controllers\Payment\Stripe\Helpers\PaymentMethods $payment_methods_helper;
+        public function __construct()
+        {
+        }
+        /**
+         * Create a Payment Intent for the current cart.
+         *
+         * @param \WP_REST_Request $request The REST request.
+         *
+         * @return array|\WP_Error The Payment Intent data or error.
+         */
+        public function create(\WP_REST_Request $request)
+        {
+        }
+        /**
+         * Update a Payment Intent with the current cart amount.
+         *
+         * @param \WP_REST_Request $request The REST request.
+         *
+         * @return array|\WP_Error The update result or error.
+         */
+        public function update(\WP_REST_Request $request)
+        {
+        }
+    }
+    class Webhook
+    {
+        use \EasyCommerce\Traits\Rest;
+        /**
+         * Validates the incoming request to ensure it is a legitimate webhook event from Stripe.
+         * It checks for the presence of required parameters and verifies the request signature.
+         *
+         * @see https://docs.stripe.com/webhooks?snapshot-or-thin=thin#verify-webhook-signatures-with-official-libraries
+         *
+         * @param \WP_REST_Request $request The incoming REST request to validate.
+         *
+         * @return \Stripe\Event|\WP_Error
+         */
+        public function validate_request(\WP_REST_Request $request)
+        {
+        }
+        /**
+         * Listen to webhook events.
+         *
+         * @see https://docs.stripe.com/webhooks#webhook-endpoint-def
+         *
+         * @return void
+         */
+        public function listen(\WP_REST_Request $request)
+        {
+        }
+        /**
+         * Handles successful payment of an invoice, ensuring subscription renewal and transaction recording.
+         *
+         * This method is triggered when a payment for an invoice succeeds. It checks the billing reason
+         * and processes subscription renewals, creates a corresponding order, and records the payment as a transaction.
+         * If a subscription has a recurrence limit, it validates the order count against the limit and updates
+         * the subscription status accordingly.
+         *
+         * @param \Stripe\Event $event The event object containing the invoice and associated data.
+         *
+         * @return void
+         */
+        public function invoice_payment_succeeded($event)
+        {
+        }
+        /**
+         * Handles the deletion of a customer subscription by updating its status based on metadata and recurrence limits.
+         *
+         * @param \Stripe\Event $event The event object containing subscription data and metadata.
+         *
+         * @return void
+         */
+        public function customer_subscription_deleted($event)
+        {
+        }
+    }
+}
+namespace EasyCommerce\Controllers\Payment\Stripe\Controllers\Common {
+    class API
+    {
+        use \EasyCommerce\Traits\Hook;
+        use \EasyCommerce\Traits\Auth;
+        use \EasyCommerce\Traits\Rest;
+        /**
+         * Constructor to add all hooks.
+         */
+        public function __construct()
+        {
+        }
+        /**
+         * Registers all REST API endpoints for the Stripe payment gateway.
+         *
+         * @return void
+         */
+        public function register_endpoints()
+        {
+        }
+        /**
+         * Registers REST API routes for handling webhooks.
+         * This method defines a single route for handling incoming webhooks.
+         *
+         * @see https://docs.stripe.com/webhooks
+         * @see https://docs.stripe.com/webhooks#webhooks-summary:~:text=Create%20a%20webhook%20endpoint%20handler%20to%20receive%20event%20data%20POST%20requests.
+         *
+         * @return void
+         */
+        public function register_webhook_endpoint_routes()
+        {
+        }
+        /**
+         * Registers REST API routes for handling Payment Intents.
+         * This method defines routes for creating and updating Payment Intents.
+         *
+         * @return void
+         */
+        public function register_payment_intent_endpoint_routes()
+        {
+        }
+    }
+    class Init
+    {
+        use \EasyCommerce\Traits\Hook;
+        use \EasyCommerce\Traits\Asset;
+        /**
+         * Constructor to add all hooks.
+         */
+        public function __construct()
+        {
+        }
+        /**
+         * Retrieves the URL of the Stripe payment method logo.
+         *
+         * @return string The URL of the logo image, or empty string if not found or not an image.
+         */
+        public function stripe_logo_url()
+        {
+        }
+        /**
+         * Manages webhook registration when Stripe payment settings are updated.
+         *
+         * @param string $option The option name that was updated.
+         *
+         * @return void
+         */
+        public function manage_webhook($option)
+        {
+        }
+    }
+}
+namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
+    class PaymentMethods
+    {
+        protected \Stripe\StripeClient $api_client;
+        protected array $payment_method_configs = array();
+        public function __construct()
+        {
+        }
+        /**
+         * Retrieves available payment method configurations from Stripe.
+         *
+         * @return array Array of available payment method configurations.
+         */
+        public function get_payment_method_config_data(): array
+        {
+        }
+        /**
+         * Gets payment method configuration options for the settings select field.
+         *
+         * @return array Array of payment method configuration options with labels.
+         */
+        public function get_payment_method_configs(): array
+        {
+        }
+        /**
+         * Gets payment method options for the settings multiselect field.
+         * Only shows options when a payment method configuration is selected.
+         *
+         * @return array Array of payment method options with labels.
+         */
+        public function get_payment_methods(): array
+        {
+        }
+        /**
+         * Gets enabled payment methods from settings.
+         *
+         * @return array Array of enabled payment method types.
+         */
+        public function get_enabled_payment_methods(): array
+        {
+        }
+        /**
+         * Gets payment methods that require domain verification.
+         *
+         * @return array Array of payment method types that need domain verification.
+         */
+        public function get_payment_methods_requiring_domain_verification(): array
+        {
+        }
+        /**
+         * Gets a human-readable label for a payment method type.
+         *
+         * @param string $method_type The payment method type.
+         *
+         * @return string The human-readable label.
+         */
+        private function get_payment_method_label(string $method_type): string
+        {
+        }
+    }
+    class Webhook
+    {
+        protected $api_client;
+        protected $events = array(\Stripe\Event::PAYMENT_INTENT_SUCCEEDED, \Stripe\Event::PAYMENT_INTENT_REQUIRES_ACTION, \Stripe\Event::PAYMENT_INTENT_AMOUNT_CAPTURABLE_UPDATED, \Stripe\Event::PAYMENT_INTENT_PAYMENT_FAILED, \Stripe\Event::SETUP_INTENT_SUCCEEDED, \Stripe\Event::SETUP_INTENT_SETUP_FAILED, \Stripe\Event::CHARGE_SUCCEEDED, \Stripe\Event::CHARGE_CAPTURED, \Stripe\Event::CHARGE_FAILED, \Stripe\Event::CHARGE_DISPUTE_CREATED, \Stripe\Event::CHARGE_DISPUTE_CLOSED, \Stripe\Event::BALANCE_AVAILABLE, \Stripe\Event::REVIEW_OPENED, \Stripe\Event::REVIEW_CLOSED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_CREATED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_UPDATED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_DELETED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_PAUSED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_RESUMED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_TRIAL_WILL_END, \Stripe\Event::INVOICE_PAYMENT_SUCCEEDED, \Stripe\Event::INVOICE_PAYMENT_FAILED, \Stripe\Event::INVOICE_PAYMENT_ACTION_REQUIRED, \Stripe\Event::INVOICE_PAID, \Stripe\Event::REFUND_CREATED, \Stripe\Event::ACCOUNT_UPDATED);
+        public function __construct()
+        {
+        }
+        /**
+         * List of events to register.
+         *
+         * @return string[]
+         */
+        public function get_events(): array
+        {
+        }
+        /**
+         * Deletes any existing webhook event destination matching the provided URL.
+         *
+         * @param string $webhook_url The webhook URL to match for deletion.
+         *
+         * @return void
+         * @throws \Stripe\Exception\ApiErrorException If an error occurs during deletion.
+         */
+        protected function delete_existing_endpoint(string $webhook_url): void
+        {
+        }
+        /**
+         * Creates a new event destination in Stripe and updates the signing secret if available.
+         *
+         * @param string $webhook_url The URL for the new webhook endpoint.
+         *
+         * @return void
+         * @throws \Stripe\Exception\ApiErrorException If an error occurs during creation.
+         */
+        protected function create_new_endpoint(string $webhook_url): void
+        {
+        }
+        /**
+         * Registers a new event destination in the Stripe payment gateway.
+         *
+         * @see https://docs.stripe.com/webhooks
+         * @see https://docs.stripe.com/api/v2/core/event_destinations/create
+         *
+         * @return void
+         */
+        public function register()
+        {
+        }
+        /**
+         * Deregisters the webhook endpoint from Stripe.
+         *
+         * @return void
+         */
+        public function deregister(): void
+        {
+        }
+    }
+}
+namespace EasyCommerce\Controllers\Payment\Stripe\PaymentMethods {
+    class Stripe extends \EasyCommerce\Abstracts\Payment_Method
+    {
+        use \EasyCommerce\Traits\Hook;
+        protected $id;
+        protected \Stripe\StripeClient $api_client;
+        protected \EasyCommerce\Controllers\Payment\Stripe\Helpers\PaymentMethods $payment_methods_helper;
+        public function __construct()
+        {
+        }
+        /**
+         * Returns the settings configuration for the Stripe payment method.
+         *
+         * @return array Array of settings fields organized by sections.
+         */
+        public function settings(): array
+        {
+        }
+        public function is_available()
+        {
+        }
+        /**
+         * Enqueues the necessary JavaScript files for Stripe payment processing.
+         *
+         * @return void
+         */
+        public function enqueue_scripts()
+        {
+        }
+        /**
+         * Adds localized variables for the Stripe payment method.
+         *
+         * @param array $vars Existing localized variables.
+         *
+         * @return array Updated localized variables including Stripe configuration.
+         */
+        public function localized($vars): array
+        {
+        }
+        /**
+         * Returns the HTML for the Stripe payment form.
+         *
+         * @return string The HTML markup for the payment form.
+         */
+        public function payment_form(): string
+        {
+        }
+        /**
+         * Processes a payment through the Stripe payment gateway.
+         *
+         * @param string $status Current order status.
+         * @param int $order_id The order ID being processed.
+         * @param array $params Payment parameters including payment method and metadata.
+         * @param int $customer_id The customer ID making the payment.
+         *
+         * @return string The updated order status after payment processing.
+         */
+        public function process_payment($status, $order_id, $params, $customer_id)
+        {
+        }
+        /**
+         * Handle payment element redirect flow (3D Secure, etc.)
+         *
+         * @param \EasyCommerce\Models\Order $order The order object.
+         * @param int $order_id The order ID.
+         * @param string $payment_intent_id The Stripe payment intent ID from URL.
+         * @param int $customer_id The customer ID.
+         *
+         * @return string The order status.
+         */
+        private function handle_payment_element_redirect($order, $order_id, $payment_intent_id, $customer_id, $default_order_status): string
+        {
+        }
+        /**
+         * Checks if the cart contains any recurring/subscription items.
+         *
+         * @param array $cart The cart data containing items and their details.
+         *
+         * @return bool True if cart has recurring items, false otherwise.
+         */
+        private function cart_has_recurring($cart): bool
+        {
+        }
+        /**
+         * Process payment using Payment Intents (new approach)
+         *
+         * @param \EasyCommerce\Models\Order $order The order object.
+         * @param int $order_id The order ID.
+         * @param string $payment_intent_id The Stripe payment intent ID.
+         * @param string|null $payment_method_id The Stripe payment method ID.
+         * @param string $payment_method_type The type of payment method used.
+         * @param float $total_amount The total payment amount.
+         * @param string $currency The payment currency.
+         * @param array $meta_data Additional metadata for the payment.
+         * @param int $customer_id The customer ID.
+         * @param array $params Payment parameters.
+         * @param string $default_order_status The default order status.
+         * @param bool $has_recurring Whether the cart has recurring items.
+         *
+         * @return string The order status after processing.
+         * @throws \Stripe\Exception\ApiErrorException
+         * @throws \Exception
+         */
+        private function process_payment_intent($order, $order_id, $payment_intent_id, $payment_method_id, $payment_method_type, $total_amount, $currency, $meta_data, $customer_id, $params, $default_order_status, $has_recurring): string
+        {
+        }
+        /**
+         * Process one time payment (legacy token approach)
+         *
+         * @param \EasyCommerce\Models\Order $order The order object.
+         * @param int $order_id The order ID.
+         * @param string $stripe_token The Stripe token.
+         * @param float $total_amount The total payment amount.
+         * @param string $currency The payment currency.
+         * @param array $meta_data Additional metadata for the payment.
+         * @param int $customer_id The customer ID.
+         * @param array $params Payment parameters.
+         * @param string $default_order_status The default order status.
+         *
+         * @return string The order status after processing.
+         * @throws \Stripe\Exception\ApiErrorException
+         * @throws \Exception
+         */
+        private function process_one_time_payment($order, $order_id, $stripe_token, $total_amount, $currency, $meta_data, $customer_id, $params, $default_order_status): string
+        {
+        }
+        /**
+         * Processes a subscription payment through Stripe.
+         *
+         * @param \EasyCommerce\Models\Order $order The order object.
+         * @param int $order_id The order ID.
+         * @param string $stripe_token The Stripe payment token.
+         * @param float $total_amount The total payment amount.
+         * @param string $currency The payment currency.
+         * @param array $meta_data Additional metadata for the payment.
+         * @param int $customer_id The customer ID.
+         * @param array $params Payment parameters.
+         * @param string $default_order_status The default order status.
+         * @param array $cart The cart data.
+         *
+         * @return string The order status after processing.
+         * @throws \Stripe\Exception\ApiErrorException
+         * @throws \Exception
+         */
+        private function process_subscription_payment($order, $order_id, $stripe_token, $total_amount, $currency, $meta_data, $customer_id, $params, $default_order_status, $cart): string
+        {
+        }
+        /**
+         * Creates a new Stripe customer or retrieves an existing one.
+         *
+         * @param int $customer_id The EasyCommerce customer ID.
+         * @param string $stripe_token The Stripe payment token.
+         * @param array $params Additional customer parameters.
+         *
+         * @return \Stripe\Customer The Stripe customer object.
+         * @throws \Stripe\Exception\ApiErrorException
+         * @throws \Exception
+         */
+        private function create_or_get_stripe_customer($customer_id, $stripe_token, $params): \Stripe\Customer
+        {
+        }
+        /**
+         * Retrieves a Stripe payment method from a token.
+         *
+         * @param string $stripe_token The Stripe token to retrieve payment method from.
+         *
+         * @return \Stripe\PaymentMethod|null The payment method object or null if not found.
+         */
+        private function retrieve_payment_method_from_token($stripe_token): ?\Stripe\PaymentMethod
+        {
+        }
+        /**
+         * Attaches a payment method to a Stripe customer.
+         *
+         * @param string $customer_id The Stripe customer ID.
+         * @param string $payment_method_id The Stripe payment method ID.
+         *
+         * @return void
+         */
+        private function attach_payment_method_to_customer($customer_id, $payment_method_id): void
+        {
+        }
+        /**
+         * Prepares subscription items for Stripe subscription creation.
+         *
+         * @param array $cart The cart data containing items.
+         *
+         * @return array Array of subscription items formatted for Stripe API.
+         */
+        private function prepare_subscription_items($cart): array
+        {
+        }
+        /**
+         * Creates a recurring price in Stripe for additional fees.
+         *
+         * @param string $type The type of fee (e.g., 'shipping', 'tax').
+         * @param float $amount The amount for the recurring fee.
+         * @param string $interval The billing interval (e.g., 'month', 'year').
+         * @param int $interval_count The number of intervals between billings.
+         *
+         * @return \Stripe\Price|null The created price object or null on failure.
+         */
+        private function create_recurring_price($type, $amount, $interval, $interval_count): ?\Stripe\Price
+        {
+        }
+        /**
+         * Creates a Stripe price for a product variation.
+         *
+         * @param mixed $variation The product variation object.
+         * @param array $item The cart item data.
+         *
+         * @return \Stripe\Price|null The created price object or null on failure.
+         */
+        private function create_stripe_price_for_product($variation, $item): ?\Stripe\Price
+        {
+        }
+        /**
+         * Inserts a transaction record for a successful payment.
+         *
+         * @param \Stripe\PaymentIntent $intent The Stripe payment intent object.
+         * @param int $order_id The order ID.
+         * @param float $total_amount The total payment amount.
+         * @param int $customer_id The customer ID.
+         * @param array $params Additional payment parameters.
+         *
+         * @return void
+         */
+        public function insert_transaction($intent, $order_id, $total_amount, $customer_id, $params)
+        {
+        }
+        /**
+         * Determines if Stripe should be shown as a payment option for subscription carts.
+         *
+         * @param bool $supports Whether Stripe supports the current cart.
+         * @param string $payment_id The payment method ID.
+         * @param mixed $cart The cart object.
+         *
+         * @return bool True if Stripe should be shown for subscriptions, false otherwise.
+         */
+        public function show_if_subscription($supports, $payment_id, $cart): bool
+        {
+        }
+        /**
+         * Inserts a transaction record for a subscription payment.
+         *
+         * @param \Stripe\Subscription $subscription The Stripe subscription object.
+         * @param int $order_id The order ID.
+         * @param int $customer_id The customer ID.
+         *
+         * @return void
+         */
+        public function insert_subscription_transaction($subscription, $order_id, $customer_id)
+        {
+        }
+        /**
+         * Processes a refund through the Stripe payment gateway.
+         *
+         * @param int $order_id The order ID to refund.
+         * @param string $reason The reason for the refund.
+         * @param float $amount The amount to refund.
+         *
+         * @return bool True on successful refund, false otherwise.
+         */
+        public function refund($order_id, $reason, $amount)
+        {
+        }
+        /**
+         * Cancels a Stripe subscription.
+         *
+         * @param int $order_id The order ID associated with the subscription.
+         * @param string $reason The reason for cancellation.
+         *
+         * @return bool True on successful cancellation, false otherwise.
+         */
+        public function cancel_subscription($order_id, $reason = ''): bool
+        {
+        }
+        /**
+         * Creates and returns a Customer object based on the provided details.
+         *
+         * @param string $stripe_token A token generated by Stripe to associate the customer with a payment source.
+         * @param int|string $customer_id The ID of the customer in the EasyCommerce system.
+         * @param array $params Additional parameters including billing address and other metadata.
+         *
+         * @return \Stripe\Customer The created Customer object.
+         * @throws \Exception If an error occurs during the customer creation process.
+         */
+        public function create_new_customer(string $stripe_token, $customer_id, array $params): \Stripe\Customer
+        {
+        }
+        /**
+         * Creates a new Stripe customer and assigns it to the EasyCommerce customer.
+         *
+         * @param string $stripe_token The Stripe payment token.
+         * @param int $customer_id The EasyCommerce customer ID.
+         * @param array $params Additional customer parameters.
+         *
+         * @return \Stripe\Customer The created Stripe customer object.
+         * @throws \Exception
+         */
+        public function create_and_assign_customer($stripe_token, $customer_id, $params): \Stripe\Customer
+        {
+        }
+        /**
+         * Retrieves the Payment Intent ID associated with the given subscription.
+         *
+         * @param \Stripe\Subscription $subscription The subscription object from which to extract the Payment Intent ID.
+         *
+         * @return string The Payment Intent ID derived from the subscription data.
+         */
+        public function get_payment_intent_id(\Stripe\Subscription $subscription): string
         {
         }
     }
@@ -5064,6 +5748,18 @@ namespace EasyCommerce\Helpers {
          * @return mixed The value of the option if it exists, or the default value if it doesn't.
          */
         public static function get_option($menu, $submenu, $key, $default = '')
+        {
+        }
+        /**
+         * Set an option value.
+         *
+         * @param string $menu The menu slug.
+         * @param string $submenu The submenu slug.
+         * @param string $key The option key.
+         * @param mixed  $value The value to set.
+         * @return bool True if the option was updated, false otherwise.
+         */
+        public static function set_option($menu, $submenu, $key, $value)
         {
         }
         /**
@@ -5551,6 +6247,26 @@ namespace EasyCommerce\Models {
     {
         protected $role = 'manager';
         public function __construct($id = null)
+        {
+        }
+    }
+    class Notice
+    {
+        use \EasyCommerce\Traits\Hook;
+        /**
+         * Checks if the current date is within the notice display period
+         * 
+         * @return bool True if current date is within the display period, false otherwise
+         */
+        public function is_pro_notice_date_range_active()
+        {
+        }
+        /**
+         * Check if the notice has been dismissed and if it's time to show it again
+         * 
+         * @return bool True if notice should be shown, false if dismissed and not time to re-show
+         */
+        public function should_show_pro_notice()
         {
         }
     }
@@ -6513,7 +7229,7 @@ namespace EasyCommerce\Models {
         /**
          * Save variation data.
          *
-         * @return bool
+         * @return int|bool Variation ID on success, false on failure.
          */
         public function save()
         {
@@ -6638,7 +7354,7 @@ namespace EasyCommerce\Models {
         /**
          * Set tax class
          *
-         * @return integer The Tax Class ID
+         * @param int $class_id The Tax Class ID
          */
         public function set_tax_class($class_id)
         {
@@ -7595,7 +8311,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.8.3
+ * Version: 1.9
  * Requires at least: 6.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
@@ -7629,6 +8345,90 @@ namespace EasyCommerce {
     }
 }
 namespace {
+    /**
+     * Retrieves the Stripe API version being used.
+     *
+     * @return string The Stripe API version.
+     */
+    function easycommerce_stripe_get_api_version(): string
+    {
+    }
+    /**
+     * Checks if Stripe is configured in sandbox mode.
+     *
+     * @return bool True if sandbox mode is enabled, false otherwise.
+     */
+    function easycommerce_stripe_is_sandbox(): bool
+    {
+    }
+    /**
+     * Retrieves the Stripe publishable key based on the current mode (sandbox or live).
+     *
+     * @return string The publishable key for Stripe integration.
+     */
+    function easycommerce_stripe_get_publishable_key(): string
+    {
+    }
+    /**
+     * Retrieves the Stripe secret key based on the current mode (sandbox or live).
+     *
+     * @return string The secret key for Stripe API authentication.
+     */
+    function easycommerce_stripe_get_secret_key(): string
+    {
+    }
+    /**
+     * Retrieves the Stripe webhook signing secret based on the current mode (sandbox or live).
+     *
+     * @return string The webhook signing secret for verifying webhook authenticity.
+     */
+    function easycommerce_stripe_get_webhook_secret(): string
+    {
+    }
+    /**
+     * Updates the Stripe webhook signing secret in the database.
+     *
+     * @param string $signing_secret The new webhook signing secret from Stripe.
+     *
+     * @return void
+     */
+    function easycommerce_stripe_update_webhook_secret(string $signing_secret): void
+    {
+    }
+    /**
+     * Checks if Stripe payment gateway is properly configured and ready for use.
+     *
+     * @return bool True if both publishable and secret keys are configured, false otherwise.
+     */
+    function easycommerce_stripe_is_ready(): bool
+    {
+    }
+    /**
+     * Generates the webhook URL for Stripe webhook endpoints.
+     *
+     * @return string The full REST API URL for Stripe webhooks.
+     */
+    function easycommerce_stripe_get_webhook_url(): string
+    {
+    }
+    /**
+     * Validates a URL for public accessibility, HTTPS, and ensures it's not a local/test domain.
+     *
+     * @param string $url The URL to validate.
+     *
+     * @return bool True if valid, false otherwise.
+     */
+    function easycommerce_stripe_is_valid_domain_url(string $url): bool
+    {
+    }
+    /**
+     * Retrieves or creates a singleton instance of the Stripe API client.
+     *
+     * @return \Stripe\StripeClient The configured Stripe API client instance.
+     */
+    function easycommerce_stripe_get_api_client(): \Stripe\StripeClient
+    {
+    }
     function easycommerce_dev_store($path = '')
     {
     }
@@ -7697,10 +8497,10 @@ namespace {
     function easycommerce_order_statuses()
     {
     }
-    function easycommerce_product_statuses()
+    function easycommerce_get_all_payment_methods()
     {
     }
-    function get_installed_addons()
+    function easycommerce_product_statuses()
     {
     }
     function easycommerce_global_default_status()
@@ -7912,6 +8712,9 @@ namespace {
     {
     }
     function easycommerce_update_ai_credits($prompt_type, $used)
+    {
+    }
+    function easycommerce_get_conflicting_plugins()
     {
     }
 }
