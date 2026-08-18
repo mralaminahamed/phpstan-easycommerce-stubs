@@ -6223,7 +6223,7 @@ namespace EasyCommerce\Models {
         /**
          * Get total spent
          *
-         * @return int
+         * @return float
          */
         public function get_total_spent()
         {
@@ -8311,7 +8311,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.9
+ * Version: 1.10
  * Requires at least: 6.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
