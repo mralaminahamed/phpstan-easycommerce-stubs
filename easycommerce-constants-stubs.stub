@@ -12,10 +12,10 @@
  * Plugin URI: https://wordpress.org/plugins/easycommerce/
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
- * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.47
+ * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
+ * Version: 0.9.0-beta2
  * Requires at least: 6.0
- * Tested up to: 7.0
+ * Tested up to: 6.7
  * Requires PHP: 7.4
  * Text Domain: easycommerce
  * Domain Path: /languages
@@ -35,9 +35,11 @@
 namespace EasyCommerce;
 
 define('EASYCOMMERCE_FILE', __FILE__);
-define('EASYCOMMERCE_VERSION', '1.47');
+define('EASYCOMMERCE_VERSION', '0.9.0-beta2');
 define('EASYCOMMERCE_PLUGIN_DIR', plugin_dir_path(EASYCOMMERCE_FILE));
 define('EASYCOMMERCE_PLUGIN_URL', plugin_dir_url(EASYCOMMERCE_FILE));
 define('EASYCOMMERCE_ASSETS_URL', EASYCOMMERCE_PLUGIN_URL . 'assets/');
 define('EASYCOMMERCE_BUILD_URL', EASYCOMMERCE_PLUGIN_URL . 'build/');
 define('EASYCOMMERCE_SPA_URL', EASYCOMMERCE_PLUGIN_URL . 'spa/');
+define('EASYCOMMERCE_STORE', 'https://my.easycommerce.dev');
+define('EASYCOMMERCE_DOCS', 'https://easycommerce.dev/docs');
