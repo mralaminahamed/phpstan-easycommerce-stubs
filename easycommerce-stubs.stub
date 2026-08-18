@@ -558,8 +558,10 @@ namespace EasyCommerce\Models {
          * @param int       $product_id The ID of the product.
          * @param int|array $price_id The price_id or an associative array of attributes.
          * @param int       $quantity The quantity to add.
+         * @param int       $user_id The user ID.
+         * @param bool      $is_free Whether this is a free product from coupon.
          */
-        public function add($product_id, $price_id = 1, $quantity = 1, $user_id = null)
+        public function add($product_id, $price_id = 1, $quantity = 1, $user_id = null, $is_free = false)
         {
         }
         /**
@@ -610,8 +612,9 @@ namespace EasyCommerce\Models {
          *
          * @param int $product_id The ID of the product to remove.
          * @param int $price_id The price ID. Default 1.
+         * @param bool $is_free Whether this is a free product removal.
          */
-        public function remove($product_id, $price_id = 1)
+        public function remove($product_id, $price_id = 1, $is_free = false)
         {
         }
         public function add_coupon($code = null)
@@ -725,6 +728,17 @@ namespace EasyCommerce\Models {
          * @return string The cart link.
          */
         public function get_link()
+        {
+        }
+        /**
+         * Handle free products discount (BXGY functionality)
+         *
+         * @param \EasyCommerce\Models\Coupon $coupon The coupon object
+         * @param array $cart_items All cart items
+         * @param array $applicable_items Applicable item indices
+         * @return float The discount amount
+         */
+        private function handle_free_products($coupon, $cart_items, $applicable_items)
         {
         }
     }
@@ -1424,8 +1438,8 @@ namespace EasyCommerce\API {
         /**
          * Get the value of a specified option.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function get($request)
         {
@@ -1433,8 +1447,8 @@ namespace EasyCommerce\API {
         /**
          * Update the value of a specified option.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function update($request)
         {
@@ -1442,8 +1456,8 @@ namespace EasyCommerce\API {
         /**
          * Delete the specified option.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function delete($request)
         {
@@ -2097,6 +2111,28 @@ namespace EasyCommerce\API {
          * @todo optimize
          */
         public function get_variations($request)
+        {
+        }
+    }
+    class Product_Review
+    {
+        use \EasyCommerce\Traits\Rest;
+        /**
+         * Get a list of product reviews.
+         *
+         * @param \WP_REST_Request $request The request object.
+         * @return \WP_REST_Response
+         */
+        public function get_all($request)
+        {
+        }
+        /**
+         * Delete a product review.
+         *
+         * @param \WP_REST_Request $request The request object.
+         * @return \WP_REST_Response
+         */
+        public function delete($request)
         {
         }
     }
@@ -3780,6 +3816,30 @@ namespace EasyCommerce\Bootstrap {
         {
         }
         /**
+         * Updates existing database tables to match the current schema.
+         *
+         * @return void
+         */
+        protected function update_existing_tables()
+        {
+        }
+        /**
+         * Handles data migration for the coupons table during schema updates.
+         *
+         * This method migrates legacy columns ('discount_type' to 'type', 'amount' to 'offer')
+         * by adding new columns, copying data, and dropping legacy ones.
+         *
+         * @param \EasyCommerce\Models\Database $db              Database instance.
+         * @param string   $table_full_name Full table name with prefix.
+         * @param array    $columns         Current column definitions from config.
+         * @param array    $options         Current table options from config.
+         *
+         * @return void
+         */
+        public function handle_coupons_data_migration(\EasyCommerce\Models\Database $db, string $table_full_name, array $columns, array $options)
+        {
+        }
+        /**
          * Updates or adds the database version in the options table.
          *
          * @return void
@@ -4162,6 +4222,12 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         /**
+         * Register Product Review-related API endpoints
+         */
+        private function register_product_review_endpoints()
+        {
+        }
+        /**
          * Register Customer-related API endpoints
          */
         private function register_customer_endpoints()
@@ -4338,6 +4404,16 @@ namespace EasyCommerce\Controllers\Common {
          * Constructor to add all hooks.
          */
         public function __construct()
+        {
+        }
+        /**
+         * Custom capability mapping for EasyCommerce features
+         * This allows editors to access certain store features
+         */
+        public function easycommerce_map_meta_cap($caps, $cap, $user_id)
+        {
+        }
+        public function migrate_old_block_names()
         {
         }
         public function modal()
@@ -5244,8 +5320,8 @@ namespace EasyCommerce\Models {
         protected $id;
         protected $name;
         protected $code;
-        protected $discount_type = 'percentage';
-        protected $amount = 0.0;
+        protected $type = 'percentage';
+        protected $offer = 0.0;
         protected $active = 1;
         protected $exists = false;
         protected $db;
@@ -5281,10 +5357,10 @@ namespace EasyCommerce\Models {
         public function get_code()
         {
         }
-        public function get_discount_type()
+        public function get_type()
         {
         }
-        public function get_amount()
+        public function get_offer()
         {
         }
         // @todo: remove exec and use get_rows
@@ -5324,6 +5400,14 @@ namespace EasyCommerce\Models {
         {
         }
         public function is_applicable($cart = null)
+        {
+        }
+        /**
+         * Get all product IDs associated with the coupon rules.
+         *
+         * @return array Array of unique product IDs.
+         */
+        public function get_products()
         {
         }
     }
@@ -6090,6 +6174,74 @@ namespace EasyCommerce\Models {
          * Initializes the Product_Meta class with the specified table name and unique identifier key.
          */
         public function __construct()
+        {
+        }
+    }
+    /**
+     * Class Product_Review
+     * Handles product review operations using WordPress comments system.
+     *
+     * @package EasyCommerce\Models
+     */
+    class Product_Review
+    {
+        /**
+         * @var int Review ID (maps to comment ID)
+         */
+        protected $id;
+        /**
+         * @var bool Whether the review exists
+         */
+        protected $exists = false;
+        /**
+         * Constructor
+         *
+         * @param int|null $id Comment ID
+         */
+        public function __construct($id = null)
+        {
+        }
+        /**
+         * Validate if the review exists and is a product review
+         *
+         * @return bool True if valid, false otherwise
+         */
+        protected function validate()
+        {
+        }
+        /**
+         * Delete a review
+         *
+         * @return bool True on success, false on failure
+         */
+        public function delete()
+        {
+        }
+        /**
+         * List product reviews with optional filters
+         *
+         * @param array $args Arguments for filtering reviews
+         * @param int $per_page Number of reviews per page
+         * @param int $offset Offset for pagination
+         * @return array Array of review data with total count
+         */
+        public static function list($args = array())
+        {
+        }
+        /**
+         * Check if review exists
+         *
+         * @return bool
+         */
+        public function exists()
+        {
+        }
+        /**
+         * Get review ID
+         *
+         * @return int|null
+         */
+        public function get_id()
         {
         }
     }
@@ -7050,6 +7202,15 @@ namespace EasyCommerce\Models {
         public function get_regions()
         {
         }
+        /** 
+         * Check if a tax class name already exists.
+         * 
+         * @param string $name Tax class name to check. 
+         * @return bool True if the name exists, false otherwise.  
+         */
+        public function name_exists($name)
+        {
+        }
         /**
          * Create a tax class with rates.
          *
@@ -7439,7 +7600,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.6
+ * Version: 1.7
  * Requires at least: 6.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
@@ -7689,13 +7850,6 @@ namespace {
     function easycommerce_cart_placeholders($cart)
     {
     }
-    /**
-     * Custom capability mapping for EasyCommerce features
-     * This allows editors to access certain store features
-     */
-    function easycommerce_map_meta_cap($caps, $cap, $user_id, $args)
-    {
-    }
     function easycommerce_is_api_connected()
     {
     }
@@ -7751,6 +7905,15 @@ namespace {
      * }
      */
     function easycommerce_import_image($url, $post_id = 0, $desc = '')
+    {
+    }
+    function easycommerce_is_paid_addon_active()
+    {
+    }
+    function easycommerce_get_ai_credits($type = 'description')
+    {
+    }
+    function easycommerce_update_ai_credits($prompt_type, $used)
     {
     }
 }
