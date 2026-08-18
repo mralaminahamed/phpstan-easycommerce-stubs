@@ -937,9 +937,6 @@ namespace EasyCommerce\API {
         public function get_addons($request)
         {
         }
-        public function install_addon($request)
-        {
-        }
         public function get_docs($request)
         {
         }
@@ -7600,7 +7597,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.7
+ * Version: 1.8
  * Requires at least: 6.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
@@ -7848,6 +7845,9 @@ namespace {
     {
     }
     function easycommerce_cart_placeholders($cart)
+    {
+    }
+    function easycommerce_generate_random_coupon_code()
     {
     }
     function easycommerce_is_api_connected()
