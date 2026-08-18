@@ -142,7 +142,7 @@ namespace EasyCommerce\API {
         /**
          * Get a list of abandoned carts.
          *
-         * @param WP_REST_Request $request The request object.
+         * @param \WP_REST_Request $request The request object.
          */
         public function get_all($request)
         {
@@ -150,15 +150,15 @@ namespace EasyCommerce\API {
         /**
          * Remove abandoned cart.
          *
-         * @param WP_REST_Request $request The request object.
+         * @param \WP_REST_Request $request The request object.
          */
         public function remove($request)
         {
         }
         /**
          * Remind abandoned cart.
-         * 
-         * @param WP_REST_Request $request The request object.
+         *
+         * @param \WP_REST_Request $request The request object.
          */
         public function remind($request)
         {
@@ -166,7 +166,7 @@ namespace EasyCommerce\API {
         /**
          * Bulk delete abandoned carts.
          *
-         * @param WP_REST_Request $request The request object.
+         * @param \WP_REST_Request $request The request object.
          */
         public function bulk_delete($request)
         {
@@ -174,7 +174,7 @@ namespace EasyCommerce\API {
         /**
          * Bulk send reminders for abandoned carts.
          *
-         * @param WP_REST_Request $request The request object.
+         * @param \WP_REST_Request $request The request object.
          */
         public function bulk_reminder($request)
         {
@@ -182,7 +182,7 @@ namespace EasyCommerce\API {
         /**
          * Clean/Empty abandoned cart.
          *
-         * @param WP_REST_Request $request The request object.
+         * @param \WP_REST_Request $request The request object.
          */
         public function clean($request)
         {
@@ -190,7 +190,7 @@ namespace EasyCommerce\API {
         /**
          * Clean invalid abandoned cart. Means it deletes some of the entries from table which are considered as invalids.
          *
-         * @param WP_REST_Request $request The request object.
+         * @param \WP_REST_Request $request The request object.
          */
         public function clean_invalid($request)
         {
@@ -248,6 +248,48 @@ namespace EasyCommerce\API {
         {
         }
         public function manage($request)
+        {
+        }
+        /**
+         * Resolves a plugin slug to its installed file path (e.g. "fluent-crm" → "fluent-crm/fluentcrm.php").
+         *
+         * Uses WP_Plugin_Dependencies (WP 6.5+) when available, then falls back to
+         * scanning get_plugins() for a file inside the slug's directory.
+         *
+         * @param string $slug Plugin directory slug.
+         * @return string|false Relative plugin file path, or false if not installed.
+         */
+        private function find_plugin_file(string $slug)
+        {
+        }
+        /**
+         * Clears plugin caches and resets WP_Plugin_Dependencies static state.
+         *
+         * WP_Plugin_Dependencies (WP 6.5+) populates its internal maps once per request
+         * via static properties. After installing a new plugin mid-request those statics
+         * are stale, so activate_plugin() wrongly reports unmet dependencies.
+         *
+         * Resetting the statics via reflection forces the next initialize() call to
+         * re-read the live plugin list, keeping the dependency check accurate.
+         */
+        private function refresh_plugin_dependencies(): void
+        {
+        }
+        /**
+         * Installs a plugin from a zip URL using the WordPress upgrader.
+         *
+         * Supports optional auth headers (e.g. for private EasyCommerce store downloads)
+         * by temporarily filtering wp_remote_get arguments.
+         *
+         * Returns the installed plugin's relative file path (e.g. "fluent-crm/fluentcrm.php")
+         * via Plugin_Upgrader::plugin_info() — the WP-native way to get the actual installed path
+         * regardless of what directory name the zip was extracted to.
+         *
+         * @param string $zip_url  Direct URL to the plugin zip file.
+         * @param array  $headers  Optional HTTP headers to attach to the download request.
+         * @return string|\WP_Error  Installed plugin file path on success, WP_Error on failure.
+         */
+        private function install_plugin(string $zip_url, array $headers = [])
         {
         }
         /**
@@ -679,6 +721,32 @@ namespace EasyCommerce\API {
         {
         }
         /**
+         * Get single abandoned cart details including items.
+         *
+         * @param WP_REST_Request $request The request object.
+         */
+        public function get_abandoned_cart_details($request)
+        {
+        }
+        /**
+         * Resolve a thumbnail value to a full image URL.
+         *
+         * @param int|string|array $thumbnail  Attachment ID, full URL, relative path, or thumbnail array with id/url keys.
+         * @param int|null         $product_id Optional product ID to fall back to if thumbnail is empty.
+         * @return string Full image URL, or empty string if not resolvable.
+         */
+        private function get_image_url($thumbnail, $product_id = null)
+        {
+        }
+        /**
+         * Send a custom reminder email for an abandoned cart.
+         *
+         * @param WP_REST_Request $request The request object.
+         */
+        public function send_abandoned_cart_reminder($request)
+        {
+        }
+        /**
          * Low stock
          *
          * @param WP_REST_Request $request
@@ -694,6 +762,14 @@ namespace EasyCommerce\API {
          * @return WP_REST_Response
          */
         public function get_top_sellers($request)
+        {
+        }
+        /**
+         * Recent activities
+         *
+         * @param WP_REST_Request $request The request object.
+         */
+        public function get_activities($request)
         {
         }
         /**
@@ -1113,6 +1189,10 @@ namespace EasyCommerce\API {
     }
     class Order extends \EasyCommerce\Abstracts\API
     {
+        use \EasyCommerce\Traits\Cache;
+        private function delete_order_cache()
+        {
+        }
         /**
          * Create a new order.
          *
@@ -1380,8 +1460,8 @@ namespace EasyCommerce\API {
         /**
          * List refunds.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function list($request)
         {
@@ -1389,8 +1469,8 @@ namespace EasyCommerce\API {
         /**
          * Get a refund.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function get($request)
         {
@@ -1398,8 +1478,8 @@ namespace EasyCommerce\API {
         /**
          * Create a new refund.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function create($request)
         {
@@ -1407,8 +1487,8 @@ namespace EasyCommerce\API {
         /**
          * Update a refund.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response|\WP_Error
          */
         public function update($request)
         {
@@ -1416,8 +1496,8 @@ namespace EasyCommerce\API {
         /**
          * Delete a refund.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function delete($request)
         {
@@ -1425,13 +1505,1341 @@ namespace EasyCommerce\API {
         /**
          * Bulk delete refunds.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
          */
         public function bulk_delete($request)
         {
         }
     }
+}
+namespace EasyCommerce\API\Reports {
+    /**
+     * Reports Base API
+     */
+    class Reports extends \EasyCommerce\Abstracts\API
+    {
+        use \EasyCommerce\Traits\Cache;
+        const CACHE_DURATION_HOUR = 3600;
+        const CACHE_DURATION_DAY = 86400;
+        /**
+         * Returns a date key based on the given timestamp and range.
+         *
+         * @param int    $timestamp The timestamp to get the date key for.
+         * @param string $range The range to get the date key for.
+         *
+         * @return string The date key.
+         */
+        public function get_date_key($timestamp, $range)
+        {
+        }
+        public function get_date_range($range = 'all')
+        {
+        }
+        /**
+         * Resolve from/to date strings for a range.
+         *
+         * @param string $range
+         * @return array { from: string, to: string }
+         */
+        public function resolve_dates($range)
+        {
+        }
+        /**
+         * Build the ordered list of date labels for a given range.
+         *
+         * @param string $range
+         * @return string[]
+         */
+        public function get_time_series_labels($range)
+        {
+        }
+        /**
+         * Ordinal suffix for a day number — 1 → "1st", 22 → "22nd", etc.
+         *
+         * @param int $day
+         * @return string
+         */
+        private function ordinal($day)
+        {
+        }
+        /**
+         * Total orders
+         *
+         * @param string $range The date range to query.
+         * @param array  $args  Optional args passed to Order::list() (e.g. status, product_id, customer_id, meta_query, etc.)
+         *
+         * @return array
+         */
+        public function total_orders($range = 'this-month', $args = array())
+        {
+        }
+        /**
+         * Total sales
+         *
+         * @param string $range The date range to query.
+         * @param array  $args  Optional args passed to Order::list() (e.g. status, product_id, customer_id, meta_query, etc.)
+         *
+         * @return float
+         */
+        public function total_sales($range = 'this-month', $args = array())
+        {
+        }
+        /**
+         * Get total refund amount from wp_ec_refunds table.
+         *
+         * Only counts approved/processed refunds within the date range.
+         *
+         * @param string $range The date range to query.
+         * @return float
+         */
+        public function total_refunds($range = 'this-month')
+        {
+        }
+        /**
+         * Get refund count and total amount from wp_ec_refunds table.
+         *
+         * Used when both the count and the monetary amount are needed.
+         *
+         * @param string   $range      The date range to query.
+         * @param int|null $product_id Optional product ID to scope to a single product.
+         * @param bool     $all_time   Whether to skip date filtering entirely.
+         * @return array { refund_count: int, refund_amount: float }
+         */
+        protected function get_refund_stats($range, $product_id = null, $all_time = false)
+        {
+        }
+        /**
+         * Get comparison range for previous period
+         *
+         * @param string $range The current range.
+         * @return string The comparison range.
+         */
+        protected function get_comparison_range($range)
+        {
+        }
+        /**
+         * Calculate stats for a given range
+         *
+         * @param string $range The date range.
+         * @return array
+         */
+        protected function calculate_stats($range)
+        {
+        }
+        /**
+         * Calculate comparison percentage and type
+         *
+         * @param float $current Current period value.
+         * @param float $previous Previous period value.
+         * @return array
+         */
+        protected function calculate_comparison($current, $previous)
+        {
+        }
+        /**
+         * Get comparison with vibe for positive metrics (increment is good)
+         *
+         * @param float $current Current period value.
+         * @param float $previous Previous period value.
+         * @return array
+         */
+        public function get_comparison_with_vibe($current, $previous)
+        {
+        }
+        /**
+         * Get comparison with vibe for negative metrics (decrement is good)
+         *
+         * @param float $current Current period value.
+         * @param float $previous Previous period value.
+         * @return array
+         */
+        public function get_refund_comparison($current, $previous)
+        {
+        }
+        /**
+         * Generate a cache key for a report endpoint.
+         *
+         * @param string $method The method name.
+         * @param array  $params Request parameters.
+         * @return string The cache key.
+         */
+        protected function generate_cache_key($method, $params = array())
+        {
+        }
+        /**
+         * Try to get cached response or execute callback and cache the result.
+         *
+         * @param string   $cache_key   The cache key.
+         * @param callable $callback    The callback to execute if cache miss.
+         * @param int      $expiration  Cache duration in seconds.
+         * @return mixed
+         */
+        protected function get_cached_or_set($cache_key, $callback, $expiration = self::CACHE_DURATION_HOUR)
+        {
+        }
+        /**
+         * Get request params for caching.
+         *
+         * @param \WP_REST_Request $request The request object.
+         * @return array
+         */
+        protected function get_cache_params($request)
+        {
+        }
+        /**
+         * Get all cache keys used for reports.
+         *
+         * @return array List of cache key prefixes (with 'report_' prefix).
+         */
+        public static function get_cache_keys()
+        {
+        }
+        /**
+         * Get all possible date ranges.
+         *
+         * @return array List of all range values.
+         */
+        public static function get_all_ranges()
+        {
+        }
+        /**
+         * Get all possible comparison ranges.
+         *
+         * @return array List of all comparison range values.
+         */
+        public static function get_all_comparison_ranges()
+        {
+        }
+        /**
+         * Get all possible variations of a cache key.
+         *
+         * Generates: base, range-only, comparison-only, range+comparison combos.
+         *
+         * @param string $key_prefix The base key prefix (e.g., 'report_overview_stats').
+         * @return array List of all possible key variations.
+         */
+        private function get_cache_key_variations($key_prefix)
+        {
+        }
+        /**
+         * Delete all cache variations for a specific product.
+         *
+         * @param int $product_id The product ID.
+         */
+        public static function delete_single_product_cache($product_id)
+        {
+        }
+        /**
+         * Get all possible cache key variations for a single product.
+         *
+         * Generates: base, range-only, comparison-only, range+comparison combos, all with product_id.
+         *
+         * @param string $key_prefix The base key prefix (e.g., 'products_single_info').
+         * @param int    $product_id  The product ID.
+         * @return array List of all possible key variations with product_id.
+         */
+        private function get_single_product_cache_key_variations($key_prefix, $product_id)
+        {
+        }
+        /**
+         * Delete all single product report caches for all products.
+         *
+         * Gets all product IDs from database and deletes their cache variations.
+         */
+        public static function delete_all_single_product_caches()
+        {
+        }
+        /**
+         * Get all product IDs from database.
+         *
+         * @return array List of product IDs.
+         */
+        private function get_all_product_ids()
+        {
+        }
+        /**
+         * Delete all variations of a cache key.
+         *
+         * @param string $key_prefix The base key prefix (without 'report_' prefix).
+         */
+        private function delete_cache_variations($key_prefix)
+        {
+        }
+        /**
+         * Get product-related cache keys.
+         *
+         * @return array List of product cache key prefixes (without 'report_' prefix).
+         */
+        public static function get_product_cache_keys()
+        {
+        }
+        /**
+         * Get single product-related cache keys.
+         *
+         * @return array List of single product cache key prefixes (with product_id).
+         */
+        public static function get_single_product_cache_keys()
+        {
+        }
+        /**
+         * Get order/customer-related cache keys.
+         *
+         * @return array List of order/customer cache key prefixes (without 'report_' prefix).
+         */
+        public static function get_order_cache_keys()
+        {
+        }
+        /**
+         * Delete all report caches.
+         *
+         * @param string $key_prefix Optional key prefix to delete specific caches.
+         */
+        public static function delete_all_cache($key_prefix = '')
+        {
+        }
+        /**
+         * Delete product-related report caches.
+         */
+        public static function delete_product_cache()
+        {
+        }
+        /**
+         * Delete order/customer-related report caches.
+         */
+        public static function delete_order_cache()
+        {
+        }
+        /**
+         * Get orders data by location (country/state) with aggregation.
+         *
+         * @param string     $date_from  Start date.
+         * @param string     $date_to    End date.
+         * @param string     $aggregate 'count' for order count, 'customers' for unique customer count, 'sum' for revenue.
+         * @param int        $product_id Optional product ID to filter orders.
+         * @param array|null $statuses   Optional list of order statuses to include. Null means no status filter.
+         * @return array
+         */
+        public function get_orders_by_location($date_from, $date_to, $aggregate = 'count', $product_id = null, $statuses = null)
+        {
+        }
+        /**
+         * Get chart labels for the given range (alias of get_time_series_labels).
+         *
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        protected function get_chart_labels($range)
+        {
+        }
+        /**
+         * Format series data as x/y array
+         *
+         * @param array $values The data values.
+         * @param array $labels The labels.
+         * @return array
+         */
+        public function format_chart_data($values, $labels)
+        {
+        }
+        /**
+         * Format chart data with labels (int variant).
+         *
+         * @param array $values The data values.
+         * @param array $labels The labels.
+         * @return array
+         */
+        protected function format_chart_data_with_labels($values, $labels)
+        {
+        }
+        /**
+         * Map raw date-grouped query results to a flat array aligned with labels.
+         *
+         * Replaces the repeated pattern of: fill keys with 0, loop results,
+         * call get_date_key(), assign to matching bucket, return array_values().
+         *
+         * @param array  $rows    Query results with 'order_date' and a value column.
+         * @param string $range   The date range (used for label formatting).
+         * @param string $value_col Column name for the value (default 'order_count').
+         * @param string $cast    Type to cast values to: 'int' or 'float'.
+         * @return array Flat array of cast values aligned with labels.
+         */
+        protected function map_to_date_series($rows, $range, $value_col = 'order_count', $cast = 'int')
+        {
+        }
+        /**
+         * Get 24-hour labels for heatmap charts.
+         *
+         * @return string[]
+         */
+        protected function get_hour_labels()
+        {
+        }
+        /**
+         * Get order status color map.
+         *
+         * @return array
+         */
+        protected function get_status_colors()
+        {
+        }
+        /**
+         * Get order status label map.
+         *
+         * @return array
+         */
+        protected function get_status_labels()
+        {
+        }
+        /**
+         * Build a date-to-hours map for heatmap queries.
+         *
+         * @param string $date_from Start date (Y-m-d).
+         * @param string $date_to   End date (Y-m-d).
+         * @return array<string, int[]>
+         */
+        protected function build_heatmap_date_map($date_from, $date_to)
+        {
+        }
+        /**
+         * Build heatmap data array from a date-hours map and hour labels.
+         *
+         * @param array   $map          Date-to-hours map from build_heatmap_date_map().
+         * @param string[] $hour_labels  24-hour labels from get_hour_labels().
+         * @return array
+         */
+        protected function build_heatmap_data($map, $hour_labels)
+        {
+        }
+        /**
+         * Build a status/fulfillment breakdown array.
+         *
+         * @param string $range      The date range.
+         * @param array  $statuses   Status key => label pairs.
+         * @param array  $colors     Status key => color pairs.
+         * @param array  $labels     Status key => translated label pairs.
+         * @param string $filter_key The query filter key ('status' or 'fulfill_status').
+         * @return array
+         */
+        protected function build_status_breakdown($range, $statuses, $colors, $labels, $filter_key = 'status')
+        {
+        }
+    }
+    /**
+     * Reports Customer API
+     */
+    class Customers extends \EasyCommerce\API\Reports\Reports
+    {
+        /**
+         * Customer stats - total, new, repeat, orders per customer, LTV, AOV
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function stats($request)
+        {
+        }
+        /**
+         * Calculate customer stats for a given range
+         *
+         * @param string $range The date range.
+         * @return array
+         */
+        protected function calculate_customer_stats($range)
+        {
+        }
+        /**
+         * Customers over time — New and Repeat customer datasets (current + comparison).
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function over_time($request)
+        {
+        }
+        /**
+         * Customer heatmap - customers over time by hour and day
+         *
+         * Response:
+         * {
+         *   "range": "last-30",
+         *   "from": "2026-03-01",
+         *   "to": "2026-03-30",
+         *   "data": [
+         *     { "x": "12am", "y": "2026-03-01", "v": 0 },
+         *     { "x": "1am",  "y": "2026-03-01", "v": 0 },
+         *     ...
+         *     { "x": "11pm", "y": "2026-03-01", "v": 3 },
+         *     { "x": "0am",  "y": "2026-03-02", "v": 0 },
+         *     ...
+         *   ]
+         * }
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function heatmap($request)
+        {
+        }
+        /**
+         * Build new customers series for a given range
+         *
+         * @param string   $range
+         * @param string[] $categories
+         * @return int[]
+         */
+        private function build_new_customers_series($range, $categories)
+        {
+        }
+        /**
+         * Build repeat customers series for a given range
+         *
+         * @param string   $range
+         * @param string[] $categories
+         * @return int[]
+         */
+        private function build_repeat_customers_series($range, $categories)
+        {
+        }
+        /**
+         * Customers by country/state location
+         *
+         * Response (world):
+         * {
+         *   "range": "last-30",
+         *   "type": "world",
+         *   "data": { "US": 100, "GB": 60 },
+         *   "country_names": { "US": "United States", ... },
+         *   "country_numeric": { "US": "840", ... }
+         * }
+         *
+         * Response (states):
+         * {
+         *   "range": "last-30",
+         *   "type": "states",
+         *   "country": "US",
+         *   "country_iso3": "USA",
+         *   "data": { "CA": 40, "NY": 30 },
+         *   "states_data": [...]
+         * }
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function customer_by_location($request)
+        {
+        }
+        /**
+         * Top customers
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function top_customers($request)
+        {
+        }
+        /**
+         * Get top customers by revenue for a date range.
+         *
+         * @param string $date_from Start date.
+         * @param string $date_to   End date.
+         * @param int    $limit     Number of customers to return.
+         * @return array
+         */
+        private function get_top_customers_by_revenue($date_from, $date_to, $limit = 50)
+        {
+        }
+    }
+    /**
+     * Reports Legacy API - maintains backward compatibility
+     */
+    class LegacyReports extends \EasyCommerce\API\Reports\Reports
+    {
+        /**
+         * Get the full report data with charts
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function reports($request)
+        {
+        }
+    }
+    /**
+     * Reports Orders API
+     */
+    class Orders extends \EasyCommerce\API\Reports\Reports
+    {
+        /**
+         * Reports orders overview stats
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function stats($request)
+        {
+        }
+        /**
+         * Orders over time — Order Count and Order Amount datasets (current + comparison).
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function over_time($request)
+        {
+        }
+        /**
+         * Build a flat order-count array (int per category bucket).
+         *
+         * @param string   $range
+         * @param string[] $categories
+         * @return int[]
+         */
+        private function build_count_series($range, $categories)
+        {
+        }
+        /**
+         * Build a flat order-amount array (float per category bucket).
+         *
+         * @param string   $range
+         * @param string[] $categories
+         * @return float[]
+         */
+        private function build_amount_series($range, $categories)
+        {
+        }
+        /**
+         * Customer order frequency report.
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function order_frequency($request)
+        {
+        }
+        /**
+         * Orders by status
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function status_breakdown($request)
+        {
+        }
+        /**
+         * Get fulfillment status color map.
+         *
+         * @return array
+         */
+        private function get_fulfill_colors()
+        {
+        }
+        /**
+         * Orders by fulfillment status
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function fulfillment_breakdown($request)
+        {
+        }
+        /**
+         * Orders heatmap — hourly order count per date.
+         * Each date has 24 hourly buckets (0–23).
+         *
+         * Response:
+         * {
+         *   "range": "last-30",
+         *   "from": "2026-03-01",
+         *   "to": "2026-03-30",
+         *   "data": [
+         *     { "x": "0am",  "y": "2026-03-01", "v": 5 },
+         *     { "x": "1am",  "y": "2026-03-01", "v": 0 },
+         *     ...
+         *     { "x": "11pm", "y": "2026-03-01", "v": 3 },
+         *     { "x": "0am",  "y": "2026-03-02", "v": 0 },
+         *     ...
+         *   ]
+         * }
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function heatmap($request)
+        {
+        }
+        /**
+         * Orders by country
+         *
+         * Response (world):
+         * {
+         *   "range": "last-30",
+         *   "type": "world",
+         *   "data": { "US": 100, "GB": 60 },
+         *   "country_names": { "US": "United States", ... },
+         *   "country_numeric": { "US": "840", ... }
+         * }
+         *
+         * Response (states):
+         * {
+         *   "range": "last-30",
+         *   "type": "states",
+         *   "country": "US",
+         *   "country_iso3": "USA",
+         *   "data": { "CA": 40, "NY": 30 },
+         *   "states_data": [...]
+         * }
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function order_by_location($request)
+        {
+        }
+    }
+    /**
+     * Reports Overview API
+     */
+    class Overview extends \EasyCommerce\API\Reports\Reports
+    {
+        /**
+         * Reports stats overview
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function stats($request)
+        {
+        }
+        /**
+         * Get total products sold
+         *
+         * @param string $range The date range.
+         * @return int
+         */
+        private function get_products_sold($range)
+        {
+        }
+        /**
+         * Get unique customers count
+         *
+         * @param string $range The date range.
+         * @return int
+         */
+        private function get_unique_customers($range)
+        {
+        }
+        /**
+         * Get Sales vs Refund vs Revenue data with chart visualization
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function sales_refund_revenue($request)
+        {
+        }
+        /**
+         * Count items by date from an array of records with 'created_at'.
+         *
+         * @param array  $items Array of records with 'created_at' key.
+         * @param string $range The date range.
+         * @return array Chart-formatted data array.
+         */
+        private function count_items_by_date($items, $range)
+        {
+        }
+        /**
+         * Sum values by date from an array of records with 'created_at'.
+         *
+         * @param array  $items Array of records with 'created_at' and 'total'.
+         * @param string $range The date range.
+         * @return array Chart-formatted data array.
+         */
+        private function sum_items_by_date($items, $range)
+        {
+        }
+        /**
+         * Get sales amount by date
+         *
+         * @param string $range The date range.
+         * @param string $status Optional status filter.
+         *
+         * @return array
+         */
+        private function get_sales_by_date($range)
+        {
+        }
+        /**
+         * Get refunds by date from the refunds table
+         *
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function get_refunds_by_date($range)
+        {
+        }
+        /**
+         * Sum refunds by date and format for chart
+         *
+         * @param array  $refunds_by_date Refunds keyed by date.
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function sum_refunds_by_date($refunds_by_date, $range)
+        {
+        }
+        /**
+         * Get net revenue by date
+         *
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function get_revenue_by_date($range)
+        {
+        }
+        /**
+         * Get orders vs refund count comparison for chart visualization
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function order_vs_refund($request)
+        {
+        }
+        /**
+         * Get order count by date
+         *
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function get_order_count_by_date($range)
+        {
+        }
+        /**
+         * Get refund count by date
+         *
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function get_refund_count_by_date($range)
+        {
+        }
+        /**
+         * Get order status breakdown
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function order_status($request)
+        {
+        }
+        /**
+         * Get order type breakdown (new vs returning orders)
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function order_type($request)
+        {
+        }
+        /**
+         * Get order count by type (new vs returning) for chart data
+         *
+         * @param string $range The date range.
+         * @param string $type The order type ('new' or 'returning').
+         *
+         * @return array
+         */
+        private function get_order_type_by_date($range, $type = 'new')
+        {
+        }
+        /**
+         * Get top selling products
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function top_selling($request)
+        {
+        }
+        /**
+         * Get top selling products
+         *
+         * @param string $range The date range.
+         * @param int    $limit Number of products to return.
+         *
+         * @return array
+         */
+        private function get_top_selling_products($range, $limit = 5)
+        {
+        }
+        /**
+         * Get product catalog stats
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function catalog_stats($request)
+        {
+        }
+        /**
+         * Get catalog stats data
+         *
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function get_catalog_stats_data($range)
+        {
+        }
+        /**
+         * Get new vs returning customers chart data
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function customer_type($request)
+        {
+        }
+        /**
+         * Get customer type data by date
+         *
+         * @param string $range The date range.
+         * @param string $type The customer type ('new' or 'returning').
+         *
+         * @return array
+         */
+        private function get_customer_type_by_date($range, $type = 'new')
+        {
+        }
+        /**
+         * Get customer overview stats and top customers
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function customer_overview($request)
+        {
+        }
+        /**
+         * Get customer metrics for a date range
+         *
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function get_customer_metrics($range)
+        {
+        }
+        /**
+         * Get top customers by spending
+         *
+         * @param string $range The date range.
+         * @param int    $limit Number of customers to return.
+         *
+         * @return array
+         */
+        private function get_top_customers($range, $limit = 10)
+        {
+        }
+    }
+    /**
+     * Reports Products API
+     */
+    class Products extends \EasyCommerce\API\Reports\Reports
+    {
+        /**
+         * Products stats overview
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function stats($request)
+        {
+        }
+        /**
+         * Get date range with time for queries.
+         *
+         * @param string $range The date range.
+         * @return array { from: string, to: string, from_raw: string, to_raw: string, is_all_time: bool }
+         */
+        private function get_query_date_range($range)
+        {
+        }
+        /**
+         * Calculate product stats for a given range
+         *
+         * @param string $range The date range.
+         * @return array
+         */
+        private function calculate_product_stats($range)
+        {
+        }
+        /**
+         * Get product sales stats (gross sales and refunds)
+         *
+         * @param string $range The date range.
+         * @return array
+         */
+        private function get_product_sales_stats($range)
+        {
+        }
+        /**
+         * Get average rating across products
+         *
+         * @param string $range The date range.
+         * @return float
+         */
+        private function get_average_rating($range)
+        {
+        }
+        /**
+         * Get total count of ratings across products
+         *
+         * @param string $range The date range.
+         * @return int
+         */
+        private function get_total_ratings_count($range)
+        {
+        }
+        /**
+         * Get products sold over time with comparison
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function products_sold_over_time($request)
+        {
+        }
+        /**
+         * Get products sold count by date
+         *
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function get_products_sold_by_date($range)
+        {
+        }
+        /**
+         * Get most sold products with detailed metrics
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function most_sold($request)
+        {
+        }
+        /**
+         * Get least sold products with detailed metrics
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function least_sold($request)
+        {
+        }
+        /**
+         * Get most sold products data
+         *
+         * @param string $range The date range.
+         * @param int    $limit Number of products to return.
+         *
+         * @return array
+         */
+        private function get_most_sold_products($range, $limit = 10)
+        {
+        }
+        /**
+         * Get least sold products data
+         *
+         * @param string $range The date range.
+         * @param int    $limit Number of products to return.
+         *
+         * @return array
+         */
+        private function get_least_sold_products($range, $limit = 10)
+        {
+        }
+        /**
+         * Get sold products data with detailed metrics.
+         *
+         * @param string $range The date range.
+         * @param int    $limit Number of products to return.
+         * @param string $order Sort direction: 'ASC' or 'DESC'.
+         *
+         * @return array
+         */
+        private function get_sold_products($range, $limit = 10, $order = 'DESC')
+        {
+        }
+        /**
+         * Get total stock for a product
+         *
+         * @param int    $product_id The product ID.
+         * @param string $variations_table The variations table name.
+         *
+         * @return int
+         */
+        private function get_product_stock($product_id, $variations_table)
+        {
+        }
+        /**
+         * Get product name by ID
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function get_product_name($request)
+        {
+        }
+        /**
+         * Get single product stats
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function single_product_stats($request)
+        {
+        }
+        /**
+         * Get single product stats data
+         *
+         * @param int    $product_id The product ID.
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function get_single_product_stats_data($product_id, $range)
+        {
+        }
+        /**
+         * Get product rating
+         *
+         * @param int $product_id The product ID.
+         *
+         * @return float
+         */
+        private function get_product_rating($product_id)
+        {
+        }
+        /**
+         * Get single product basic info with variations
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function single_product_info($request)
+        {
+        }
+        /**
+         * Get single product info data
+         *
+         * @param \EasyCommerce\Models\Product $product The product object.
+         * @param string  $range   The date range.
+         *
+         * @return array
+         */
+        private function get_single_product_info_data($product, $range = 'last-30')
+        {
+        }
+        /**
+         * Get product variations with sales and rating stats
+         *
+         * @param int    $product_id The product ID.
+         * @param string $range      The date range.
+         *
+         * @return array
+         */
+        private function get_product_variations_with_stats($product_id, $range = 'last-30')
+        {
+        }
+        /**
+         * Get single product sales over time with new vs repeat customers
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function single_product_sales_over_time($request)
+        {
+        }
+        /**
+         * Get new customers who bought a specific product by date
+         *
+         * @param int    $product_id The product ID.
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function get_single_product_new_customers_by_date($product_id, $range)
+        {
+        }
+        /**
+         * Get repeat customers who bought a specific product by date
+         *
+         * @param int    $product_id The product ID.
+         * @param string $range The date range.
+         *
+         * @return array
+         */
+        private function get_single_product_repeat_customers_by_date($product_id, $range)
+        {
+        }
+        /**
+         * Get single product sales by location (country/state).
+         *
+         * Response (world):
+         * {
+         *   "range": "last-30",
+         *   "type": "world",
+         *   "data": { "US": 120.00, "GB": 60.00 },
+         *   "country_names": { "US": "United States", ... },
+         *   "country_numeric": { "US": "840", ... }
+         * }
+         *
+         * Response (states):
+         * {
+         *   "range": "last-30",
+         *   "type": "states",
+         *   "country": "US",
+         *   "country_iso3": "USA",
+         *   "data": { "CA": 80.00, "NY": 40.00 },
+         *   "states_data": [...]
+         * }
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function product_sale_by_location($request)
+        {
+        }
+        /**
+         * Aggregate product-level revenue by country/state.
+         *
+         * Unlike get_orders_by_location() which sums o.total (the full order
+         * amount), this method uses oi.price * oi.quantity so that only the
+         * specific product's contribution is counted per location.
+         *
+         * @param int    $product_id Product ID to scope.
+         * @param string $date_from  Start datetime (Y-m-d).
+         * @param string $date_to    End datetime (Y-m-d H:i:s, with 23:59:59 appended by caller).
+         * @return array Same shape as get_orders_by_location() with type=world|states.
+         */
+        private function get_product_sales_by_location(int $product_id, string $date_from, string $date_to): array
+        {
+        }
+        /**
+         * Get single product reviews with stats
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function single_product_reviews($request)
+        {
+        }
+        /**
+         * Get single product reviews data
+         *
+         * @param int    $product_id The product ID.
+         * @param int    $limit      Number of reviews to return.
+         * @param string $range      The date range.
+         *
+         * @return array
+         */
+        private function get_single_product_reviews_data($product_id, $limit = 6, $range = 'last-30')
+        {
+        }
+        /**
+         * Get product review count
+         *
+         * @param int   $product_id The product ID.
+         * @param array $date_query Optional WP_Comment_Query date_query array.
+         *
+         * @return int
+         */
+        private function get_product_review_count($product_id, $date_query = array())
+        {
+        }
+        /**
+         * Get product rating counts by star
+         *
+         * @param int   $product_id The product ID.
+         * @param array $date_query Optional WP_Comment_Query date_query array.
+         *
+         * @return array
+         */
+        private function get_product_rating_counts($product_id, $date_query = array())
+        {
+        }
+        /**
+         * Get product reviews
+         *
+         * @param int   $product_id The product ID.
+         * @param int   $limit      Number of reviews to return.
+         * @param array $date_query Optional WP_Comment_Query date_query array.
+         *
+         * @return array
+         */
+        private function get_product_reviews($product_id, $limit = 6, $date_query = array())
+        {
+        }
+    }
+    /**
+     * Reports Revenue API
+     */
+    class Revenue extends \EasyCommerce\API\Reports\Reports
+    {
+        /**
+         * Revenue stats - gross revenue, averages by customer, order, and product
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function stats($request)
+        {
+        }
+        /**
+         * Revenue over time — Revenue Amount datasets (current + comparison)
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function over_time($request)
+        {
+        }
+        /**
+         * Build a revenue amount array keyed by label.
+         *
+         * @param string   $range
+         * @param string[] $labels
+         * @return float[]
+         */
+        private function build_revenue_series($range, $labels)
+        {
+        }
+        /**
+         * Calculate revenue stats for a given range
+         *
+         * Mirrors calculate_stats() in Reports: only completed, processing,
+         * partially_refunded, and refunded orders count toward gross revenue,
+         * and refunds come from the Refund table (approved refunds only).
+         *
+         * @param string $range The date range.
+         * @return array
+         */
+        protected function calculate_revenue_stats($range)
+        {
+        }
+        /**
+         * Top customers by revenue
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function top_customers($request)
+        {
+        }
+        /**
+         * Revenue by country/state location
+         *
+         * Response (world):
+         * {
+         *   "range": "last-30",
+         *   "type": "world",
+         *   "data": { "US": 1000.00, "GB": 600.00 },
+         *   "country_names": { "US": "United States", ... },
+         *   "country_numeric": { "US": "840", ... }
+         * }
+         *
+         * Response (states):
+         * {
+         *   "range": "last-30",
+         *   "type": "states",
+         *   "country": "US",
+         *   "country_iso3": "USA",
+         *   "data": { "CA": 400.00, "NY": 300.00 },
+         *   "states_data": [...]
+         * }
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function revenue_by_location($request)
+        {
+        }
+    }
+}
+namespace EasyCommerce\API {
     class Shipping_Plan extends \EasyCommerce\Abstracts\API
     {
         /**
@@ -3500,6 +4908,12 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         /**
+         * Register Reports-related API endpoints
+         */
+        private function register_reports_endpoints()
+        {
+        }
+        /**
          * Register Option-related API endpoints
          */
         private function register_option_endpoints()
@@ -3724,6 +5138,9 @@ namespace EasyCommerce\Controllers\Common {
          * Constructor to add all hooks.
          */
         public function __construct()
+        {
+        }
+        public function invalidate_cache()
         {
         }
         /**
@@ -4119,7 +5536,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
          *
          * @param \WP_REST_Request $request The incoming REST request to validate.
          *
-         * @return \Stripe\Event|\WP_Error
+         * @return \EasyCommerce\ThirdParty\Packages\Stripe\Event|\WP_Error
          */
         public function validate_request(\WP_REST_Request $request)
         {
@@ -4137,7 +5554,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
         /**
          * Handle successful payment intent
          *
-         * @param \Stripe\Event $event The event object.
+         * @param \EasyCommerce\ThirdParty\Packages\Stripe\Event $event The event object.
          *
          * @return void
          */
@@ -4147,7 +5564,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
         /**
          * Handle failed payment intent
          *
-         * @param \Stripe\Event $event The event object.
+         * @param \EasyCommerce\ThirdParty\Packages\Stripe\Event $event The event object.
          *
          * @return void
          */
@@ -4251,7 +5668,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
     class Webhook
     {
         protected $api_client;
-        protected $events = array(\Stripe\Event::PAYMENT_INTENT_SUCCEEDED, \Stripe\Event::PAYMENT_INTENT_REQUIRES_ACTION, \Stripe\Event::PAYMENT_INTENT_AMOUNT_CAPTURABLE_UPDATED, \Stripe\Event::PAYMENT_INTENT_PAYMENT_FAILED, \Stripe\Event::SETUP_INTENT_SUCCEEDED, \Stripe\Event::SETUP_INTENT_SETUP_FAILED, \Stripe\Event::CHARGE_SUCCEEDED, \Stripe\Event::CHARGE_CAPTURED, \Stripe\Event::CHARGE_FAILED, \Stripe\Event::CHARGE_DISPUTE_CREATED, \Stripe\Event::CHARGE_DISPUTE_CLOSED, \Stripe\Event::BALANCE_AVAILABLE, \Stripe\Event::REVIEW_OPENED, \Stripe\Event::REVIEW_CLOSED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_CREATED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_UPDATED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_DELETED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_PAUSED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_RESUMED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_TRIAL_WILL_END, \Stripe\Event::INVOICE_PAYMENT_SUCCEEDED, \Stripe\Event::INVOICE_PAYMENT_FAILED, \Stripe\Event::INVOICE_PAYMENT_ACTION_REQUIRED, \Stripe\Event::INVOICE_PAID, \Stripe\Event::REFUND_CREATED, \Stripe\Event::ACCOUNT_UPDATED);
+        protected $events = array(\EasyCommerce\ThirdParty\Packages\Stripe\Event::PAYMENT_INTENT_SUCCEEDED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::PAYMENT_INTENT_REQUIRES_ACTION, \EasyCommerce\ThirdParty\Packages\Stripe\Event::PAYMENT_INTENT_AMOUNT_CAPTURABLE_UPDATED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::PAYMENT_INTENT_PAYMENT_FAILED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::SETUP_INTENT_SUCCEEDED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::SETUP_INTENT_SETUP_FAILED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CHARGE_SUCCEEDED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CHARGE_CAPTURED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CHARGE_FAILED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CHARGE_DISPUTE_CREATED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CHARGE_DISPUTE_CLOSED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::BALANCE_AVAILABLE, \EasyCommerce\ThirdParty\Packages\Stripe\Event::REVIEW_OPENED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::REVIEW_CLOSED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_CREATED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_UPDATED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_DELETED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_PAUSED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_RESUMED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_TRIAL_WILL_END, \EasyCommerce\ThirdParty\Packages\Stripe\Event::INVOICE_PAYMENT_SUCCEEDED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::INVOICE_PAYMENT_FAILED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::INVOICE_PAYMENT_ACTION_REQUIRED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::INVOICE_PAID, \EasyCommerce\ThirdParty\Packages\Stripe\Event::REFUND_CREATED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::ACCOUNT_UPDATED);
         public function __construct()
         {
         }
@@ -4269,7 +5686,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
          * @param string $webhook_url The webhook URL to match for deletion.
          *
          * @return void
-         * @throws \Stripe\Exception\ApiErrorException If an error occurs during deletion.
+         * @throws \EasyCommerce\ThirdParty\Packages\Stripe\Exception\ApiErrorException If an error occurs during deletion.
          */
         protected function delete_existing_endpoint(string $webhook_url): void
         {
@@ -4280,7 +5697,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
          * @param string $webhook_url The URL for the new webhook endpoint.
          *
          * @return void
-         * @throws \Stripe\Exception\ApiErrorException If an error occurs during creation.
+         * @throws \EasyCommerce\ThirdParty\Packages\Stripe\Exception\ApiErrorException If an error occurs during creation.
          */
         protected function create_new_endpoint(string $webhook_url): void
         {
@@ -4429,7 +5846,7 @@ namespace EasyCommerce\Helpers {
         /**
          * Gets the recipient(s) of the email.
          *
-         * @return string A comma-separated string of recipients.
+         * @return string A comma-separated string of valid recipients.
          */
         public function get_recipient()
         {
@@ -5687,7 +7104,7 @@ namespace EasyCommerce\Models {
          *
          * @return int
          */
-        public function get_order_count()
+        public function get_order_count($range = '')
         {
         }
         /**
@@ -6083,6 +7500,19 @@ namespace EasyCommerce\Models {
          * @return array List of logs with total count.
          */
         public static function list($args = array(), $per_page = 10, $offset = 0, $sort = 'desc')
+        {
+        }
+        /**
+         * Get all logs based on filters like object, action, user ID, date range, pagination.
+         * This method handles exclude_objects filtering using custom SQL.
+         *
+         * @param array $args Filters for querying logs.
+         * @param int   $per_page Number of records per page.
+         * @param int   $offset Offset for pagination.
+         * @param string $sort Sort order (asc/desc).
+         * @return array List of logs with total count.
+         */
+        public static function list_with_exclude($args = array(), $per_page = 10, $offset = 0, $sort = 'desc')
         {
         }
         /**
@@ -9109,7 +10539,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Digital Physical & Sell Products
- * Version: 1.29
+ * Version: 1.30
  * Requires at least: 6.0
  * Tested up to: 6.9
  * Requires PHP: 7.4
@@ -9222,7 +10652,7 @@ namespace {
     /**
      * Retrieves or creates a singleton instance of the Stripe API client.
      *
-     * @return \Stripe\StripeClient|null The configured Stripe API client instance or null if API key is empty.
+     * @return \EasyCommerce\ThirdParty\Packages\Stripe\StripeClient|null The configured Stripe API client instance or null if API key is empty.
      */
     function easycommerce_stripe_get_api_client()
     {
