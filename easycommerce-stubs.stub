@@ -3966,6 +3966,21 @@ namespace EasyCommerce\Controllers\Front {
         public function show_shop_products($settings, $products)
         {
         }
+        public function show_billing()
+        {
+        }
+        public function show_shipping($cart_obj)
+        {
+        }
+        public function show_items($cart)
+        {
+        }
+        public function show_summary($cart, $cart_obj)
+        {
+        }
+        public function show_payment_methods($cart_obj)
+        {
+        }
     }
 }
 namespace EasyCommerce\Helpers {
@@ -6467,7 +6482,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.0-beta5
+ * Version: 0.9.0-beta6
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 7.4
