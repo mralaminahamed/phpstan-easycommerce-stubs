@@ -3479,6 +3479,14 @@ namespace EasyCommerce\Controllers\Admin {
         public function add_page_labels($post_states, $post)
         {
         }
+        /**
+         * Force using block editor even if the Classic Editor plugin is activated
+         * 
+         * @since 0.9.18-beta
+         */
+        public function force_block_editor($use_block_editor, $post)
+        {
+        }
     }
 }
 namespace EasyCommerce\Traits {
@@ -6582,7 +6590,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.17-beta
+ * Version: 0.9.17.1-beta
  * Requires at least: 6.0
  * Tested up to: 6.8.1
  * Requires PHP: 7.4
