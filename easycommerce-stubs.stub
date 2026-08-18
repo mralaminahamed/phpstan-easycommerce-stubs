@@ -6,6 +6,78 @@
  */
 
 namespace EasyCommerce\Traits {
+    /**
+     * Trait Rest
+     *
+     * This trait provides methods to register REST API routes and handle JSON responses in the WordPress plugin.
+     *
+     * @package EasyCommerce
+     */
+    trait Rest
+    {
+        // Namespace for the REST API routes specific to this plugin.
+        public $namespace = 'easycommerce/v1';
+        /**
+         * Registers a new REST API route.
+         *
+         * @param string $path The route path.
+         * @param array  $args The route arguments.
+         */
+        public function register_route($path, $args)
+        {
+        }
+        /**
+         * Sends a JSON response success message.
+         *
+         * @param mixed $data The data to encode as JSON and send.
+         * @param int   $status_code HTTP status code to send with the response. Default is 200.
+         */
+        public function response_success($data = null, $status_code = 200)
+        {
+        }
+        /**
+         * Sends a JSON response error message.
+         *
+         * @param mixed $data The data to encode as JSON and send.
+         * @param int   $status_code HTTP status code to send with the response. Default is 400.
+         */
+        public function response_error($data = null, $status_code = 400)
+        {
+        }
+        /**
+         * Sends a JSON response with arbitrary data.
+         *
+         * @param mixed $data The data to encode as JSON and send.
+         * @param int   $status_code HTTP status code to send with the response. Default is 200.
+         */
+        public function response($data, $status_code = 200)
+        {
+        }
+    }
+}
+namespace EasyCommerce\API {
+    class Abandoned_Cart
+    {
+        use \EasyCommerce\Traits\Rest;
+        /**
+         * Get a list of abandoned carts.
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function get_all($request)
+        {
+        }
+        /**
+         * Remove abandoned cart.
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function remove_abandoned($request)
+        {
+        }
+    }
+}
+namespace EasyCommerce\Traits {
     trait Cleaner
     {
         /**
@@ -65,7 +137,7 @@ namespace EasyCommerce\Models {
          * @param string $slug
          * @return bool
          */
-        public function add($name, $slug = null)
+        public function add($name, $type = 'text', $slug = null)
         {
         }
         /**
@@ -118,56 +190,6 @@ namespace EasyCommerce\Models {
         }
     }
 }
-namespace EasyCommerce\Traits {
-    /**
-     * Trait Rest
-     *
-     * This trait provides methods to register REST API routes and handle JSON responses in the WordPress plugin.
-     *
-     * @package EasyCommerce
-     */
-    trait Rest
-    {
-        // Namespace for the REST API routes specific to this plugin.
-        public $namespace = 'easycommerce/v1';
-        /**
-         * Registers a new REST API route.
-         *
-         * @param string $path The route path.
-         * @param array  $args The route arguments.
-         */
-        public function register_route($path, $args)
-        {
-        }
-        /**
-         * Sends a JSON response success message.
-         *
-         * @param mixed $data The data to encode as JSON and send.
-         * @param int   $status_code HTTP status code to send with the response. Default is 200.
-         */
-        public function response_success($data = null, $status_code = 200)
-        {
-        }
-        /**
-         * Sends a JSON response error message.
-         *
-         * @param mixed $data The data to encode as JSON and send.
-         * @param int   $status_code HTTP status code to send with the response. Default is 400.
-         */
-        public function response_error($data = null, $status_code = 400)
-        {
-        }
-        /**
-         * Sends a JSON response with arbitrary data.
-         *
-         * @param mixed $data The data to encode as JSON and send.
-         * @param int   $status_code HTTP status code to send with the response. Default is 200.
-         */
-        public function response($data, $status_code = 200)
-        {
-        }
-    }
-}
 namespace EasyCommerce\API {
     /**
      * Class Attribute
@@ -190,7 +212,7 @@ namespace EasyCommerce\API {
          *
          * @param \WP_REST_Request $request The request object.
          */
-        public function add_items($request)
+        public function add_item($request)
         {
         }
         /**
@@ -199,6 +221,30 @@ namespace EasyCommerce\API {
          * @param \WP_REST_Request $request The request object.
          */
         public function get_values($request)
+        {
+        }
+        /**
+         * Get a specific attribute.
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function get_attribute($request)
+        {
+        }
+        /**
+         * 	Delete an attribute.
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function delete_attribute($request)
+        {
+        }
+        /**
+         * Update an attribute.
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function update_attribute($request)
         {
         }
     }
@@ -306,6 +352,14 @@ namespace EasyCommerce\Models {
          * @return mixed The data from the cart.
          */
         public function get_data($column)
+        {
+        }
+        /**
+         * If it's from a logged in user/customer
+         * 
+         * @return \EasyCommerce\Models\Customer object | false
+         */
+        public function get_customer()
         {
         }
         /**
@@ -624,27 +678,11 @@ namespace EasyCommerce\API {
         {
         }
         /**
-         * List abandoned carts.
-         *
-         * @param WP_REST_Request $request The request object.
-         */
-        public function list_abandoned($request)
-        {
-        }
-        /**
          * Remind abandoned cart.
          *
          * @param WP_REST_Request $request The request object.
          */
         public function remind_abandoned($request)
-        {
-        }
-        /**
-         * Remove abandoned cart.
-         *
-         * @param WP_REST_Request $request The request object.
-         */
-        public function remove_abandoned($request)
         {
         }
     }
@@ -864,24 +902,15 @@ namespace EasyCommerce\API {
         public function get_order_statuses($request)
         {
         }
+        public function get_setup_status($request)
+        {
+        }
         /**
          * Sales
          *
          * @param \WP_REST_Request $request The request object.
          */
         public function get_sales($request)
-        {
-        }
-        /**
-         * Pending carts
-         *
-         * @param \WP_REST_Request $request
-         *
-         * @return \WP_REST_Response
-         *
-         * @see \EasyCommerce\API\Cart::list_abandoned()
-         */
-        public function get_pending_carts($request)
         {
         }
         /**
@@ -982,6 +1011,9 @@ namespace EasyCommerce\API {
          * @return array
          */
         public function get_customers($range = 'this-month')
+        {
+        }
+        public function get_abandoned_carts($range = 'this-month')
         {
         }
     }
@@ -1392,9 +1424,9 @@ namespace EasyCommerce\Models {
         {
         }
         /**
-         * Static method to list orders with optional filters such as per_page, page, status, and customer_id.
+         * Static method to list orders with optional filters such as per_page, page, status, and search_query.
          *
-         * @param array $args Arguments that may include 'per_page', 'page', 'status', and 'customer_id'.
+         * @param array $args Arguments that may include 'per_page', 'page', 'status', and 'search_query'.
          * @return array List of orders and pagination info.
          */
         public static function list($args = array(), $formatted = false)
@@ -1434,6 +1466,24 @@ namespace EasyCommerce\API {
         {
         }
         /**
+         * Update the status of multiple orders.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function bulk_update_statuses($request)
+        {
+        }
+        /**
+         * Update the fulfill status of multiple orders.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function bulk_update_fulfill_statuses($request)
+        {
+        }
+        /**
          * Delete an order.
          *
          * @param WP_REST_Request $request
@@ -1467,6 +1517,9 @@ namespace EasyCommerce\API {
          * @return WP_REST_Response
          */
         public function get_all($request)
+        {
+        }
+        public function bulk_delete($request)
         {
         }
     }
@@ -1685,6 +1738,19 @@ namespace EasyCommerce\API {
         {
         }
         /**
+         * Bulk delete products.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function bulk_delete($request)
+        {
+        }
+        // bulk status update
+        public function bulk_update_status($request)
+        {
+        }
+        /**
          * Get review to a product.
          *
          * @param WP_REST_Request $request
@@ -1877,12 +1943,25 @@ namespace EasyCommerce\Models {
          * Adds a new term to the specified taxonomy
          *
          * @param string   $name The name of the term
+         * @param string   $slug The slug of the term (optional)
          * @param string   $taxonomy The taxonomy name
          * @param int|null $parent The parent term ID (optional)
          *
-         * @return array|WP_Error
+         * @return array
          */
-        public function add_term($name, $taxonomy, $parent = null)
+        public function add_term($name, $taxonomy, $slug = null, $parent = null)
+        {
+        }
+        /**
+         * Updates a term in the specified taxonomy
+         * @param int      $term_id The ID of the term to update
+         * @param string   $name The new name of the term ( optional )
+         * @param string   $taxonomy The taxonomy name
+         * @param int|null $parent The new parent term ID (optional)
+         *
+         * @return array
+         */
+        public function update_term($term_id, $name, $taxonomy, $slug = null, $parent = null)
         {
         }
         public function delete_term($term_id, $taxonomy)
@@ -1901,6 +1980,9 @@ namespace EasyCommerce\API {
         public function add_category($request)
         {
         }
+        public function update_category($request)
+        {
+        }
         public function delete_category($request)
         {
         }
@@ -1910,7 +1992,22 @@ namespace EasyCommerce\API {
         public function add_brand($request)
         {
         }
+        public function update_brand($request)
+        {
+        }
         public function delete_brand($request)
+        {
+        }
+        public function get_tags($request)
+        {
+        }
+        public function add_tag($request)
+        {
+        }
+        public function update_tag($request)
+        {
+        }
+        public function delete_tag($request)
         {
         }
     }
@@ -3688,15 +3785,6 @@ namespace EasyCommerce\Controllers\Admin {
         public function hide_menu()
         {
         }
-        public function callback_store()
-        {
-        }
-        public function callback_easycommerce()
-        {
-        }
-        public function callback_wizard()
-        {
-        }
         public function render_settings()
         {
         }
@@ -3883,6 +3971,9 @@ namespace EasyCommerce\Controllers\Common {
          * Register Unified Tax API endpoints.
          */
         private function register_tax_endpoints()
+        {
+        }
+        private function register_abandoned_cart_endpoints()
         {
         }
     }
@@ -4796,7 +4887,7 @@ namespace EasyCommerce\Models {
          * @param string $slug
          * @return bool
          */
-        public function add($attribute_id, $name, $slug = null)
+        public function add($attribute_id, $name, $value = null, $slug = null)
         {
         }
         /**
@@ -4847,7 +4938,7 @@ namespace EasyCommerce\Models {
          * @param array $data
          * @return bool
          */
-        public function update($id, $data)
+        public function update($attribute_value_id, $data)
         {
         }
         /**
@@ -4925,12 +5016,6 @@ namespace EasyCommerce\Models {
         public function create($args)
         {
         }
-        /**
-         * Update the coupon and its associated rules.
-         *
-         * @param array $data Updated coupon data, including optional 'rules'.
-         * @return bool True on success, false on failure.
-         */
         public function update($data)
         {
         }
@@ -5311,6 +5396,22 @@ namespace EasyCommerce\Models {
          * @param string $description
          */
         public function set_description($description)
+        {
+        }
+        /**
+         * Get product summary.
+         *
+         * @return string
+         */
+        public function get_summary()
+        {
+        }
+        /**
+         * Set product summary.
+         *
+         * @param string $summary
+         */
+        public function set_summary($summary)
         {
         }
         /**
@@ -6082,7 +6183,7 @@ namespace EasyCommerce\Models {
          *
          * @todo improve as it's not considering product_id
          */
-        public function get_by_attributes($attributes = array())
+        public function get_by_attributes($attributes = array(), $show_all = false)
         {
         }
         /**
@@ -6748,7 +6849,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 0.9.26-beta
+ * Version: 1.0.0
  * Requires at least: 6.0
  * Tested up to: 6.8.1
  * Requires PHP: 7.4
@@ -6823,6 +6924,9 @@ namespace {
     function easycommerce_order_statuses()
     {
     }
+    function easycommerce_product_statuses()
+    {
+    }
     function easycommerce_global_default_status()
     {
     }
@@ -6894,6 +6998,9 @@ namespace {
     {
     }
     function easycommerce_currency_format_options()
+    {
+    }
+    function easycommerce_menus()
     {
     }
     /**
