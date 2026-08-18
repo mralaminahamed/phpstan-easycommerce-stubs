@@ -5660,24 +5660,6 @@ namespace EasyCommerce\Controllers\Common {
     }
 }
 namespace EasyCommerce\Controllers\Front {
-    /**
-     * A test class to debug things
-     *
-     * @todo remove before release
-     */
-    class Debug
-    {
-        use \EasyCommerce\Traits\Hook;
-        /**
-         * Constructor to add all hooks.
-         */
-        public function __construct()
-        {
-        }
-        public function test()
-        {
-        }
-    }
     class Init
     {
         use \EasyCommerce\Traits\Hook;
@@ -11121,7 +11103,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.42.2
+ * Version: 1.43
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.4
