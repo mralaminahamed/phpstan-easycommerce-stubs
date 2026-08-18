@@ -74,21 +74,16 @@ namespace EasyCommerce\API {
         {
         }
         /**
-         * Ask the AI chatbot about EasyCommerce
+         * Stop the request with a 403 if the given Generative AI feature is disabled.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
-         */
-        public function ask_chatbot($request)
-        {
-        }
-        /**
-         * Generate report
+         * response_error() sends the JSON response and exits, so when the feature is
+         * off this never returns and the calling endpoint short-circuits.
          *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
+         * @param string $feature Feature key (see easycommerce_is_ai_feature_enabled()).
+         * @param string $label   Human-readable feature name for the error message.
+         * @return void
          */
-        public function analyze_report($request)
+        private function require_feature($feature, $label)
         {
         }
         /**
@@ -287,9 +282,12 @@ namespace EasyCommerce\API {
          *
          * @param string $zip_url  Direct URL to the plugin zip file.
          * @param array  $headers  Optional HTTP headers to attach to the download request.
+         * @param string $slug     Optional canonical plugin slug. When set, the extracted
+         *                         source directory is renamed to this slug before install so
+         *                         the addon lands in {slug}/ instead of a temp/obfuscated dir.
          * @return string|\WP_Error  Installed plugin file path on success, WP_Error on failure.
          */
-        private function install_plugin(string $zip_url, array $headers = [])
+        private function install_plugin(string $zip_url, array $headers = [], string $slug = '')
         {
         }
         /**
@@ -299,6 +297,305 @@ namespace EasyCommerce\API {
         {
         }
     }
+}
+namespace EasyCommerce\Traits {
+    trait Auth
+    {
+        /**
+         * Check if sandbox/test mode is enabled.
+         *
+         * @return bool True if sandbox mode is enabled, false otherwise.
+         */
+        protected function is_sandbox_mode()
+        {
+        }
+        /**
+         * Verifies if it's a human user, not bots
+         *
+         * @param WP_REST_Request $request The request object.
+         * @return bool True for regular cases, false otherwise.
+         *
+         * @todo Introduce real check
+         */
+        public function is_user($request)
+        {
+        }
+        /**
+         * Check if the current user is a guest (not logged in).
+         *
+         * @param WP_REST_Request $request The request object.
+         * @return bool True if sandbox mode is disabled and the user is not logged in, false otherwise.
+         */
+        public function is_guest($request)
+        {
+        }
+        /**
+         * Check if the current user is a logged in user.
+         *
+         * @param WP_REST_Request $request The request object.
+         * @return bool True if sandbox mode is enabled or the user is logged in, false otherwise.
+         */
+        public function is_member($request)
+        {
+        }
+        /**
+         * Check if the current user is a customer.
+         *
+         * @param WP_REST_Request $request The request object.
+         * @return bool True if sandbox mode is enabled or the user is logged in, false otherwise.
+         */
+        public function is_customer($request)
+        {
+        }
+        /**
+         * Check if the current user is an editor.
+         *
+         * @param WP_REST_Request $request The request object.
+         * @return bool True if sandbox mode is enabled or the user has editor capabilities, false otherwise.
+         */
+        public function is_editor($request)
+        {
+        }
+        /**
+         * Check if the current user is an administrator.
+         *
+         * @param WP_REST_Request $request The request object.
+         * @return bool True if sandbox mode is enabled or the user has administrator capabilities, false otherwise.
+         */
+        public function is_admin($request)
+        {
+        }
+        /**
+         * Check if the current user is an administrator or an manager.
+         *
+         * @param WP_REST_Request $request The request object.
+         * @return bool True if sandbox mode is enabled or the user has administrator capabilities or user has manager capabilities, false otherwise.
+         */
+        public function is_manager($request)
+        {
+        }
+    }
+}
+namespace EasyCommerce\Abstracts {
+    abstract class Agent
+    {
+        use \EasyCommerce\Traits\Rest;
+        use \EasyCommerce\Traits\Auth;
+        protected $ai;
+        protected $db;
+        /**
+         * Usage-log type for this agent. Subclasses override (copilot, shopping_agent).
+         *
+         * @var string
+         */
+        protected $log_type = 'agent';
+        public function __construct()
+        {
+        }
+        public function handle($request)
+        {
+        }
+        protected function build_response(array $result, string $session_id): array
+        {
+        }
+        public function run_message(string $session_id, string $message): array
+        {
+        }
+        protected function run_agent(array &$history): string
+        {
+        }
+        /**
+         * The most recent user message in a history array.
+         *
+         * @param array $history
+         * @return string
+         */
+        protected function last_user_message(array $history): string
+        {
+        }
+        protected function load_session(string $session_id): array
+        {
+        }
+        protected function save_session(string $session_id, array $history): void
+        {
+        }
+        abstract protected function dispatch_tool(string $name, array $args): array;
+        abstract protected function get_tools(): array;
+        abstract protected function get_system_prompt(): string;
+    }
+}
+namespace EasyCommerce\API\Agent {
+    class Assistant extends \EasyCommerce\Abstracts\Agent
+    {
+        protected $log_type = 'shopping_agent';
+        private $order_url = null;
+        // -------------------------------------------------------------------------
+        // Overrides
+        // -------------------------------------------------------------------------
+        public function run_message(string $session_id, string $message): array
+        {
+        }
+        protected function build_response(array $result, string $session_id): array
+        {
+        }
+        // -------------------------------------------------------------------------
+        // Tool dispatch
+        // -------------------------------------------------------------------------
+        protected function dispatch_tool(string $name, array $args): array
+        {
+        }
+        // -------------------------------------------------------------------------
+        // Tool implementations
+        // -------------------------------------------------------------------------
+        private function tool_search_products(array $args): array
+        {
+        }
+        private function tool_get_product_details(array $args): array
+        {
+        }
+        private function tool_check_stock(array $args): array
+        {
+        }
+        private function tool_calculate_shipping(array $args): array
+        {
+        }
+        private function tool_apply_coupon(array $args): array
+        {
+        }
+        private function tool_create_order(array $args): array
+        {
+        }
+        private function tool_generate_payment_link(array $args): array
+        {
+        }
+        private function tool_get_order_status(array $args): array
+        {
+        }
+        private function tool_update_order_contact(array $args): array
+        {
+        }
+        private function tool_update_order_address(array $args): array
+        {
+        }
+        private function tool_add_order_note(array $args): array
+        {
+        }
+        private function tool_get_order_breakdown(array $args): array
+        {
+        }
+        private function tool_get_order_items(array $args): array
+        {
+        }
+        private function tool_estimate_order_total(array $args): array
+        {
+        }
+        private function tool_apply_coupon_to_order(array $args): array
+        {
+        }
+        private function tool_cancel_order(array $args): array
+        {
+        }
+        private function tool_resend_order_email(array $args): array
+        {
+        }
+        private function tool_track_order(array $args): array
+        {
+        }
+        private function tool_get_refund_info(array $args): array
+        {
+        }
+        private function tool_get_customer_profile(array $args): array
+        {
+        }
+        private function tool_list_products_by_category(array $args): array
+        {
+        }
+        private function tool_get_product_reviews(array $args): array
+        {
+        }
+        private function tool_validate_coupon(array $args): array
+        {
+        }
+        // -------------------------------------------------------------------------
+        // Tool definitions & system prompt
+        // -------------------------------------------------------------------------
+        protected function get_tools(): array
+        {
+        }
+        protected function get_system_prompt(): string
+        {
+        }
+    }
+    class Copilot extends \EasyCommerce\Abstracts\Agent
+    {
+        protected $log_type = 'copilot';
+        private $reports;
+        public function __construct()
+        {
+        }
+        // -------------------------------------------------------------------------
+        // Tool dispatch
+        // -------------------------------------------------------------------------
+        protected function dispatch_tool(string $name, array $args): array
+        {
+        }
+        // -------------------------------------------------------------------------
+        // Tool implementations
+        // -------------------------------------------------------------------------
+        private function tool_create_product(array $args): array
+        {
+        }
+        private function tool_update_product(array $args): array
+        {
+        }
+        private function tool_get_store_overview(array $args): array
+        {
+        }
+        private function tool_get_top_products(array $args): array
+        {
+        }
+        private function tool_list_orders(array $args): array
+        {
+        }
+        private function tool_search_order(array $args): array
+        {
+        }
+        private function tool_list_products(array $args): array
+        {
+        }
+        private function tool_search_customer(array $args): array
+        {
+        }
+        private function tool_update_order_status(array $args): array
+        {
+        }
+        private function tool_delete_product(array $args): array
+        {
+        }
+        private function tool_update_product_stock(array $args): array
+        {
+        }
+        private function tool_create_coupon(array $args): array
+        {
+        }
+        private function tool_issue_refund(array $args): array
+        {
+        }
+        private function tool_run_analytics_query(array $args): array
+        {
+        }
+        // -------------------------------------------------------------------------
+        // Tool definitions & system prompt
+        // -------------------------------------------------------------------------
+        protected function get_tools(): array
+        {
+        }
+        protected function get_system_prompt(): string
+        {
+        }
+    }
+}
+namespace EasyCommerce\API {
     class Attribute extends \EasyCommerce\Abstracts\API
     {
         /**
@@ -385,6 +682,15 @@ namespace EasyCommerce\API {
          * @param WP_REST_Request $request The request object.
          */
         public function remove_item($request)
+        {
+        }
+        /**
+         * Lock the cart for payment processing.
+         * Once locked, add/update/remove operations are rejected until the payment completes or fails.
+         *
+         * @param WP_REST_Request $request The request object.
+         */
+        public function lock($request)
         {
         }
         /**
@@ -1091,6 +1397,25 @@ namespace EasyCommerce\API {
         {
         }
         /**
+         * Download a remote image and attach it to the media library.
+         *
+         * Uses an unsafe wp_remote_get() instead of media_sideload_image()/download_url()
+         * on purpose: those route through wp_safe_remote_get(), which calls
+         * wp_http_validate_url(). On WP 7.0 that helper does an IPv4-only gethostbyname()
+         * and returns false when it can't resolve an A record — so CDN hosts that only
+         * resolve over IPv6 (e.g. Cloudflare-fronted cdn.easycommerce.dev) get rejected
+         * pre-flight with "A valid URL was not provided." on live/IPv6 servers, while
+         * working on IPv4 localhost. The URLs handled here are plugin-controlled sample
+         * assets and operator-supplied CSV image URLs, not arbitrary user input, so
+         * bypassing the safe-URL SSRF guard is acceptable.
+         *
+         * @param string $url Remote image URL.
+         * @return int|\WP_Error Attachment ID on success, WP_Error on failure.
+         */
+        private function sideload_remote_image($url)
+        {
+        }
+        /**
          * Build explicit variation from CSV data with proper attribute structure
          */
         private function build_variation($variation_data, $key, $product_attributes)
@@ -1260,6 +1585,12 @@ namespace EasyCommerce\API {
         {
         }
         public function bulk_delete($request)
+        {
+        }
+        /**
+         * Process payment for an existing pending order (agent-created orders).
+         */
+        public function pay($request)
         {
         }
     }
@@ -3954,6 +4285,9 @@ namespace EasyCommerce\Abstracts {
         public function is_available()
         {
         }
+        public function is_offline(): bool
+        {
+        }
         public function refund($order_id, $reason, $amount)
         {
         }
@@ -4635,6 +4969,20 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         /**
+         * Handles the AI activation magic link from the token email.
+         *
+         * The link lands in wp-admin carrying the one-time token + email. It does not
+         * authenticate anyone - it only works inside an already-authenticated admin
+         * session (capability check below), then verifies the token against the
+         * EasyCommerce store and persists the connection exactly like the manual
+         * copy-paste flow ( {@see \EasyCommerce\API\Connectivity::verify_token} ).
+         *
+         * @return void
+         */
+        public function connect_via_magic_link()
+        {
+        }
+        /**
          * Adds custom body class to the admin area.
          *
          * @param string $classes Existing body classes.
@@ -4704,6 +5052,12 @@ namespace EasyCommerce\Controllers\Admin {
          * Add migration popup for installing 'Migration Addon'
          */
         public function add_migration_popup()
+        {
+        }
+        /**
+         * Load HelpWP chat widget on all EasyCommerce admin pages.
+         */
+        public function add_ai_assistant()
         {
         }
         /*
@@ -4789,84 +5143,6 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         public function survey_popup()
-        {
-        }
-    }
-}
-namespace EasyCommerce\Traits {
-    trait Auth
-    {
-        /**
-         * Check if sandbox/test mode is enabled.
-         *
-         * @return bool True if sandbox mode is enabled, false otherwise.
-         */
-        protected function is_sandbox_mode()
-        {
-        }
-        /**
-         * Verifies if it's a human user, not bots
-         *
-         * @param WP_REST_Request $request The request object.
-         * @return bool True for regular cases, false otherwise.
-         *
-         * @todo Introduce real check
-         */
-        public function is_user($request)
-        {
-        }
-        /**
-         * Check if the current user is a guest (not logged in).
-         *
-         * @param WP_REST_Request $request The request object.
-         * @return bool True if sandbox mode is disabled and the user is not logged in, false otherwise.
-         */
-        public function is_guest($request)
-        {
-        }
-        /**
-         * Check if the current user is a logged in user.
-         *
-         * @param WP_REST_Request $request The request object.
-         * @return bool True if sandbox mode is enabled or the user is logged in, false otherwise.
-         */
-        public function is_member($request)
-        {
-        }
-        /**
-         * Check if the current user is a customer.
-         *
-         * @param WP_REST_Request $request The request object.
-         * @return bool True if sandbox mode is enabled or the user is logged in, false otherwise.
-         */
-        public function is_customer($request)
-        {
-        }
-        /**
-         * Check if the current user is an editor.
-         *
-         * @param WP_REST_Request $request The request object.
-         * @return bool True if sandbox mode is enabled or the user has editor capabilities, false otherwise.
-         */
-        public function is_editor($request)
-        {
-        }
-        /**
-         * Check if the current user is an administrator.
-         *
-         * @param WP_REST_Request $request The request object.
-         * @return bool True if sandbox mode is enabled or the user has administrator capabilities, false otherwise.
-         */
-        public function is_admin($request)
-        {
-        }
-        /**
-         * Check if the current user is an administrator or an manager.
-         *
-         * @param WP_REST_Request $request The request object.
-         * @return bool True if sandbox mode is enabled or the user has administrator capabilities or user has manager capabilities, false otherwise.
-         */
-        public function is_manager($request)
         {
         }
     }
@@ -5010,6 +5286,18 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         /**
+         * Register AI Assistant endpoint (customer-facing).
+         */
+        private function register_agent_assistant_endpoints()
+        {
+        }
+        /**
+         * Register AI Copilot endpoint (admin only).
+         */
+        private function register_agent_copilot_endpoints()
+        {
+        }
+        /**
          * Register Email Placeholder-related API endpoints
          */
         private function register_email_placeholder_endpoints()
@@ -5060,6 +5348,27 @@ namespace EasyCommerce\Controllers\Common {
          * Enqueue block editor only assets.
          */
         public function enqueue_block_editor_assets()
+        {
+        }
+        /**
+         * Whether the current public request needs the shared EasyCommerce frontend
+         * bundle (Tailwind + plugin common CSS/JS).
+         *
+         * Loading the bundle site-wide injects Tailwind's preflight reset onto every
+         * page, including the theme's own (non-EasyCommerce) pages. This limits it to
+         * pages that actually render EasyCommerce content:
+         *   - the product CPT (single + archive),
+         *   - any singular page/post containing an EasyCommerce block or shortcode,
+         *   - any page when the AI shopping agent chatbot is enabled (shown site-wide).
+         *
+         * Block themes can place EasyCommerce blocks inside templates/template parts
+         * (not the post content), which this cannot detect - the
+         * `easycommerce_load_storefront_assets` filter is the escape hatch for that.
+         *
+         * @param \WP_Post|null $post The queried post, if any.
+         * @return bool
+         */
+        private function is_storefront_context($post)
         {
         }
         public function add_assets()
@@ -5229,6 +5538,18 @@ namespace EasyCommerce\Controllers\Common {
         public function add_store_mode_admin_bar($wp_admin_bar)
         {
         }
+        /**
+         * Show an "AI Credits: used/limit" badge at the top-right of the admin bar,
+         * left of the Howdy menu, linking to the AI usage screen.
+         *
+         * Reads the locally cached credit state only (no hub call on page load); the
+         * numbers refresh on AI usage and when the usage screen is opened.
+         *
+         * @param \WP_Admin_Bar $wp_admin_bar
+         */
+        public function add_ai_credits_admin_bar($wp_admin_bar)
+        {
+        }
         public function output_admin_bar_css()
         {
         }
@@ -5386,6 +5707,9 @@ namespace EasyCommerce\Controllers\Front {
         public function dashboard($atts)
         {
         }
+        public function payment()
+        {
+        }
     }
     class Template
     {
@@ -5496,7 +5820,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
         /**
          * Prepare metadata for Stripe.
          *
-         * @param array $cart Cart data.
+         * @param array  $cart Cart data.
          * @param string $customer_email Customer email.
          *
          * @return array Metadata array.
@@ -5536,7 +5860,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
          *
          * @param \WP_REST_Request $request The incoming REST request to validate.
          *
-         * @return \EasyCommerce\ThirdParty\Packages\Stripe\Event|\WP_Error
+         * @return \Stripe\Event|\WP_Error
          */
         public function validate_request(\WP_REST_Request $request)
         {
@@ -5554,7 +5878,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
         /**
          * Handle successful payment intent
          *
-         * @param \EasyCommerce\ThirdParty\Packages\Stripe\Event $event The event object.
+         * @param \Stripe\Event $event The event object.
          *
          * @return void
          */
@@ -5564,7 +5888,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
         /**
          * Handle failed payment intent
          *
-         * @param \EasyCommerce\ThirdParty\Packages\Stripe\Event $event The event object.
+         * @param \Stripe\Event $event The event object.
          *
          * @return void
          */
@@ -5579,6 +5903,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
         protected $api_client;
         protected array $payment_method_configs = array();
         protected string $cache_key = 'easycommerce_stripe_payment_methods_cache';
+        protected string $pmc_id_cache_key = 'easycommerce_stripe_default_pmc_id';
         public function __construct()
         {
         }
@@ -5591,35 +5916,32 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
         {
         }
         /**
+         * Find the account's default payment method configuration.
+         *
+         * Stripe uses this configuration for any PaymentIntent that does not name a
+         * specific one, so it is the single source of truth for what shows at
+         * checkout. Per Stripe's API, the account default is uniquely identified by
+         * `parent === null` (a top-level config, not a child) AND `is_default === true`.
+         * Stripe guarantees exactly one such configuration per account/mode.
+         *
+         * `name` is a user-editable label and is deliberately NOT matched on — a
+         * renamed default, or an unrelated config coincidentally named "Default",
+         * must not change the result.
+         *
+         * The list is auto-paginated, so the default is found even when the account
+         * has more configurations than fit in a single API page.
+         *
+         * @return \Stripe\PaymentMethodConfiguration|null The account default, or null if none/error.
+         */
+        private function get_account_default_pmc()
+        {
+        }
+        /**
          * Fetch payment methods directly from Stripe API
          *
          * @return array Array of payment method data
          */
         private function fetch_payment_methods_from_api(): array
-        {
-        }
-        /**
-         * Retrieves available payment method configurations from Stripe.
-         *
-         * @return array Array of available payment method configurations.
-         */
-        public function get_payment_method_config_data(): array
-        {
-        }
-        /**
-         * Gets payment method configuration options for the settings select field.
-         *
-         * @return array Array of payment method configuration options with labels.
-         */
-        public function get_payment_method_configs(): array
-        {
-        }
-        /**
-         * Gets payment method options from Stripe's default configuration.
-         *
-         * @return array Array of payment method options with labels.
-         */
-        public function get_payment_methods(): array
         {
         }
         /**
@@ -5631,11 +5953,15 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
         {
         }
         /**
-         * Gets payment methods that require domain verification.
+         * Get the id of the default Stripe payment method configuration in use.
          *
-         * @return array Array of payment method types that need domain verification.
+         * Returns the cached id, syncing from the Stripe API if not yet cached.
+         * Used to deep-link the admin settings to the exact configuration that
+         * supplies the checkout payment methods.
+         *
+         * @return string The default PMC id (pmc_...), or empty string if unavailable.
          */
-        public function get_payment_methods_requiring_domain_verification(): array
+        public function get_default_pmc_id(): string
         {
         }
         /**
@@ -5668,7 +5994,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
     class Webhook
     {
         protected $api_client;
-        protected $events = array(\EasyCommerce\ThirdParty\Packages\Stripe\Event::PAYMENT_INTENT_SUCCEEDED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::PAYMENT_INTENT_REQUIRES_ACTION, \EasyCommerce\ThirdParty\Packages\Stripe\Event::PAYMENT_INTENT_AMOUNT_CAPTURABLE_UPDATED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::PAYMENT_INTENT_PAYMENT_FAILED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::SETUP_INTENT_SUCCEEDED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::SETUP_INTENT_SETUP_FAILED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CHARGE_SUCCEEDED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CHARGE_CAPTURED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CHARGE_FAILED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CHARGE_DISPUTE_CREATED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CHARGE_DISPUTE_CLOSED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::BALANCE_AVAILABLE, \EasyCommerce\ThirdParty\Packages\Stripe\Event::REVIEW_OPENED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::REVIEW_CLOSED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_CREATED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_UPDATED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_DELETED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_PAUSED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_RESUMED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::CUSTOMER_SUBSCRIPTION_TRIAL_WILL_END, \EasyCommerce\ThirdParty\Packages\Stripe\Event::INVOICE_PAYMENT_SUCCEEDED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::INVOICE_PAYMENT_FAILED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::INVOICE_PAYMENT_ACTION_REQUIRED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::INVOICE_PAID, \EasyCommerce\ThirdParty\Packages\Stripe\Event::REFUND_CREATED, \EasyCommerce\ThirdParty\Packages\Stripe\Event::ACCOUNT_UPDATED);
+        protected $events = array(\Stripe\Event::PAYMENT_INTENT_SUCCEEDED, \Stripe\Event::PAYMENT_INTENT_REQUIRES_ACTION, \Stripe\Event::PAYMENT_INTENT_AMOUNT_CAPTURABLE_UPDATED, \Stripe\Event::PAYMENT_INTENT_PAYMENT_FAILED, \Stripe\Event::SETUP_INTENT_SUCCEEDED, \Stripe\Event::SETUP_INTENT_SETUP_FAILED, \Stripe\Event::CHARGE_SUCCEEDED, \Stripe\Event::CHARGE_CAPTURED, \Stripe\Event::CHARGE_FAILED, \Stripe\Event::CHARGE_DISPUTE_CREATED, \Stripe\Event::CHARGE_DISPUTE_CLOSED, \Stripe\Event::BALANCE_AVAILABLE, \Stripe\Event::REVIEW_OPENED, \Stripe\Event::REVIEW_CLOSED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_CREATED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_UPDATED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_DELETED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_PAUSED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_RESUMED, \Stripe\Event::CUSTOMER_SUBSCRIPTION_TRIAL_WILL_END, \Stripe\Event::INVOICE_PAYMENT_SUCCEEDED, \Stripe\Event::INVOICE_PAYMENT_FAILED, \Stripe\Event::INVOICE_PAYMENT_ACTION_REQUIRED, \Stripe\Event::INVOICE_PAID, \Stripe\Event::REFUND_CREATED, \Stripe\Event::ACCOUNT_UPDATED);
         public function __construct()
         {
         }
@@ -5686,7 +6012,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
          * @param string $webhook_url The webhook URL to match for deletion.
          *
          * @return void
-         * @throws \EasyCommerce\ThirdParty\Packages\Stripe\Exception\ApiErrorException If an error occurs during deletion.
+         * @throws \Stripe\Exception\ApiErrorException If an error occurs during deletion.
          */
         protected function delete_existing_endpoint(string $webhook_url): void
         {
@@ -5697,7 +6023,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
          * @param string $webhook_url The URL for the new webhook endpoint.
          *
          * @return void
-         * @throws \EasyCommerce\ThirdParty\Packages\Stripe\Exception\ApiErrorException If an error occurs during creation.
+         * @throws \Stripe\Exception\ApiErrorException If an error occurs during creation.
          */
         protected function create_new_endpoint(string $webhook_url): void
         {
@@ -6224,7 +6550,36 @@ namespace EasyCommerce\Helpers {
         {
         }
         /**
+         * Resolve the file to load for a template, allowing themes and addons to
+         * override it.
+         *
+         * Resolution order:
+         *   1. Theme override - wp-content/themes/<active-theme>/easycommerce/<template>
+         *   2. Plugin default - <plugin>/views/<template>
+         *
+         * The result is filterable through `easycommerce_template_path`, so an addon
+         * can point any EasyCommerce template at its own file:
+         *
+         *     add_filter( 'easycommerce_template_path', function ( $path, $template ) {
+         *         if ( 'templates/single-product/price.php' === $template ) {
+         *             return MY_ADDON_DIR . 'templates/price.php';
+         *         }
+         *         return $path;
+         *     }, 10, 2 );
+         *
+         * @param string $template Template path relative to the views/ directory.
+         * @return string Absolute path to the template that will be loaded.
+         */
+        public static function get_template_path($template)
+        {
+        }
+        /**
          * Includes a template file from the 'view' directory.
+         *
+         * Themes and addons can override the file via `easycommerce_template_path`
+         * (see get_template_path()), adjust the variables passed in via
+         * `easycommerce_template_args`, or filter the rendered output via
+         * `easycommerce_template_html`.
          *
          * @param string $template The template file name.
          * @param array  $args Optional. An associative array of variables to pass to the template file.
@@ -6274,6 +6629,9 @@ namespace EasyCommerce\Helpers {
          * @param string $search The search term to match against product titles.
          * @return string|false   The matching product title on success, or false if no match found.
          */
+        public static function get_product_titles(): array
+        {
+        }
         public static function fuzzy_search($search)
         {
         }
@@ -6644,6 +7002,30 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Check whether the cart is locked for payment processing.
+         *
+         * @return bool
+         */
+        public function is_locked()
+        {
+        }
+        /**
+         * Get the cart total snapshotted at payment initiation time.
+         *
+         * @return float|null Null if no snapshot exists.
+         */
+        public function get_lock_amount()
+        {
+        }
+        /**
+         * Lock the cart for payment and snapshot the current total in one DB write.
+         *
+         * @return float The snapshotted amount.
+         */
+        public function lock_for_payment(): float
+        {
+        }
+        /**
          * Set the status of the cart.
          *
          * @param string $status The new status for the cart.
@@ -6782,6 +7164,18 @@ namespace EasyCommerce\Models {
          * @return string The cart link.
          */
         public function get_link()
+        {
+        }
+        /**
+         * Pre-fill cart data (items + addresses) from external source such as the AI agent.
+         * Computes and stores the total from item prices so the cart is ready for checkout.
+         *
+         * @param array  $items        Items keyed as [ product_id => [ price_id => [ quantity, rate, price ] ] ].
+         * @param array  $billing      Billing address fields.
+         * @param array  $shipping     Shipping address fields.
+         * @param string $coupon_code  Optional coupon code.
+         */
+        public function prefill(array $items, array $billing, array $shipping, string $coupon_code = ''): void
         {
         }
         /**
@@ -7281,6 +7675,24 @@ namespace EasyCommerce\Models {
          * @return array List of cities for the given state or all cities for the country if state code is not provided.
          */
         public static function get_cities($country_code, $state_code = null)
+        {
+        }
+        /**
+         * Bundled country data keyed by ISO-2 code.
+         * Used as fallback when locations.json has not yet been downloaded.
+         *
+         * @return array [ 'US' => [ 'iso3', 'numeric_code', 'name' ], ... ]
+         */
+        protected static function fallback_countries()
+        {
+        }
+        /**
+         * Bundled currency data keyed by ISO-2 country code.
+         * Used as fallback when locations.json has not yet been downloaded.
+         *
+         * @return array [ 'US' => [ 'USD', 'US Dollar', '$' ], ... ]
+         */
+        protected static function fallback_currencies()
         {
         }
         /**
@@ -10309,50 +10721,89 @@ namespace EasyCommerce\Services {
         {
         }
         /**
-         * Asks a question to the AI chatbot.
+         * Insert a row into the AI usage log.
          *
-         * Uses the external RAG (Retrieval Augmented Generation) system to answer
-         * user questions about the e-commerce store.
-         *
-         * @since 1.16
-         *
-         * @param string $question The question to ask the AI chatbot.
-         *
-         * @return array {
-         *     Response from the AI service.
-         *
-         *     @type bool   $success Whether the request was successful.
-         *     @type string $message The response message or error message.
-         * }
+         * @param string $type     The hub path (write, paint, enhance, agent, ...).
+         * @param array  $data      Request body sent to the hub.
+         * @param object $response  Decoded hub response.
          */
-        public function ask($question)
+        private function log_usage($type, $data, $response)
         {
         }
         /**
-         * Analyzes data and generates reports from natural language queries.
+         * Log one conversational AI use (Copilot / shopping agent / smart search) as a
+         * single row, even though it spanned several hub turns. The caller provides the
+         * question, final answer, and the total credits the turns consumed.
          *
-         * Converts a user query into an SQL query, executes it against the database,
-         * and then uses AI to generate a human-readable report from the results.
-         *
-         * This method performs the following steps:
-         * 1. Checks if API credentials are configured
-         * 2. Verifies user has enough AI credits (costs 2 credits)
-         * 3. Sends query to AI to generate SQL
-         * 4. Executes the SQL query against the database
-         * 5. Sends results back to AI for analysis and report generation
-         *
-         * @since 1.16
-         *
-         * @param string $query The natural language query describing the report needed.
-         *
-         * @return array {
-         *     Response from the AI service.
-         *
-         *     @type bool   $success Whether the request was successful.
-         *     @type string $message The generated report or error message.
-         * }
+         * @param string $type   Log type (copilot, shopping_agent, search, ...).
+         * @param string $input  User question.
+         * @param string $output Final answer.
+         * @param int    $credit Total credits consumed across the conversation.
          */
-        public function analyze($query)
+        public function log_conversation($type, $input, $output, $credit)
+        {
+        }
+        /**
+         * Default per-type credit cost when the hub did not report one.
+         *
+         * @param string $type
+         * @return int
+         */
+        private function default_credit($type)
+        {
+        }
+        /**
+         * Insert a row into the AI usage log.
+         *
+         * @param string $type
+         * @param string $input
+         * @param string $output
+         * @param int    $credit
+         */
+        private function insert_log($type, $input, $output, $credit)
+        {
+        }
+        /**
+         * Extract a human-readable prompt/question from the request body.
+         *
+         * @param string $type
+         * @param array  $data
+         * @return string
+         */
+        private function usage_input($type, $data)
+        {
+        }
+        /**
+         * Extract the assistant answer (or an image marker) from the hub response.
+         *
+         * @param object $response
+         * @return string
+         */
+        private function usage_output($response)
+        {
+        }
+        /**
+         * Create the ai_logs table on first use (option-guarded) so the usage log
+         * works without waiting for a full plugin reinstall. The column definition
+         * lives in app/Config/tables.php (single source of truth).
+         */
+        private function ensure_log_table()
+        {
+        }
+        /**
+         * Runs an agentic chat completion turn with tool/function-calling support.
+         *
+         * Sends the full conversation history and tool definitions to the AI
+         * server. The response may contain tool_calls that the caller must
+         * execute and loop on until a final text reply is returned.
+         *
+         * @param array  $messages      Full conversation history [{role, content}, ...].
+         * @param array  $tools         Tool definitions in OpenAI function-calling format.
+         * @param string $system_prompt System prompt injected on the server side.
+         *
+         * @return object Response from the AI service.
+         */
+        public function agent(array $messages, array $tools, string $system_prompt = '')
         {
         }
         /**
@@ -10449,7 +10900,7 @@ namespace EasyCommerce\Services {
          * Generates an image based on a text prompt.
          *
          * Uses AI image generation to create a new image based on the provided
-         * text description. This operation costs 10 AI credits.
+         * text description. This operation costs 50 AI credits.
          *
          * @since 1.16
          *
@@ -10477,7 +10928,7 @@ namespace EasyCommerce\Services {
          * Edits an existing image based on a text prompt.
          *
          * Uses AI image editing to modify an existing image according to the
-         * provided text description. This operation costs 10 AI credits.
+         * provided text description. This operation costs 50 AI credits.
          *
          * @since 1.16
          *
@@ -10498,6 +10949,21 @@ namespace EasyCommerce\Services {
          * }
          */
         public function edit_image($image, $prompt, $size = '1024x1024', $quality = 'standard')
+        {
+        }
+        /**
+         * Extracts a product search keyword from a natural-language query.
+         *
+         * Passes the real product catalog to the AI so it can pick the closest
+         * matching product name or keyword. Returns null when the query does not
+         * clearly map to any known product (e.g. profanity, nonsense, off-topic).
+         *
+         * @param string $query         The raw search string entered by the user.
+         * @param array  $product_titles All product titles from the store.
+         *
+         * @return array|null Associative array with 'search' key, or null on failure / no match.
+         */
+        public function search_intent(string $query, array $product_titles = []): ?array
         {
         }
     }
@@ -10539,9 +11005,9 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Digital Physical & Sell Products
- * Version: 1.31
+ * Version: 1.40
  * Requires at least: 6.0
- * Tested up to: 6.9
+ * Tested up to: 7.0
  * Requires PHP: 7.4
  * Text Domain: easycommerce
  * Domain Path: /languages
@@ -10652,7 +11118,7 @@ namespace {
     /**
      * Retrieves or creates a singleton instance of the Stripe API client.
      *
-     * @return \EasyCommerce\ThirdParty\Packages\Stripe\StripeClient|null The configured Stripe API client instance or null if API key is empty.
+     * @return \Stripe\StripeClient|null The configured Stripe API client instance or null if API key is empty.
      */
     function easycommerce_stripe_get_api_client()
     {
@@ -10669,19 +11135,64 @@ namespace {
     {
     }
     /**
-     * Filter out wallet payment methods that are automatically handled by Stripe Elements.
+     * Filter out only the wallets Stripe rejects as explicit Payment Element
+     * paymentMethodTypes. `apple_pay` and `google_pay` are NOT valid types — passing
+     * them throws and breaks the whole element; the Payment Element instead surfaces
+     * them automatically as buttons when the shopper's browser/device supports them.
+     * Every other wallet (alipay, amazon_pay, cashapp, wechat_pay, link, samsung_pay,
+     * kakao_pay, mb_way, naver_pay, payco) is a valid type and stays so it renders.
      *
      * @param array $payment_methods List of payment method types.
      *
-     * @return array Filtered payment methods without wallet types.
+     * @return array Filtered payment methods without the non-listable express wallets.
      */
     function easycommerce_stripe_filter_wallet_payment_methods($payment_methods)
+    {
+    }
+    /**
+     * Single source of truth for Stripe payment method minimum transaction amounts.
+     *
+     * Keyed by method, then lowercase currency code, value in cents. Shared by the
+     * server-side filter and localized to the client (stripe-payment.js) so both
+     * sides apply identical thresholds. These are public Stripe limits, not secrets.
+     *
+     * @return array<string, array<string, int>> Minimum amounts in cents.
+     */
+    function easycommerce_stripe_payment_method_minimums()
+    {
+    }
+    /**
+     * Filter payment methods that require a minimum transaction amount.
+     *
+     * @param array  $payment_methods List of payment method types.
+     * @param int    $amount_in_cents Transaction amount in cents.
+     * @param string $currency        Currency code (lowercase).
+     *
+     * @return array Filtered payment methods satisfying amount minimums.
+     */
+    function easycommerce_stripe_filter_payment_methods_by_amount($payment_methods, $amount_in_cents, $currency)
     {
     }
     function easycommerce_dev_store($path = '')
     {
     }
     function easycommerce_dev_docs($path = '')
+    {
+    }
+    /**
+     * Whether a Generative AI feature is enabled in settings.
+     *
+     * Reads the raw option array directly instead of Utility::get_option(): that
+     * helper treats a stored "0" as empty and falls back to its default, which would
+     * make the disabled state unreachable for a default-on checkbox. Defaults to
+     * enabled when the feature key has never been saved (matches the field defaults
+     * in app/Config/settings.php → ai → generative-ai).
+     *
+     * @param string $feature Feature key: 'text_generator', 'image_generator',
+     *                        'template_generator', 'attribute_generator'.
+     * @return bool
+     */
+    function easycommerce_is_ai_feature_enabled($feature)
     {
     }
     /**
@@ -10714,6 +11225,9 @@ namespace {
     {
     }
     function easycommerce_reset_password_page($url = \false)
+    {
+    }
+    function easycommerce_payment_page($url = \false)
     {
     }
     function send_reset_password_email($user_data, $key)
@@ -10925,6 +11439,9 @@ namespace {
     function easycommerce_is_checkout(): bool
     {
     }
+    function easycommerce_is_payment_page(): bool
+    {
+    }
     /**
      * Returns true if the current page is the account page.
      *
@@ -10969,10 +11486,47 @@ namespace {
     function easycommerce_is_paid_addon_active()
     {
     }
+    /**
+     * Single source of truth for the client's AI credit/plan state.
+     *
+     * One option (`easycommerce_ai`) holds everything: plan, monthly allowance,
+     * usage, remaining balance, next reset date and the last hub-sync timestamp. It
+     * replaces the legacy `easycommerce_ai_credits` + `easycommerce_ai_plan` options
+     * and the status transient, migrating them once on first read.
+     *
+     * @return array { plan, plan_name, limit, used, remaining, next_refresh, synced_at }
+     */
+    function easycommerce_ai_data()
+    {
+    }
+    /**
+     * Merge a partial update into the single AI state option.
+     *
+     * @param array $patch Keys to overwrite.
+     * @return array The full, updated state.
+     */
+    function easycommerce_ai_update(array $patch)
+    {
+    }
     function easycommerce_get_ai_credits()
     {
     }
     function easycommerce_deduct_ai_credits($deduct = 1, $credits = \null)
+    {
+    }
+    /**
+     * Fetch the authoritative monthly AI credit status from the hub.
+     *
+     * Returns the plan, monthly allowance, usage, remaining balance and the next
+     * reset date from the single `easycommerce_ai` option. Re-syncs from the hub
+     * when the cached state is older than 10 minutes (tracked via `synced_at`).
+     * Falls back to the locally-stored state when the hub is unreachable or no
+     * account is connected.
+     *
+     * @param bool $force Skip the freshness check and re-fetch.
+     * @return array See easycommerce_ai_data().
+     */
+    function easycommerce_ai_status($force = \false)
     {
     }
     function easycommerce_get_conflicting_plugins()
