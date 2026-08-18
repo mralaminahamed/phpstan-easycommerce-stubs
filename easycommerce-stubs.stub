@@ -1245,6 +1245,14 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Set the fulfillment status of the order.
+         *
+         * @return string
+         */
+        public function set_fulfillment_status($fulfill_status)
+        {
+        }
+        /**
          * Get the payment method for the order.
          *
          * @return string
@@ -3420,6 +3428,9 @@ namespace EasyCommerce\Controllers\Admin {
         public function add_page_labels($post_states, $post)
         {
         }
+        public function add_custom_allowed_tags($allowed_html)
+        {
+        }
     }
 }
 namespace EasyCommerce\Traits {
@@ -3478,6 +3489,9 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         public function hide_menu()
+        {
+        }
+        public function show_product_menu()
         {
         }
         public function callback_store()
@@ -4422,7 +4436,7 @@ namespace EasyCommerce\Helpers {
          * @param string $template The template file name.
          * @param array  $args Optional. An associative array of variables to pass to the template file.
          */
-        public static function get_template($template, $args = array())
+        public static function get_template($template, $args = array(), $is_return = true)
         {
         }
         /**
@@ -6488,7 +6502,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.1-beta1
+ * Version: 0.9.2-beta1
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 7.4
@@ -6602,7 +6616,7 @@ namespace {
     function easycommerce_cart_redirect()
     {
     }
-    function easycommerce_order_redirect($path = '')
+    function easycommerce_order_redirect($order_id)
     {
     }
     function easycommerce_date_ranges()
