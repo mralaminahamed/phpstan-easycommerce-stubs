@@ -5754,6 +5754,18 @@ namespace EasyCommerce\Controllers\Front {
         public function show_notices()
         {
         }
+        /**
+         * Show an admin-only banner on the storefront when the store is in Test mode.
+         *
+         * Admins are exempt from the Test-mode checkout/dashboard gate, so the storefront
+         * looks live to them while real customers are silently blocked at checkout. This
+         * banner closes that awareness gap. Hooked to wp_body_open (primary) with a
+         * wp_footer fallback for themes that don't fire wp_body_open; a static guard
+         * prevents duplicate output when a theme fires both.
+         */
+        public function show_test_mode_banner()
+        {
+        }
     }
     class Shortcode
     {
@@ -11079,7 +11091,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.42
+ * Version: 1.42.1
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.4
