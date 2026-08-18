@@ -4482,12 +4482,10 @@ namespace EasyCommerce\Helpers {
         /**
          * Formats a price
          *
-         * @param float       $price The price
-         * @param string|null $currency The currency symbol (default is '$')
-         * @param bool|string $separator Thousand separator: use ',' for comma, '.' for dot, or false for no separator
+         * @param float $price The price
          * @return string Formatted price string.
          */
-        public static function format_price($price, $currency = null, $separator = ',')
+        public static function format_price($price)
         {
         }
         /**
@@ -6581,7 +6579,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.14.1-beta
+ * Version: 0.9.15-beta
  * Requires at least: 6.0
  * Tested up to: 6.8
  * Requires PHP: 7.4
@@ -6720,6 +6718,9 @@ namespace {
     function easycommerce_currencies($label = 'currency_name')
     {
     }
+    function easycommerce_currency_format_options()
+    {
+    }
     /**
      * @see app/Config/settings.php
      */
@@ -6745,6 +6746,9 @@ namespace {
     {
     }
     function easycommerce_currency()
+    {
+    }
+    function easycommerce_currency_format()
     {
     }
     function easycommerce_currency_symbol()
