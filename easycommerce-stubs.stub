@@ -773,6 +773,15 @@ namespace EasyCommerce\API {
         private function get_total_products()
         {
         }
+        /**
+         * Get total refunded amount from the Refund model (handles partial refunds correctly)
+         *
+         * @param string $range The date range to query.
+         * @return float
+         */
+        public function total_refunded_amount($range = 'this-month')
+        {
+        }
     }
 }
 namespace EasyCommerce\Traits {
@@ -5165,6 +5174,12 @@ namespace EasyCommerce\Models {
          * @var int
          */
         protected $user_id = null;
+        /**
+         * Formatted cart cache
+         *
+         * @var array|null
+         */
+        protected $formatted_cart = null;
         protected $table = 'cart_sessions';
         /**
          * Constructor
@@ -5189,6 +5204,12 @@ namespace EasyCommerce\Models {
          * @return string The cart hash.
          */
         public function set_user_hash($hash = '')
+        {
+        }
+        /**
+         * Clear the formatted cart cache.
+         */
+        protected function clear_cache()
         {
         }
         /**
@@ -5305,6 +5326,14 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Check if the shipping address is the same as the billing address.
+         *
+         * @return bool
+         */
+        public function is_shipping_same_as_billing()
+        {
+        }
+        /**
          * Get the payment intent ID for a specific payment method.
          *
          * @param string $method The payment method.
@@ -5356,6 +5385,14 @@ namespace EasyCommerce\Models {
          * @return mixed The amount from the cart.
          */
         public function get_amount($segment = 'total')
+        {
+        }
+        /**
+         * Get total amount from the cart.
+         *
+         * @return float The total amount from the cart.
+         */
+        public function get_total()
         {
         }
         /**
@@ -6459,6 +6496,22 @@ namespace EasyCommerce\Models {
          * @return float
          */
         public function get_subtotal()
+        {
+        }
+        /**
+         * Get the product tax amount of the order.
+         *
+         * @return float
+         */
+        public function get_product_tax()
+        {
+        }
+        /**
+         * Get the shipping tax amount of the order.
+         *
+         * @return float
+         */
+        public function get_shipping_tax()
         {
         }
         /**
@@ -9278,7 +9331,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Digital Physical & Sell Products
- * Version: 1.24
+ * Version: 1.25
  * Requires at least: 6.0
  * Tested up to: 6.9
  * Requires PHP: 7.4
@@ -9730,6 +9783,27 @@ namespace {
     {
     }
     function easycommerce_get_user_country()
+    {
+    }
+    function easycommerce_business_address_1()
+    {
+    }
+    function easycommerce_business_address_2()
+    {
+    }
+    function easycommerce_business_state()
+    {
+    }
+    function easycommerce_business_city()
+    {
+    }
+    function easycommerce_business_postcode()
+    {
+    }
+    function easycommerce_business_country()
+    {
+    }
+    function easycommerce_business_full_address(): string
     {
     }
 }
