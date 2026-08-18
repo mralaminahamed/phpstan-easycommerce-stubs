@@ -3965,16 +3965,6 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         /**
-         * What's happening here?
-         *
-         * @since 0.9.14-beta
-         *
-         * temp
-         */
-        public function observe()
-        {
-        }
-        /**
          * Shows different admin notices
          */
         public function admin_notices()
@@ -5916,6 +5906,14 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Get product rating
+         *
+         * @return float
+         */
+        public function get_rating_count()
+        {
+        }
+        /**
          * Get product total sales
          *
          * @return float
@@ -7597,7 +7595,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.8
+ * Version: 1.8.1
  * Requires at least: 6.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
