@@ -3804,6 +3804,17 @@ namespace EasyCommerce\Controllers\Common {
         public function load_full_width_template($template)
         {
         }
+        /**
+         * Add Store Mode badge to admin bar.
+         *
+         * @param WP_Admin_Bar $wp_admin_bar Admin bar instance.
+         */
+        public function add_store_mode_admin_bar($wp_admin_bar)
+        {
+        }
+        public function output_admin_bar_css()
+        {
+        }
     }
     class Process
     {
@@ -4627,6 +4638,12 @@ namespace EasyCommerce\Helpers\Field {
     class Radio extends \EasyCommerce\Helpers\Field\Multicheck
     {
         protected $option_type = 'radio';
+        protected function get_input_class(): string
+        {
+        }
+        public function render()
+        {
+        }
     }
     /**
      * Range Field Class
@@ -9084,7 +9101,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Digital Physical & Sell Products
- * Version: 1.27
+ * Version: 1.28
  * Requires at least: 6.0
  * Tested up to: 6.9
  * Requires PHP: 7.4
@@ -9408,9 +9425,6 @@ namespace {
     {
     }
     function easycommerce_format_size($bytes)
-    {
-    }
-    function easycommerce_icons()
     {
     }
     function easycommerce_currency()
