@@ -2046,7 +2046,7 @@ namespace EasyCommerce\Models {
          *
          * @return array
          */
-        public function list_terms($parent_id = 0, $taxonomy = 'product_cat')
+        public function list_terms($parent_id = 0, $taxonomy = 'product_cat', $limit = 10, $offset = 0)
         {
         }
         /**
@@ -4113,6 +4113,9 @@ namespace EasyCommerce\Controllers\Common {
         public function shoot($recipient, $subject, $body, $placeholders = array())
         {
         }
+        public function remind_password_reset($user_id, \EasyCommerce\Abstracts\User $user)
+        {
+        }
         public function order_email($event, $order_id)
         {
         }
@@ -5159,7 +5162,7 @@ namespace EasyCommerce\Models {
          *
          * @return string
          */
-        public function get_phone()
+        public function get_phone($type = '')
         {
         }
         /**
@@ -5188,16 +5191,13 @@ namespace EasyCommerce\Models {
         public function get_address_field($field, $type = 'billing')
         {
         }
-        public function get_first_name($type = 'billing')
+        public function get_first_name($type = '')
         {
         }
-        public function get_last_name($type = 'billing')
+        public function get_last_name($type = '')
         {
         }
-        public function get_email($type = 'billing')
-        {
-        }
-        public function get_billing_phone($type = 'billing')
+        public function get_email($type = '')
         {
         }
         public function get_address_1($type = 'billing')
@@ -6935,7 +6935,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.2.4
+ * Version: 1.2.5
  * Requires at least: 6.0
  * Tested up to: 6.8.2
  * Requires PHP: 7.4
@@ -7011,6 +7011,9 @@ namespace {
     {
     }
     function easycommerce_product_statuses()
+    {
+    }
+    function get_installed_addons()
     {
     }
     function easycommerce_global_default_status()
