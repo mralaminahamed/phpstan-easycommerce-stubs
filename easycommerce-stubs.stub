@@ -5499,8 +5499,7 @@ namespace EasyCommerce\Models {
         /**
          * Get product stock.
          *
-         * @return integer|bool If at least one of the variations manages stock, return the total stock count
-         *                      Return false otherwise.
+         * @return integer|bool The stock of the product or false if not found
          */
         public function get_stock()
         {
@@ -6849,7 +6848,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Requires at least: 6.0
  * Tested up to: 6.8.1
  * Requires PHP: 7.4
