@@ -5177,6 +5177,12 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * An unorganized list of all downloads from all variations of this product.
+         */
+        public function get_downloads()
+        {
+        }
+        /**
          * Set product categories.
          *
          * @param array $categories Array of category IDs, slugs, or names.
@@ -6482,7 +6488,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.0-beta7
+ * Version: 0.9.1-beta1
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 7.4
