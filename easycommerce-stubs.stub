@@ -648,7 +648,7 @@ namespace EasyCommerce\Traits {
          * @param string $key The cache key to store the value under.
          * @param mixed  $value The value to store in the cache.
          * @param int    $expiration Optional. The time until expiration, in seconds. Default 3600 (1 hour).
-         * @param bool	 $allow_empty Should we allow caching empty values
+         * @param bool   $allow_empty Should we allow caching empty values
          */
         public function set_cache($key, $value, $expiration = 3600, $allow_empty = false)
         {
@@ -839,7 +839,6 @@ namespace EasyCommerce\API {
          * Orders by statuses
          *
          * @param \WP_REST_Request $request The request object.
-         *
          */
         public function get_order_statuses($request)
         {
@@ -848,7 +847,6 @@ namespace EasyCommerce\API {
          * Sales
          *
          * @param \WP_REST_Request $request The request object.
-         *
          */
         public function get_sales($request)
         {
@@ -907,7 +905,7 @@ namespace EasyCommerce\API {
          * - If the range is 'this-year' or 'last-year', then the date key is the full month name (e.g. January, February, etc.).
          * - If the range is 'this-week', 'last-week', 'last-7', 'today', or 'yesterday', then the date key is the abbreviated day of the week (e.g. Mon, Tue, Wed, etc.).
          *
-         * @param int $timestamp The timestamp to get the date key for.
+         * @param int    $timestamp The timestamp to get the date key for.
          * @param string $range The range to get the date key for.
          * @return string The date key.
          */
@@ -3518,7 +3516,7 @@ namespace EasyCommerce\Traits {
          *
          * @param WP_REST_Request $request The request object.
          * @return bool True for regular cases, false otherwise.
-         * 
+         *
          * @todo Introduce real check
          */
         public function is_user($request)
@@ -5126,7 +5124,7 @@ namespace EasyCommerce\Models {
          * Get product stock.
          *
          * @return integer|bool If at least one of the variations manages stock, return the total stock count
-         * 						Return false otherwise.
+         *                      Return false otherwise.
          */
         public function get_stock()
         {
@@ -6376,7 +6374,7 @@ namespace EasyCommerce\Models {
          * @param int   $offset Offset for pagination.
          * @return array List of transactions.
          */
-        public static function list($args = [], $per_page = 10, $offset = 0, $sort = 'desc')
+        public static function list($args = array(), $per_page = 10, $offset = 0, $sort = 'desc')
         {
         }
         /**
@@ -6469,7 +6467,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.0-beta3
+ * Version: 0.9.0-beta4
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 7.4
