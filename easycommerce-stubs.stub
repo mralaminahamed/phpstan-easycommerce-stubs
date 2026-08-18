@@ -2575,6 +2575,15 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Prepares an SQL clause
+         * 
+         * @see get_rows()
+         * @return [ 'where' => 'where clause statements', 'values' => 'clause values' ]
+         */
+        private function prepare_clause($conditions)
+        {
+        }
+        /**
          * Get the default WordPress table prefix.
          *
          * @return string
@@ -6739,7 +6748,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 0.9.23-beta
+ * Version: 0.9.24-beta
  * Requires at least: 6.0
  * Tested up to: 6.8.1
  * Requires PHP: 7.4
