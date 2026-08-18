@@ -6496,7 +6496,37 @@ namespace EasyCommerce\Helpers\Field {
      */
     class Select extends \EasyCommerce\Abstracts\Field
     {
+        /**
+         * Whether the field allows free-text input alongside the options list.
+         *
+         * @var bool
+         */
+        protected $allow_input = false;
+        /**
+         * Constructor.
+         *
+         * @param array $config Field configuration.
+         */
+        public function __construct($config = array())
+        {
+        }
+        /**
+         * Whether the field allows free-text input alongside the options list.
+         *
+         * @return bool
+         */
+        public function allow_input()
+        {
+        }
         public function render()
+        {
+        }
+        /**
+         * Render the field as a free-text input backed by a datalist.
+         *
+         * @return string
+         */
+        protected function render_open_text()
         {
         }
     }
@@ -11091,7 +11121,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.42.1
+ * Version: 1.42.2
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.4
