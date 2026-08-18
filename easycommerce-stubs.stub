@@ -143,6 +143,22 @@ namespace EasyCommerce\API {
         public function bulk_reminder($request)
         {
         }
+        /**
+         * Clean/Empty abandoned cart.
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function clean_abandoned_cart($request)
+        {
+        }
+        /**
+         * Clean invalid abandoned cart. Means it deletes some of the entries from table which are considered as invalids.
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function clean_invalid_abandoned_cart($request)
+        {
+        }
     }
 }
 namespace EasyCommerce\Traits {
@@ -191,6 +207,7 @@ namespace EasyCommerce\API {
     {
         use \EasyCommerce\Traits\Rest;
         use \EasyCommerce\Traits\Cache;
+        private $menu_slug = ['easycommerce-subscriptions' => 'easycommerce-store#/subscriptions', 'easycommerce-wpbakery' => '', 'easycommerce-license' => 'easycommerce-store#/licenses', 'easycommerce-paddle' => 'easycommerce-settings&menu=payment&submenu=paddle', 'easycommerce-points-and-rewards' => 'easycommerce-settings&menu=points-rewards', 'easycommerce-product-recommendations' => 'easycommerce-settings&menu=product-recommendations', 'easycommerce-fluentcrm' => 'easycommerce-settings&menu=fluentcrm', 'easycommerce-bank-transfer' => 'easycommerce-settings&menu=payment&submenu=bank-transfer', 'easycommerce-sliding-cart' => '', 'easycommerce-rocket' => 'easycommerce-settings&menu=payment&submenu=rocket', 'easycommerce-csv-importer' => 'easycommerce-store#/easycommerce-importer', 'easycommerce-wishlist' => '', 'easycommerce-checkout-editor' => 'easycommerce-checkout-editor', 'easycommerce-nagad' => 'easycommerce-settings&menu=payment&submenu=nagad', 'easycommerce-bkash' => 'easycommerce-settings&menu=payment&submenu=bkash', 'easycommerce-google-sheets-sync' => 'easycommerce-settings&menu=google_sheets', 'easycommerce-klaviyo' => 'easycommerce-settings&menu=klaviyo', 'easycommerce-zendesk' => 'easycommerce-settings&menu=zendesk', 'easycommerce-pdf-invoice' => 'easycommerce-settings&menu=pdf-invoice', 'easycommerce-delivery-date-picker' => '', 'easycommerce-mailchimp' => 'easycommerce-settings&menu=mailchimp', 'easycommerce-hubspot' => 'easycommerce-settings&menu=hubspot', 'easycommerce-migration' => 'easycommerce-settings&menu=migration', 'easycommerce-slack' => 'easycommerce-settings&menu=slack'];
         public function list($request)
         {
         }
@@ -501,6 +518,27 @@ namespace EasyCommerce\Models {
          * @return array The cart data.
          */
         public function get($formatted = false, $formatted_price = true)
+        {
+        }
+        /**
+         * Get the payment intent ID for a specific payment method.
+         *
+         * @param string $method The payment method.
+         * @return string|null The payment intent ID or null if not found.
+         */
+        public function get_payment_intent($method)
+        {
+        }
+        /**
+         * Set the payment intent ID for a specific payment method.
+         *
+         * @param string $method The payment method.
+         * @param string $payment_intent_id The payment intent ID.
+         */
+        public function set_payment_intent($method, $payment_intent_id)
+        {
+        }
+        public function clear_payment_intent($method)
         {
         }
         /**
@@ -1433,6 +1471,7 @@ namespace EasyCommerce\API {
     {
         use \EasyCommerce\Traits\Rest;
         use \EasyCommerce\Traits\Cleaner;
+        use \EasyCommerce\Traits\Queue;
         public function upload_csv($request)
         {
         }
@@ -1442,13 +1481,49 @@ namespace EasyCommerce\API {
         public function import_products($request)
         {
         }
-        private function create_product($row)
+        public function create_product($row)
+        {
+        }
+        /**
+         * Extract unique attribute values from variation data when product-level values are empty
+         * 
+         * @param string $attribute_names Product-level attribute names (e.g., "Color, Size")
+         * @param string $variation_attr_names Variation attribute names (e.g., "Color,Color,Size,Size")
+         * @param string $variation_attr_values Variation attribute values (e.g., "Blue,Black,M,L")
+         * @return array Structured attributes array with IDs
+         */
+        private function extract_attributes_from_variations($attribute_names, $variation_attr_names, $variation_attr_values)
+        {
+        }
+        /**
+         * Process product attributes and create them in database if they don't exist
+         * 
+         * @param string $attribute_names Comma-separated attribute names
+         * @param string $attribute_values Pipe-separated groups of comma-separated values
+         * @return array Structured attributes array with IDs
+         */
+        private function process_product_attributes($attribute_names, $attribute_values)
+        {
+        }
+        /**
+         * Generate all possible variations from product attributes
+         * 
+         * @param array $attributes Product attributes array
+         * @return array Generated variations
+         */
+        private function generate_variations_from_attributes($variation_data, $attributes)
+        {
+        }
+        private function generate_attribute_combinations($attributes)
         {
         }
         private function get_img_ids($urls)
         {
         }
-        private function build_variations($variation_data, $has_multiple_variations, $key = 0)
+        /**
+         * Build explicit variation from CSV data with proper attribute structure
+         */
+        private function build_variation($variation_data, $key, $product_attributes)
         {
         }
     }
@@ -4046,7 +4121,7 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         /**
-         * Show the EasyCommerce Pro admin notice for BFCM campaign
+         * Show the EasyCommerce Pro admin notice for Year End campaign
          */
         private function show_easycommerce_pro_notice()
         {
@@ -4534,6 +4609,9 @@ namespace EasyCommerce\Controllers\Common {
         public function __construct()
         {
         }
+        public function process_import_batch($import_id, $offset)
+        {
+        }
         /**
          * Downloads the `locations.json` database file from the CDN
          */
@@ -4628,6 +4706,12 @@ namespace EasyCommerce\Controllers\Front {
         public function smart_search($result, $filters, $request)
         {
         }
+        /**
+         * Check if required elements are present on setup wizard pages
+         */
+        public function check_required_elements($content)
+        {
+        }
     }
     class Shortcode
     {
@@ -4665,10 +4749,7 @@ namespace EasyCommerce\Controllers\Front {
         public function __construct()
         {
         }
-        public function override_archive_template($archive_template)
-        {
-        }
-        public function override_single_template($single_template)
+        public function override_template($template)
         {
         }
         public function show_product_archive()
@@ -4752,6 +4833,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
     class PaymentIntent
     {
         use \EasyCommerce\Traits\Rest;
+        protected \EasyCommerce\Models\Cart $cart;
         protected \Stripe\StripeClient $api_client;
         protected \EasyCommerce\Controllers\Payment\Stripe\Helpers\PaymentMethods $payment_methods_helper;
         public function __construct()
@@ -4775,6 +4857,9 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
          * @return array|\WP_Error The update result or error.
          */
         public function update(\WP_REST_Request $request)
+        {
+        }
+        public function clear()
         {
         }
     }
@@ -5912,6 +5997,55 @@ namespace EasyCommerce\Interfaces {
     }
 }
 namespace EasyCommerce\Models {
+    /**
+     * Class to do operation for abandoned cart
+     */
+    class Abandoned_Cart
+    {
+        /**
+         * The WordPress database access abstraction object.
+         *
+         * @var wpdb
+         */
+        protected $db;
+        /**
+         * The full database table name including the prefix.
+         *
+         * @var string
+         */
+        protected $table_name;
+        /**
+         * Constructor to set up database operations.
+         *
+         */
+        public function __construct($table_name)
+        {
+        }
+        /**
+         * Empties the table by deleting all its entries.
+         *
+         * @return string Returns:
+         *                - 'cleaned' if rows were deleted,
+         *                - 'empty' if the table was already empty,
+         *                - 'error' if the operation failed.
+         */
+        public function clean_abandoned_cart()
+        {
+        }
+        /**
+         * Cleans all invalid entries from the abandoned cart.
+         *
+         * An invalid entry is a row where the 'items' array is empty.
+         *
+         * @return string Returns:
+         *                - 'cleaned' if one or more invalid entries were deleted,
+         *                - 'empty' if no invalid entries were found,
+         *                - 'error' if the deletion query failed.
+         */
+        public function clean_invalid_abandoned_cart()
+        {
+        }
+    }
     /**
      * Class Attribute_Value
      * Handles attribute values operations.
@@ -8317,7 +8451,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.13
+ * Version: 1.14
  * Requires at least: 6.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
@@ -8537,6 +8671,9 @@ namespace {
     {
     }
     function easycommerce_get_cart_hash()
+    {
+    }
+    function easycommerce_add_payment_method_icons($methods)
     {
     }
     function easycommerce_payment_methods()
