@@ -151,6 +151,14 @@ namespace EasyCommerce\API {
         {
         }
         /**
+         * Get the email subject and body (with placeholders resolved) for an abandoned cart.
+         *
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function get_email_content($request)
+        {
+        }
+        /**
          * Remind abandoned cart.
          *
          * @param \WP_REST_Request $request The request object.
@@ -4860,6 +4868,43 @@ namespace EasyCommerce\Bootstrap {
         {
         }
         /**
+         * Handles schema migration for the cart_sessions table during schema updates.
+         *
+         * Adds the `payment_initiated` value to the `status` ENUM on existing installs.
+         * dbDelta does not reliably ALTER ENUM definitions on existing columns, so the
+         * change is applied explicitly here. Without it, the payment lock silently fails
+         * because MySQL coerces the unknown ENUM value to an empty string.
+         *
+         * @param \EasyCommerce\Models\Database $db              Database instance.
+         * @param string   $table_full_name Full table name with prefix.
+         * @param array    $columns         Current column definitions from config.
+         * @param array    $options         Current table options from config.
+         *
+         * @return void
+         */
+        public function handle_cart_sessions_data_migration(\EasyCommerce\Models\Database $db, string $table_full_name, array $columns, array $options)
+        {
+        }
+        /**
+         * Handles schema migration for the orders table during schema updates.
+         *
+         * Adds the `failed` value to the `status` ENUM on existing installs and
+         * back-fills any orders whose status was previously coerced to '' (failed
+         * payments written before `failed` existed) to `failed`. dbDelta does not
+         * reliably alter ENUM definitions on existing columns, so the change is
+         * applied explicitly here.
+         *
+         * @param \EasyCommerce\Models\Database $db              Database instance.
+         * @param string   $table_full_name Full table name with prefix.
+         * @param array    $columns         Current column definitions from config.
+         * @param array    $options         Current table options from config.
+         *
+         * @return void
+         */
+        public function handle_orders_data_migration(\EasyCommerce\Models\Database $db, string $table_full_name, array $columns, array $options)
+        {
+        }
+        /**
          * Updates or adds the database version in the options table.
          *
          * @return void
@@ -5576,6 +5621,25 @@ namespace EasyCommerce\Controllers\Common {
          * Constructor to add all hooks.
          */
         public function __construct()
+        {
+        }
+        /**
+         * Registers custom WP-Cron recurrence intervals.
+         */
+        public function register_cron_intervals($schedules)
+        {
+        }
+        /**
+         * Keeps the abandoned-cart auto-send cron in sync with the setting.
+         * Schedules every 5 minutes when enabled; unschedules when disabled.
+         */
+        public function sync_abandoned_cart_cron()
+        {
+        }
+        /**
+         * Cron callback: sends a reminder to every pending abandoned cart that has not yet received one.
+         */
+        public function send_abandoned_cart_reminders()
         {
         }
         public function process_import_batch($import_id, $offset)
@@ -11015,7 +11079,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.41
+ * Version: 1.42
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.4
@@ -11172,13 +11236,25 @@ namespace {
     {
     }
     /**
-     * Filter payment methods that require a minimum transaction amount.
+     * Single source of truth for Stripe payment method maximum transaction amounts.
+     *
+     * Keyed by method, then lowercase currency code, value in cents. Shared by the
+     * server-side filter and localized to the client (stripe-payment.js) so both
+     * sides apply identical thresholds. These are public Stripe limits, not secrets.
+     *
+     * @return array<string, array<string, int>> Maximum amounts in cents.
+     */
+    function easycommerce_stripe_payment_method_maximums()
+    {
+    }
+    /**
+     * Filter payment methods based on both minimum and maximum transaction amounts.
      *
      * @param array  $payment_methods List of payment method types.
      * @param int    $amount_in_cents Transaction amount in cents.
      * @param string $currency        Currency code (lowercase).
      *
-     * @return array Filtered payment methods satisfying amount minimums.
+     * @return array Filtered payment methods within the allowed amount range.
      */
     function easycommerce_stripe_filter_payment_methods_by_amount($payment_methods, $amount_in_cents, $currency)
     {
