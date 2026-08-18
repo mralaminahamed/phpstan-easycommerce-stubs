@@ -75,6 +75,80 @@ namespace EasyCommerce\API {
         public function remove_abandoned($request)
         {
         }
+        /**
+         * Remind abandoned cart.
+         * 
+         * @param \WP_REST_Request $request The request object.
+         */
+        public function remind_abandoned(\WP_REST_Request $request)
+        {
+        }
+        public function bulk_delete($request)
+        {
+        }
+        public function bulk_reminder($request)
+        {
+        }
+    }
+}
+namespace EasyCommerce\Traits {
+    trait Cache
+    {
+        /**
+         * Checks if external object cache is in use and returns true or false.
+         *
+         * @return bool Returns true if external object cache is used, otherwise false.
+         */
+        private function is_using_object_cache()
+        {
+        }
+        /**
+         * Sets a cache value using either object cache or transients based on availability.
+         *
+         * @param string $key The cache key to store the value under.
+         * @param mixed  $value The value to store in the cache.
+         * @param int    $expiration Optional. The time until expiration, in seconds. Default 3600 (1 hour).
+         * @param bool   $allow_empty Should we allow caching empty values
+         */
+        public function set_cache($key, $value, $expiration = 3600, $allow_empty = false)
+        {
+        }
+        /**
+         * Retrieves a cache value using either object cache or transients based on availability.
+         *
+         * @param string $key The cache key to retrieve.
+         * @return mixed The cached value, or false if the value is not found or is expired.
+         */
+        public function get_cache($key)
+        {
+        }
+        /**
+         * Deletes a cache value using either object cache or transients based on availability.
+         *
+         * @param string $key The cache key whose value should be deleted.
+         */
+        public function delete_cache($key)
+        {
+        }
+    }
+}
+namespace EasyCommerce\API {
+    class Addon
+    {
+        use \EasyCommerce\Traits\Rest;
+        use \EasyCommerce\Traits\Cache;
+        public function list($request)
+        {
+        }
+        public function manage($request)
+        {
+        }
+        /**
+         * @todo implement API verification
+         */
+        public function license($request)
+        {
+        }
     }
 }
 namespace EasyCommerce\Traits {
@@ -310,7 +384,7 @@ namespace EasyCommerce\Models {
         /**
          * Save the cart data to the database.
          */
-        protected function save()
+        public function save()
         {
         }
         /**
@@ -688,42 +762,64 @@ namespace EasyCommerce\API {
     }
 }
 namespace EasyCommerce\Traits {
-    trait Cache
+    trait Queue
     {
         /**
-         * Checks if external object cache is in use and returns true or false.
+         * Schedules a single event to run immediately (if not already scheduled).
          *
-         * @return bool Returns true if external object cache is used, otherwise false.
+         * @param string $hook Action hook to execute.
+         * @param array  $args Optional. Arguments to pass to the callback function. Default empty array.
          */
-        private function is_using_object_cache()
+        public function schedule($hook, $args = [])
         {
         }
         /**
-         * Sets a cache value using either object cache or transients based on availability.
+         * Schedules a single event to run at a specific timestamp.
          *
-         * @param string $key The cache key to store the value under.
-         * @param mixed  $value The value to store in the cache.
-         * @param int    $expiration Optional. The time until expiration, in seconds. Default 3600 (1 hour).
-         * @param bool   $allow_empty Should we allow caching empty values
+         * @param int    $run_at When to run the event (Unix timestamp).
+         * @param string $hook      Action hook to execute.
+         * @param array  $args      Optional. Arguments to pass to the callback function. Default empty array.
          */
-        public function set_cache($key, $value, $expiration = 3600, $allow_empty = false)
+        public function schedule_at($run_at, $hook, $args = [])
         {
         }
         /**
-         * Retrieves a cache value using either object cache or transients based on availability.
+         * Schedules a recurring event.
          *
-         * @param string $key The cache key to retrieve.
-         * @return mixed The cached value, or false if the value is not found or is expired.
+         * @param int    $start_at	 When to run the first event (Unix timestamp).
+         * @param string $recurrence How often the event should recur ('hourly', 'daily', etc).
+         * @param string $hook       Action hook to execute.
+         * @param array  $args       Optional. Arguments to pass to the callback function. Default empty array.
          */
-        public function get_cache($key)
+        public function schedule_recurring($start_at, $recurrence, $hook, $args = [])
         {
         }
         /**
-         * Deletes a cache value using either object cache or transients based on availability.
+         * Unschedules a specific event.
          *
-         * @param string $key The cache key whose value should be deleted.
+         * @param string $hook Action hook to remove.
+         * @param array  $args Optional. Arguments to match when removing. Default empty array.
          */
-        public function delete_cache($key)
+        public function unschedule($hook, $args = [])
+        {
+        }
+        /**
+         * Clears all scheduled hooks with the given hook name and arguments.
+         *
+         * @param string $hook Hook name to clear.
+         * @param array  $args Optional. Arguments to match. Default empty array.
+         */
+        public function clear_schedules($hook, $args = [])
+        {
+        }
+        /**
+         * Checks if an event is already scheduled.
+         *
+         * @param string $hook Hook name to check.
+         * @param array  $args Optional. Arguments to match. Default empty array.
+         * @return bool
+         */
+        public function has_schedule($hook, $args = [])
         {
         }
     }
@@ -733,6 +829,7 @@ namespace EasyCommerce\API {
     {
         use \EasyCommerce\Traits\Rest;
         use \EasyCommerce\Traits\Cache;
+        use \EasyCommerce\Traits\Queue;
         public function save($request)
         {
         }
@@ -819,6 +916,24 @@ namespace EasyCommerce\API {
          * @return \WP_REST_Response
          */
         public function delete($request)
+        {
+        }
+        /**
+         * Bulk delete coupons.
+         *
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
+         */
+        public function bulk_delete($request)
+        {
+        }
+        /**
+         * Bulk update the status of coupons.
+         *
+         * @param \WP_REST_Request $request
+         * @return \WP_REST_Response
+         */
+        public function bulk_status_update($request)
         {
         }
     }
@@ -1465,22 +1580,7 @@ namespace EasyCommerce\API {
         public function update($request)
         {
         }
-        /**
-         * Update the status of multiple orders.
-         *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
-         */
         public function bulk_update_statuses($request)
-        {
-        }
-        /**
-         * Update the fulfill status of multiple orders.
-         *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
-         */
-        public function bulk_update_fulfill_statuses($request)
         {
         }
         /**
@@ -3457,71 +3557,6 @@ namespace EasyCommerce\Bootstrap {
         {
         }
     }
-}
-namespace EasyCommerce\Traits {
-    trait Queue
-    {
-        /**
-         * Schedules a single event to run immediately (if not already scheduled).
-         *
-         * @param string $hook Action hook to execute.
-         * @param array  $args Optional. Arguments to pass to the callback function. Default empty array.
-         */
-        public function schedule($hook, $args = [])
-        {
-        }
-        /**
-         * Schedules a single event to run at a specific timestamp.
-         *
-         * @param int    $run_at When to run the event (Unix timestamp).
-         * @param string $hook      Action hook to execute.
-         * @param array  $args      Optional. Arguments to pass to the callback function. Default empty array.
-         */
-        public function schedule_at($run_at, $hook, $args = [])
-        {
-        }
-        /**
-         * Schedules a recurring event.
-         *
-         * @param int    $start_at	 When to run the first event (Unix timestamp).
-         * @param string $recurrence How often the event should recur ('hourly', 'daily', etc).
-         * @param string $hook       Action hook to execute.
-         * @param array  $args       Optional. Arguments to pass to the callback function. Default empty array.
-         */
-        public function schedule_recurring($start_at, $recurrence, $hook, $args = [])
-        {
-        }
-        /**
-         * Unschedules a specific event.
-         *
-         * @param string $hook Action hook to remove.
-         * @param array  $args Optional. Arguments to match when removing. Default empty array.
-         */
-        public function unschedule($hook, $args = [])
-        {
-        }
-        /**
-         * Clears all scheduled hooks with the given hook name and arguments.
-         *
-         * @param string $hook Hook name to clear.
-         * @param array  $args Optional. Arguments to match. Default empty array.
-         */
-        public function clear_schedules($hook, $args = [])
-        {
-        }
-        /**
-         * Checks if an event is already scheduled.
-         *
-         * @param string $hook Hook name to check.
-         * @param array  $args Optional. Arguments to match. Default empty array.
-         * @return bool
-         */
-        public function has_schedule($hook, $args = [])
-        {
-        }
-    }
-}
-namespace EasyCommerce\Bootstrap {
     class Installer
     {
         use \EasyCommerce\Traits\Queue;
@@ -3890,6 +3925,12 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         /**
+         * Register Addon-related API endpoints
+         */
+        private function register_addon_endpoints()
+        {
+        }
+        /**
          * Register Dashboard-related API endpoints
          */
         private function register_dashboard_endpoints()
@@ -4101,6 +4142,9 @@ namespace EasyCommerce\Controllers\Common {
          * Downloads the `locations.json` database file from the CDN
          */
         public function download_geo_db()
+        {
+        }
+        public function handle_addon_installation($slug)
         {
         }
     }
@@ -6848,9 +6892,9 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.0.3
+ * Version: 1.1.0
  * Requires at least: 6.0
- * Tested up to: 6.8.1
+ * Tested up to: 6.8.2
  * Requires PHP: 7.4
  * Text Domain: easycommerce
  * Domain Path: /languages
@@ -6984,6 +7028,11 @@ namespace {
      * Get an associative list of countries
      *
      * @return []
+     */
+    /**
+     * Get an associative list of countries
+     *
+     * @return array [ 'BD' => 'Bangladesh', ... ]
      */
     function easycommerce_countries()
     {
