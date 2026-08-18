@@ -55,21 +55,40 @@ namespace EasyCommerce\Traits {
         }
     }
 }
-namespace EasyCommerce\API {
-    class AI
+namespace EasyCommerce\Abstracts {
+    /**
+     * Abstract API class
+     *
+     * Provides common functionality for API classes.
+     */
+    abstract class API
     {
         use \EasyCommerce\Traits\Rest;
-        public $service;
+    }
+}
+namespace EasyCommerce\API {
+    class AI extends \EasyCommerce\Abstracts\API
+    {
+        public $ai_service;
         public function __construct()
         {
         }
         /**
-         * Write product description or summary
+         * Ask the AI chatbot about EasyCommerce
          *
          * @param WP_REST_Request $request
          * @return WP_REST_Response
          */
-        public function ask($request)
+        public function ask_chatbot($request)
+        {
+        }
+        /**
+         * Generate report
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function analyze_report($request)
         {
         }
         /**
@@ -78,16 +97,16 @@ namespace EasyCommerce\API {
          * @param WP_REST_Request $request
          * @return WP_REST_Response
          */
-        public function write($request)
+        public function write_copy($request)
         {
         }
         /**
-         * Draw an image
+         * Generate product attributes
          *
          * @param WP_REST_Request $request
          * @return WP_REST_Response
          */
-        public function draw($request)
+        public function generate_attributes($request)
         {
         }
         /**
@@ -96,17 +115,34 @@ namespace EasyCommerce\API {
          * @param WP_REST_Request $request
          * @return WP_REST_Response
          */
-        public function design($request)
+        public function design_template($request)
+        {
+        }
+        /**
+         * Draw an image
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function draw_image($request)
+        {
+        }
+        /**
+         * Edit an image
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function edit_image($request)
         {
         }
     }
-    class Abandoned_Cart
+    class Abandoned_Cart extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         /**
          * Get a list of abandoned carts.
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function get_all($request)
         {
@@ -114,7 +150,7 @@ namespace EasyCommerce\API {
         /**
          * Remove abandoned cart.
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function remove_abandoned($request)
         {
@@ -122,15 +158,15 @@ namespace EasyCommerce\API {
         /**
          * Remind abandoned cart.
          * 
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
-        public function remind_abandoned(\WP_REST_Request $request)
+        public function remind_abandoned($request)
         {
         }
         /**
          * Bulk delete abandoned carts.
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function bulk_delete($request)
         {
@@ -138,7 +174,7 @@ namespace EasyCommerce\API {
         /**
          * Bulk send reminders for abandoned carts.
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function bulk_reminder($request)
         {
@@ -146,7 +182,7 @@ namespace EasyCommerce\API {
         /**
          * Clean/Empty abandoned cart.
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function clean_abandoned_cart($request)
         {
@@ -154,7 +190,7 @@ namespace EasyCommerce\API {
         /**
          * Clean invalid abandoned cart. Means it deletes some of the entries from table which are considered as invalids.
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function clean_invalid_abandoned_cart($request)
         {
@@ -164,6 +200,7 @@ namespace EasyCommerce\API {
 namespace EasyCommerce\Traits {
     trait Cache
     {
+        private $key_prefix = 'easycommerce_';
         /**
          * Checks if external object cache is in use and returns true or false.
          *
@@ -203,9 +240,8 @@ namespace EasyCommerce\Traits {
     }
 }
 namespace EasyCommerce\API {
-    class Addon
+    class Addon extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         use \EasyCommerce\Traits\Cache;
         private $menu_slug = ['easycommerce-subscriptions' => 'easycommerce-store#/subscriptions', 'easycommerce-wpbakery' => '', 'easycommerce-license' => 'easycommerce-store#/licenses', 'easycommerce-paddle' => 'easycommerce-settings&menu=payment&submenu=paddle', 'easycommerce-points-and-rewards' => 'easycommerce-settings&menu=points-rewards', 'easycommerce-product-recommendations' => 'easycommerce-settings&menu=product-recommendations', 'easycommerce-fluentcrm' => 'easycommerce-settings&menu=fluentcrm', 'easycommerce-bank-transfer' => 'easycommerce-settings&menu=payment&submenu=bank-transfer', 'easycommerce-sliding-cart' => '', 'easycommerce-rocket' => 'easycommerce-settings&menu=payment&submenu=rocket', 'easycommerce-csv-importer' => 'easycommerce-store#/easycommerce-importer', 'easycommerce-wishlist' => '', 'easycommerce-checkout-editor' => 'easycommerce-checkout-editor', 'easycommerce-nagad' => 'easycommerce-settings&menu=payment&submenu=nagad', 'easycommerce-bkash' => 'easycommerce-settings&menu=payment&submenu=bkash', 'easycommerce-google-sheets-sync' => 'easycommerce-settings&menu=google_sheets', 'easycommerce-klaviyo' => 'easycommerce-settings&menu=klaviyo', 'easycommerce-zendesk' => 'easycommerce-settings&menu=zendesk', 'easycommerce-pdf-invoice' => 'easycommerce-settings&menu=pdf-invoice', 'easycommerce-delivery-date-picker' => '', 'easycommerce-mailchimp' => 'easycommerce-settings&menu=mailchimp', 'easycommerce-hubspot' => 'easycommerce-settings&menu=hubspot', 'easycommerce-migration' => 'easycommerce-settings&menu=migration', 'easycommerce-slack' => 'easycommerce-settings&menu=slack'];
         public function list($request)
@@ -221,132 +257,8 @@ namespace EasyCommerce\API {
         {
         }
     }
-}
-namespace EasyCommerce\Traits {
-    trait Cleaner
+    class Attribute extends \EasyCommerce\Abstracts\API
     {
-        /**
-         * Generic sanitization method that dynamically selects the appropriate sanitization function based on the type or data content.
-         *
-         * @param mixed  $input The input data to sanitize, can be a string or an array.
-         * @param string $type  The type of sanitization to perform, or 'array' to recursively sanitize an array of data.
-         * @return mixed The sanitized data, either a string or an array of sanitized strings.
-         */
-        public function sanitize($input, $type = 'text')
-        {
-        }
-        /**
-         * Generic escaping method for securing output against XSS and other vulnerabilities.
-         * If an array is provided as output, the specified escaping context will be applied to each element.
-         *
-         * @param mixed  $output The output data to escape, can be a string or an array of strings.
-         * @param string $context The context for escaping. Default is 'html'.
-         *                        Supported contexts: 'html', 'url', 'js', 'sql', 'attr'.
-         * @return mixed The escaped data, either a string or an array of escaped strings.
-         */
-        public function escape($output, $context = 'html')
-        {
-        }
-        /**
-         * Recursively unserialize a value if it is serialized, handling nested serialization.
-         *
-         * @param mixed $value The value to unserialize.
-         * @return mixed The unserialized value.
-         */
-        public function unserialize($value)
-        {
-        }
-    }
-}
-namespace EasyCommerce\Models {
-    /**
-     * Class Attribute
-     * Handles product attributes operations.
-     *
-     * @package EasyCommerce\Model
-     */
-    class Attribute
-    {
-        use \EasyCommerce\Traits\Cleaner;
-        /**
-         * @var Database Database instance for handling DB operations
-         */
-        protected $db;
-        public function __construct()
-        {
-        }
-        /**
-         * Add an attribute.
-         *
-         * @param string $name
-         * @param string $slug
-         * @return bool
-         */
-        public function add($name, $type = 'text', $slug = null)
-        {
-        }
-        /**
-         * Get an attribute.
-         *
-         * @param int $id
-         * @return object|null
-         */
-        public function get($id)
-        {
-        }
-        /**
-         * Get an attribute by slug.
-         *
-         * @param string $slug
-         * @return object|null
-         */
-        public function get_by_slug($slug)
-        {
-        }
-        /**
-         * Get all attributes.
-         *
-         * @return array
-         */
-        // public function get_all( $args = array() ) {
-        // 	return $this->db->get_rows( $args );
-        // }
-        public function get_all($args = array(), $limit = 0, $offset = 0, $order = 'DESC', $orderby = 'id')
-        {
-        }
-        public function count()
-        {
-        }
-        /**
-         * Update an attribute.
-         *
-         * @param int   $id
-         * @param array $data
-         * @return bool
-         */
-        public function update($id, $data)
-        {
-        }
-        /**
-         * Delete an attribute.
-         *
-         * @param int $id
-         * @return bool
-         */
-        public function delete($id)
-        {
-        }
-    }
-}
-namespace EasyCommerce\API {
-    /**
-     * Class Attribute
-     *
-     * Handles attribute-related operations such as listing, adding, and retrieving attribute values.
-     */
-    class Attribute extends \EasyCommerce\Models\Attribute
-    {
-        use \EasyCommerce\Traits\Rest;
         /**
          * List all attributes with optional search and details.
          *
@@ -396,398 +308,8 @@ namespace EasyCommerce\API {
         {
         }
     }
-}
-namespace EasyCommerce\Models {
-    /**
-     * Cart Model
-     *
-     * @package EasyCommerce
-     */
-    class Cart
+    class Cart extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Cleaner;
-        /**
-         * Cart data
-         *
-         * @var array
-         */
-        public $cart;
-        /**
-         * Cart hash
-         *
-         * @var string
-         */
-        protected $hash;
-        /**
-         * User ID
-         *
-         * @var int
-         */
-        protected $user_id = null;
-        /**
-         * Database instance
-         *
-         * @var \EasyCommerce\Models\Database
-         */
-        protected $db;
-        /**
-         * Constructor
-         *
-         * @param string $hash The cart hash.
-         */
-        public function __construct($hash = null)
-        {
-        }
-        /**
-         * Get the user's cart hash.
-         *
-         * @return string The user's cart hash.
-         */
-        private function get_user_hash()
-        {
-        }
-        /**
-         * Set the user's cart hash.
-         *
-         * @param string $hash The cart hash.
-         * @return string The cart hash.
-         */
-        public function set_user_hash($hash = '')
-        {
-        }
-        /**
-         * Save the cart data to the database.
-         */
-        public function save()
-        {
-        }
-        /**
-         * Load the cart data from the database using the hash.
-         *
-         * @param string $hash The cart hash.
-         */
-        public function load_cart_by_hash($hash = null)
-        {
-        }
-        /**
-         * Get the items in the cart.
-         *
-         * @return array The items in the cart.
-         */
-        public function get_items()
-        {
-        }
-        /**
-         * Get the item count in the cart.
-         *
-         * @return int The item count in the cart.
-         */
-        public function get_item_count()
-        {
-        }
-        /**
-         * Get the shipping methods in the cart.
-         *
-         * @return array The shipping methods in the cart.
-         */
-        public function get_shipping_methods()
-        {
-        }
-        /**
-         * Get the data from the cart.
-         *
-         * @param string $column The column to get the data from.
-         * @return mixed The data from the cart.
-         */
-        public function get_data($column)
-        {
-        }
-        /**
-         * If it's from a logged in user/customer
-         * 
-         * @return \EasyCommerce\Models\Customer object | false
-         */
-        public function get_customer()
-        {
-        }
-        /**
-         * Get the cart data.
-         *
-         * @param bool $formatted Whether to format the cart data.
-         * @param bool $formatted_price Whether to format the price.
-         * @return array The cart data.
-         */
-        public function get($formatted = false, $formatted_price = true)
-        {
-        }
-        /**
-         * Get the payment intent ID for a specific payment method.
-         *
-         * @param string $method The payment method.
-         * @return string|null The payment intent ID or null if not found.
-         */
-        public function get_payment_intent($method)
-        {
-        }
-        /**
-         * Set the payment intent ID for a specific payment method.
-         *
-         * @param string $method The payment method.
-         * @param string $payment_intent_id The payment intent ID.
-         */
-        public function set_payment_intent($method, $payment_intent_id)
-        {
-        }
-        public function clear_payment_intent($method)
-        {
-        }
-        /**
-         * Get the customer name from the cart.
-         *
-         * @return string The customer name.
-         */
-        public function get_customer_name()
-        {
-        }
-        /**
-         * Get the customer email from the cart.
-         *
-         * @return string The customer email.
-         */
-        public function get_customer_email()
-        {
-        }
-        /**
-         * Get the amounts from the cart.
-         *
-         * @return array The amounts from the cart.
-         */
-        public function get_amounts()
-        {
-        }
-        /**
-         * Get the amount from the cart.
-         *
-         * @param string $segment The segment to get the amount from.
-         * @return mixed The amount from the cart.
-         */
-        public function get_amount($segment = 'total')
-        {
-        }
-        /**
-         * Get the quantity from the cart.
-         *
-         * @return int The quantity from the cart.
-         */
-        public function get_quantity()
-        {
-        }
-        /**
-         * Get the weight from the cart.
-         *
-         * @return float The weight from the cart.
-         */
-        public function get_weight()
-        {
-        }
-        /**
-         * Adds product data to the cart, now storing more detailed information.
-         *
-         * @param int       $product_id The ID of the product.
-         * @param int|array $price_id The price_id or an associative array of attributes.
-         * @param int       $quantity The quantity to add.
-         * @param int       $user_id The user ID.
-         * @param bool      $is_free Whether this is a free product from coupon.
-         */
-        public function add($product_id, $price_id = 1, $quantity = 1, $user_id = null, $is_free = false)
-        {
-        }
-        /**
-         * Updates a product quantity in the cart.
-         *
-         * @param int $product_id The ID of the product.
-         * @param int $quantity The new quantity to set.
-         */
-        public function update_qty($product_id, $price_id = 0, $quantity = 1)
-        {
-        }
-        /**
-         * Checks if the cart contains a given product_id and price_id
-         *
-         * @return bool
-         */
-        public function has_product($product_id, $price_id = 1)
-        {
-        }
-        /**
-         * Get the current status of the cart.
-         *
-         * @return string|null The cart status if found, null if the cart doesn't exist.
-         */
-        public function get_status()
-        {
-        }
-        /**
-         * Set the status of the cart.
-         *
-         * @param string $status The new status for the cart.
-         * @return bool True if status is updated, False if failure.
-         */
-        public function set_status($status)
-        {
-        }
-        /**
-         * Check if the cart contains at least 1 item of the given type.
-         *
-         * @param string $type The type of item to check for (e.g., 'physical').
-         * @return bool True if the cart contains an item of the given type, false otherwise.
-         */
-        public function has_item_type($type = 'physical')
-        {
-        }
-        /**
-         * Removes a product from the cart.
-         *
-         * @param int $product_id The ID of the product to remove.
-         * @param int $price_id The price ID. Default 1.
-         * @param bool $is_free Whether this is a free product removal.
-         */
-        public function remove($product_id, $price_id = 1, $is_free = false)
-        {
-        }
-        public function add_coupon($code = null)
-        {
-        }
-        /**
-         * Adds fee to the cart
-         * 
-         * @param array $fee An associative array of `name => amount` pair
-         * 
-         * @since 0.9.20
-         */
-        public function add_fee($fee = [])
-        {
-        }
-        /**
-         * Empties the cart.
-         */
-        public function empty()
-        {
-        }
-        /**
-         * Remove reference from the user meta or session.
-         */
-        public function remove_flag()
-        {
-        }
-        /**
-         * Reset the cart hash and store the new hash in the database.
-         *
-         * @return string The new cart hash.
-         */
-        public function reset()
-        {
-        }
-        /**
-         * Completely erase the cart session.
-         *
-         * @return bool True if the cart session is successfully deleted, false otherwise.
-         */
-        public function delete()
-        {
-        }
-        /**
-         * Get the billing address from the cart.
-         *
-         * @return array The billing address from the cart.
-         */
-        public function get_billing_address()
-        {
-        }
-        /**
-         * Get the shipping address from the cart.
-         *
-         * @return array The shipping address from the cart.
-         */
-        public function get_shipping_address()
-        {
-        }
-        /**
-         * Retrieve a specific field from the billing or shipping address.
-         *
-         * @param string $field The field name to retrieve.
-         * @param string $type  The address type ('billing' or 'shipping'). Default is 'billing'.
-         * @return string The value of the requested field or an empty string if not set.
-         */
-        public function get_address_field($field, $type = 'billing')
-        {
-        }
-        public function get_phone($type = 'billing')
-        {
-        }
-        public function get_address_1($type = 'billing')
-        {
-        }
-        public function get_address_2($type = 'billing')
-        {
-        }
-        public function get_country($type = 'billing')
-        {
-        }
-        public function get_state($type = 'billing')
-        {
-        }
-        public function get_city($type = 'billing')
-        {
-        }
-        public function get_postcode($type = 'billing')
-        {
-        }
-        /**
-         * Get abandoned carts
-         *
-         * @param int $period The time delay to consider as abandoned, in minutes. Default is 30 minutes.
-         * @return array Array of abandoned carts.
-         */
-        public function get_abandoned($period, $range = null, $from = null, $to = null)
-        {
-        }
-        /**
-         * Retrieves the current cart hash.
-         *
-         * @return string The cart hash.
-         */
-        public function get_hash()
-        {
-        }
-        /**
-         * Retrieves the current cart link.
-         *
-         * @return string The cart link.
-         */
-        public function get_link()
-        {
-        }
-        /**
-         * Handle free products discount (BXGY functionality)
-         *
-         * @param \EasyCommerce\Models\Coupon $coupon The coupon object
-         * @param array $cart_items All cart items
-         * @param array $applicable_items Applicable item indices
-         * @return float The discount amount
-         */
-        private function handle_free_products($coupon, $cart_items, $applicable_items)
-        {
-        }
-    }
-}
-namespace EasyCommerce\API {
-    /**
-     * Cart class.
-     */
-    class Cart extends \EasyCommerce\Models\Cart
-    {
-        use \EasyCommerce\Traits\Rest;
         /**
          * List the cart contents and hash.
          *
@@ -934,9 +456,8 @@ namespace EasyCommerce\Traits {
     }
 }
 namespace EasyCommerce\API {
-    class Connectivity
+    class Connectivity extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         use \EasyCommerce\Traits\Cache;
         use \EasyCommerce\Traits\Queue;
         public function save($request)
@@ -988,14 +509,13 @@ namespace EasyCommerce\API {
         {
         }
     }
-    class Coupon
+    class Coupon extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         /**
          * Retrieve all coupons or a specific coupon by ID.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function get_all($request)
         {
@@ -1003,8 +523,8 @@ namespace EasyCommerce\API {
         /**
          * Create a new coupon.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function create($request)
         {
@@ -1012,8 +532,8 @@ namespace EasyCommerce\API {
         /**
          * Retrieve details of a specific coupon by ID.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function get_single($request)
         {
@@ -1021,8 +541,8 @@ namespace EasyCommerce\API {
         /**
          * Update an existing coupon.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function update($request)
         {
@@ -1030,8 +550,8 @@ namespace EasyCommerce\API {
         /**
          * Delete a coupon.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function delete($request)
         {
@@ -1039,8 +559,8 @@ namespace EasyCommerce\API {
         /**
          * Bulk delete coupons.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function bulk_delete($request)
         {
@@ -1048,21 +568,20 @@ namespace EasyCommerce\API {
         /**
          * Bulk update the status of coupons.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function bulk_status_update($request)
         {
         }
     }
-    class Customer
+    class Customer extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         /**
          * Create a new customer.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function create($request)
         {
@@ -1070,8 +589,8 @@ namespace EasyCommerce\API {
         /**
          * Get a specific customer.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function get($request)
         {
@@ -1079,8 +598,8 @@ namespace EasyCommerce\API {
         /**
          * List customers with optional filters such as `s` for search, `page`, and `per_page`.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function list($request)
         {
@@ -1088,8 +607,8 @@ namespace EasyCommerce\API {
         /**
          * Update an existing customer.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function update($request)
         {
@@ -1097,8 +616,8 @@ namespace EasyCommerce\API {
         /**
          * Delete a customer.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function delete($request)
         {
@@ -1106,8 +625,8 @@ namespace EasyCommerce\API {
         /**
          * List customer orders with optional filters such as `s` for search, `page`, and `per_page`.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function list_orders($request)
         {
@@ -1116,13 +635,12 @@ namespace EasyCommerce\API {
     /**
      * Dashboard API
      */
-    class Dashboard
+    class Dashboard extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         /**
          * The dashboard stats
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function get_stats($request)
         {
@@ -1130,7 +648,7 @@ namespace EasyCommerce\API {
         /**
          * Orders by statuses
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function get_order_statuses($request)
         {
@@ -1141,7 +659,7 @@ namespace EasyCommerce\API {
         /**
          * Sales
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function get_sales($request)
         {
@@ -1149,7 +667,7 @@ namespace EasyCommerce\API {
         /**
          * Recent orders
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function get_recent_orders($request)
         {
@@ -1157,8 +675,8 @@ namespace EasyCommerce\API {
         /**
          * Low stock
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function get_low_stock($request)
         {
@@ -1175,7 +693,7 @@ namespace EasyCommerce\API {
         /**
          * Reports
          *
-         * @param \WP_REST_Request $request The request object.
+         * @param WP_REST_Request $request The request object.
          */
         public function reports($request)
         {
@@ -1247,6 +765,9 @@ namespace EasyCommerce\API {
         {
         }
         public function get_abandoned_carts($range = 'this-month', $from = null, $to = null)
+        {
+        }
+        private function get_total_products()
         {
         }
     }
@@ -1328,12 +849,45 @@ namespace EasyCommerce\Traits {
         {
         }
     }
+    trait Cleaner
+    {
+        /**
+         * Generic sanitization method that dynamically selects the appropriate sanitization function based on the type or data content.
+         *
+         * @param mixed  $input The input data to sanitize, can be a string or an array.
+         * @param string $type  The type of sanitization to perform, or 'array' to recursively sanitize an array of data.
+         * @return mixed The sanitized data, either a string or an array of sanitized strings.
+         */
+        public function sanitize($input, $type = 'text')
+        {
+        }
+        /**
+         * Generic escaping method for securing output against XSS and other vulnerabilities.
+         * If an array is provided as output, the specified escaping context will be applied to each element.
+         *
+         * @param mixed  $output The output data to escape, can be a string or an array of strings.
+         * @param string $context The context for escaping. Default is 'html'.
+         *                        Supported contexts: 'html', 'url', 'js', 'sql', 'attr'.
+         * @return mixed The escaped data, either a string or an array of escaped strings.
+         */
+        public function escape($output, $context = 'html')
+        {
+        }
+        /**
+         * Recursively unserialize a value if it is serialized, handling nested serialization.
+         *
+         * @param mixed $value The value to unserialize.
+         * @return mixed The unserialized value.
+         */
+        public function unserialize($value)
+        {
+        }
+    }
 }
 namespace EasyCommerce\API {
-    class Email_Placeholder
+    class Email_Placeholder extends \EasyCommerce\Abstracts\API
     {
         use \EasyCommerce\Traits\Hook;
-        use \EasyCommerce\Traits\Rest;
         use \EasyCommerce\Traits\Cleaner;
         /**
          * Get general email placeholders (available for all emails)
@@ -1366,96 +920,16 @@ namespace EasyCommerce\API {
         /**
          * REST API handler to get placeholders for Select2
          *
-         * @param \WP_REST_Request $request The REST request object.
+         * @param WP_REST_Request $request The REST request object.
          *
          * @return void Uses Rest trait response methods.
          */
-        public function get_placeholders(\WP_REST_Request $request)
+        public function get_placeholders(\EasyCommerce\API\WP_REST_Request $request)
         {
         }
     }
-}
-namespace EasyCommerce\Models {
-    /**
-     * Location Class
-     * Handles loading country, state, city, and other location-related data from a static JSON file.
-     */
-    class Location
+    class Geo extends \EasyCommerce\Abstracts\API
     {
-        /**
-         * @var array Cached data from the JSON file
-         */
-        protected static $data = array();
-        /**
-         * Load data from the JSON file if not already loaded.
-         */
-        protected static function load_data()
-        {
-        }
-        /**
-         * Retrieve the list of all countries.
-         *
-         * @return array List of countries with basic details.
-         */
-        public static function get_countries()
-        {
-        }
-        /**
-         * Retrieve the list of states for a given country.
-         *
-         * @param string $country_code ISO-2 code of the country.
-         * @return array List of states for the given country.
-         */
-        public static function get_states($country_code)
-        {
-        }
-        /**
-         * Retrieve the list of cities for a given state within a country.
-         * If no state code is provided, return all cities in the country.
-         *
-         * @param string      $country_code ISO-2 code of the country.
-         * @param string|null $state_code Optional. State code within the country.
-         * @return array List of cities for the given state or all cities for the country if state code is not provided.
-         */
-        public static function get_cities($country_code, $state_code = null)
-        {
-        }
-        /**
-         * Retrieve the list of currencies.
-         * If a country is specified, return only the currency for that country.
-         *
-         * @param string|null $country ISO-2 code of the country.
-         * @return array List of all currencies or a single currency for the specified country.
-         */
-        public static function get_currencies($country = null)
-        {
-        }
-        /**
-         * Retrieve the list of ISD codes.
-         * If a country is specified, return only the ISD code for that country.
-         *
-         * @param string|null $country ISO-2 code of the country.
-         * @return array List of ISD codes for all countries or a single ISD code for the specified country.
-         */
-        public static function get_isd_codes($country = null)
-        {
-        }
-        /**
-         * Retrieve the list of timezones.
-         * If a country is specified, return only the timezones for that country.
-         *
-         * @param string|null $country ISO-2 code of the country.
-         * @return array List of timezones for all countries or specific timezones for the specified country.
-         */
-        public static function get_timezones($country = null)
-        {
-        }
-    }
-}
-namespace EasyCommerce\API {
-    class Geo extends \EasyCommerce\Models\Location
-    {
-        use \EasyCommerce\Traits\Rest;
         use \EasyCommerce\Traits\Cache;
         public function list_countries($request)
         {
@@ -1466,10 +940,12 @@ namespace EasyCommerce\API {
         public function list_cities($request)
         {
         }
+        public function list_currencies($request)
+        {
+        }
     }
-    class Importer
+    class Importer extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         use \EasyCommerce\Traits\Cleaner;
         use \EasyCommerce\Traits\Queue;
         public function upload_csv($request)
@@ -1479,6 +955,9 @@ namespace EasyCommerce\API {
         {
         }
         public function import_products($request)
+        {
+        }
+        public function import_sample_products($request)
         {
         }
         public function create_product($row)
@@ -1526,27 +1005,74 @@ namespace EasyCommerce\API {
         private function build_variation($variation_data, $key, $product_attributes)
         {
         }
-    }
-    class Notice
-    {
-        /**
-         * Get notice status information
-         *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
-         */
-        public function pro_notice_status($request)
+        public function is_base64_data_url(string $value): bool
+        {
+        }
+        public function sideload_image($request)
         {
         }
     }
-    class Option
+    class Log extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
+        /**
+         * List logs with optional filters.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function list($request)
+        {
+        }
+        /**
+         * Get a single log by ID.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function get($request)
+        {
+        }
+        /**
+         * Add a new log entry.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function add($request)
+        {
+        }
+        /**
+         * Delete a log entry.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function delete($request)
+        {
+        }
+    }
+    class Notice extends \EasyCommerce\Abstracts\API
+    {
+        /**
+         * List notices via REST API, optionally filtered by type and screen.
+         *
+         * @param  WP_REST_Request $request Request object containing optional 'type' and 'screen' params.
+         * @return WP_REST_Response Response with 'notices' array and 'total' count.
+         */
+        public function list($request)
+        {
+        }
+        public function dismiss($request)
+        {
+        }
+    }
+    class Option extends \EasyCommerce\Abstracts\API
+    {
         /**
          * Get the value of a specified option.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function get($request)
         {
@@ -1554,8 +1080,8 @@ namespace EasyCommerce\API {
         /**
          * Update the value of a specified option.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function update($request)
         {
@@ -1563,310 +1089,15 @@ namespace EasyCommerce\API {
         /**
          * Delete the specified option.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function delete($request)
         {
         }
     }
-}
-namespace EasyCommerce\Models {
-    /**
-     * Concrete Order Class
-     * Handles order-related operations in the database.
-     */
-    class Order
+    class Order extends \EasyCommerce\Abstracts\API
     {
-        /**
-         * @var int Order ID
-         */
-        protected $id;
-        /**
-         * @var int Customer ID
-         */
-        protected $customer_id = 0;
-        /**
-         * @var float Order total amount
-         */
-        protected $total = 0.0;
-        /**
-         * @var float Order subtotal amount
-         */
-        protected $subtotal = 0.0;
-        /**
-         * @var string Order status
-         */
-        protected $status = 'pending';
-        /**
-         * @var string Fulfillment status
-         */
-        protected $fulfill_status = '';
-        /**
-         * @var string Payment method
-         */
-        protected $payment_method = '';
-        /**
-         * @var string Order creation date
-         */
-        protected $created_at = '';
-        /**
-         * @var string Last modified date
-         */
-        protected $updated_at = '';
-        /**
-         * @var bool Order existence flag
-         */
-        protected $exists = false;
-        /**
-         * @var \EasyCommerce\Models\Order_Meta Instance for handling order meta data
-         */
-        protected $meta;
-        /**
-         * @var \EasyCommerce\Models\Order_Item Instance for handling order items
-         */
-        protected $items;
-        /**
-         * @var Database Instance for handling DB operations
-         */
-        protected $db;
-        /**
-         * Constructor for the Order class.
-         *
-         * @param int|null $id Optional. The order ID.
-         */
-        public function __construct($id = null)
-        {
-        }
-        /**
-         * Get the order ID.
-         *
-         * @return int|null
-         */
-        public function get_id()
-        {
-        }
-        /**
-         * Check if the order exists.
-         *
-         * @return bool
-         */
-        public function exists()
-        {
-        }
-        /**
-         * Get the customer ID for the order.
-         *
-         * @return int
-         */
-        public function get_customer_id()
-        {
-        }
-        /**
-         * Get the total amount of the order.
-         *
-         * @return float
-         */
-        public function get_total()
-        {
-        }
-        /**
-         * Get the subtotal amount of the order.
-         *
-         * @return float
-         */
-        public function get_subtotal()
-        {
-        }
-        /**
-         * Get the tax amount of the order.
-         *
-         * @return float
-         */
-        public function get_tax_total()
-        {
-        }
-        /**
-         * Get the shipping amount of the order.
-         *
-         * @return float
-         */
-        public function get_shipping_total()
-        {
-        }
-        /**
-         * Get the coupon discount amount of the order.
-         *
-         * @return float
-         */
-        public function get_discount_total()
-        {
-        }
-        /**
-         * Get the status of the order.
-         *
-         * @return string
-         */
-        public function get_status()
-        {
-        }
-        /**
-         * Set the status of the order.
-         *
-         * @return bool|int
-         */
-        public function set_status($status)
-        {
-        }
-        /**
-         * Get the fulfillment status of the order.
-         *
-         * @return string
-         */
-        public function get_fulfillment_status()
-        {
-        }
-        /**
-         * Set the fulfillment status of the order.
-         *
-         * @return bool|int
-         */
-        public function set_fulfillment_status($fulfill_status)
-        {
-        }
-        /**
-         * Get the payment method for the order.
-         *
-         * @return string
-         */
-        public function get_payment_method()
-        {
-        }
-        public function get_created_at()
-        {
-        }
-        public function get_updated_at()
-        {
-        }
-        public function get_transactions($formatted = false)
-        {
-        }
-        /**
-         * Create a new order.
-         *
-         * @param array $args Order data.
-         * @return bool|int Order ID on success, false on failure.
-         */
-        public function create($args)
-        {
-        }
-        /**
-         * Update the order.
-         *
-         * @param array $data Updated order data.
-         * @return bool|int Number of affected rows on success, false on failure.
-         */
-        public function update($data)
-        {
-        }
-        /**
-         * Delete the order.
-         *
-         * @return bool True on success, false on failure.
-         */
-        public function delete()
-        {
-        }
-        /**
-         * Add order meta data using the Order_Meta class.
-         *
-         * @param string $key Meta key.
-         * @param mixed  $value Meta value.
-         * @return bool True on success, false on failure.
-         */
-        public function add_meta($key, $value)
-        {
-        }
-        /**
-         * Get order meta data using the Order_Meta class.
-         *
-         * @param string $key Meta key.
-         * @param bool   $single Whether to return a single value.
-         * @return mixed Meta value or null if not found.
-         */
-        public function get_meta($key, $single = true)
-        {
-        }
-        /**
-         * Update order meta data using the Order_Meta class.
-         *
-         * @param string $key Meta key.
-         * @param mixed  $value Meta value.
-         * @return bool True on success, false on failure.
-         */
-        public function update_meta($key, $value)
-        {
-        }
-        /**
-         * Delete order meta data using the Order_Meta class.
-         *
-         * @param string $key Meta key.
-         * @return bool True on success, false on failure.
-         */
-        public function delete_meta($key)
-        {
-        }
-        /**
-         * Get all items for the order using the Order_Item class.
-         *
-         * @return array List of order items.
-         */
-        public function get_items($formatted = false)
-        {
-        }
-        /**
-         * Add an item to the order using the Order_Item class.
-         *
-         * @param array $item_data Item data (product ID, quantity, price, etc.).
-         * @return bool True on success, false on failure.
-         */
-        public function add_item($item_data)
-        {
-        }
-        /**
-         * Remove an item from the order using the Order_Item class.
-         *
-         * @param int $item_id The order item ID.
-         * @return bool True on success, false on failure.
-         */
-        public function remove_item($item_id)
-        {
-        }
-        /**
-         * Update an item in the order using the Order_Item class.
-         *
-         * @param int   $item_id The order item ID.
-         * @param array $data    Updated item data.
-         * @return bool True on success, false on failure.
-         */
-        public function update_item($item_id, $data)
-        {
-        }
-        /**
-         * Static method to list orders with optional filters such as per_page, page, status, and search_query.
-         *
-         * @param array $args Arguments that may include 'per_page', 'page', 'status', and 'search_query'.
-         * @return array List of orders and pagination info.
-         */
-        public static function list($args = array(), $formatted = false)
-        {
-        }
-    }
-}
-namespace EasyCommerce\API {
-    class Order extends \EasyCommerce\Models\Order
-    {
-        use \EasyCommerce\Traits\Rest;
         /**
          * Create a new order.
          *
@@ -1916,33 +1147,6 @@ namespace EasyCommerce\API {
         {
         }
         /**
-         * Add an order note.
-         *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
-         */
-        public function add_note($request)
-        {
-        }
-        /**
-         * Get order notes.
-         *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
-         */
-        public function get_notes($request)
-        {
-        }
-        /**
-         * Delete an order note.
-         *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
-         */
-        public function delete_note($request)
-        {
-        }
-        /**
          * Send an email.
          *
          * @param \WP_REST_Request $request
@@ -1964,141 +1168,8 @@ namespace EasyCommerce\API {
         {
         }
     }
-}
-namespace EasyCommerce\Models {
-    /**
-     * Class Order_Item
-     * Handles order items and their metadata operations in the database.
-     *
-     * @package EasyCommerce\Model
-     */
-    class Order_Item
+    class Order_Item extends \EasyCommerce\Abstracts\API
     {
-        /**
-         * @var Order Item ID
-         */
-        protected $id;
-        /**
-         * @var Database
-         */
-        protected $db;
-        /**
-         * @var Order_Item_Meta Instance for handling order item metadata
-         */
-        protected $meta;
-        /**
-         * Order_Item constructor.
-         * Initializes the class with the 'order_items' table and metadata handler.
-         */
-        public function __construct($id = null)
-        {
-        }
-        /**
-         * Get all items for a specific order by order ID.
-         *
-         * @param int $order_id The order ID.
-         * @return array List of order items.
-         */
-        public function get_by_order_id($order_id)
-        {
-        }
-        /**
-         * Add a new item to the order.
-         *
-         * @param int   $order_id The order ID.
-         * @param array $item_data The item data (product ID, quantity, price, etc.).
-         * @return bool|int Item ID on success, false on failure.
-         */
-        public function add($order_id, $item_data)
-        {
-        }
-        /**
-         * Update an existing order item.
-         *
-         * @param int   $item_id The item ID.
-         * @param array $data    Updated item data (quantity, price, etc.).
-         * @return bool True on success, false on failure.
-         */
-        public function update($data)
-        {
-        }
-        /**
-         * Delete an order item by its item ID.
-         * The associated metadata will be automatically deleted by the database.
-         *
-         * @param int $item_id The item ID.
-         * @return bool True on success, false on failure.
-         */
-        public function delete()
-        {
-        }
-        /**
-         * Get a specific order item by its ID.
-         *
-         * @param int $item_id The item ID.
-         * @return object|null The order item object if found, otherwise null.
-         */
-        public function get_by_id($item_id)
-        {
-        }
-        /**
-         * Get a specific order item by its ID.
-         *
-         * @param int $item_id The item ID.
-         * @return object|null The order item object if found, otherwise null.
-         */
-        public function get_by($value, $key = 'order_id')
-        {
-        }
-        /**
-         * Add metadata to a specific order item using Order_Item_Meta.
-         *
-         * @param int    $item_id The item ID.
-         * @param string $key     The meta key.
-         * @param mixed  $value   The meta value.
-         * @return bool True on success, false on failure.
-         */
-        public function add_meta($key, $value)
-        {
-        }
-        /**
-         * Get metadata for a specific order item using Order_Item_Meta.
-         *
-         * @param int    $item_id The item ID.
-         * @param string $key     The meta key.
-         * @param bool   $single  Whether to return a single value.
-         * @return mixed The meta value or null if not found.
-         */
-        public function get_meta($key, $single = true)
-        {
-        }
-        /**
-         * Update metadata for a specific order item using Order_Item_Meta.
-         *
-         * @param int    $item_id The item ID.
-         * @param string $key     The meta key.
-         * @param mixed  $value   The meta value.
-         * @return bool True on success, false on failure.
-         */
-        public function update_meta($key, $value)
-        {
-        }
-        /**
-         * Delete metadata for a specific order item using Order_Item_Meta.
-         *
-         * @param int    $item_id The item ID.
-         * @param string $key     The meta key.
-         * @return bool True on success, false on failure.
-         */
-        public function delete_meta($key)
-        {
-        }
-    }
-}
-namespace EasyCommerce\API {
-    class Order_Item extends \EasyCommerce\Models\Order_Item
-    {
-        use \EasyCommerce\Traits\Rest;
         /**
          * Get items for a specific order.
          *
@@ -2136,9 +1207,8 @@ namespace EasyCommerce\API {
         {
         }
     }
-    class Product
+    class Product extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         public function list($request)
         {
         }
@@ -2221,14 +1291,13 @@ namespace EasyCommerce\API {
         {
         }
     }
-    class Product_Review
+    class Product_Review extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         /**
          * Get a list of product reviews.
          *
-         * @param \WP_REST_Request $request The request object.
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request The request object.
+         * @return WP_REST_Response
          */
         public function get_all($request)
         {
@@ -2236,16 +1305,15 @@ namespace EasyCommerce\API {
         /**
          * Delete a product review.
          *
-         * @param \WP_REST_Request $request The request object.
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request The request object.
+         * @return WP_REST_Response
          */
         public function delete($request)
         {
         }
     }
-    class Profile
+    class Profile extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         /**
          * Gets current user summary
          */
@@ -2292,14 +1360,70 @@ namespace EasyCommerce\API {
         {
         }
     }
-    class Shipping_Plan
+    class Refund extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
+        /**
+         * List refunds.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function list($request)
+        {
+        }
+        /**
+         * Get a refund.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function get($request)
+        {
+        }
+        /**
+         * Create a new refund.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function create($request)
+        {
+        }
+        /**
+         * Update a refund.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function update($request)
+        {
+        }
+        /**
+         * Delete a refund.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function delete($request)
+        {
+        }
+        /**
+         * Bulk delete refunds.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function bulk_delete($request)
+        {
+        }
+    }
+    class Shipping_Plan extends \EasyCommerce\Abstracts\API
+    {
         /**
          * Retrieve all shipping plans or a specific plan by ID.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function get_all($request)
         {
@@ -2307,8 +1431,8 @@ namespace EasyCommerce\API {
         /**
          * Create a new shipping plan.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function create($request)
         {
@@ -2316,8 +1440,8 @@ namespace EasyCommerce\API {
         /**
          * Update an existing shipping plan.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function update($request)
         {
@@ -2325,8 +1449,8 @@ namespace EasyCommerce\API {
         /**
          * Delete a shipping plan.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function delete($request)
         {
@@ -2334,8 +1458,8 @@ namespace EasyCommerce\API {
         /**
          * Retrieve shipping plans available for a specific region.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function get_by_location($request)
         {
@@ -2344,17 +1468,16 @@ namespace EasyCommerce\API {
     /**
      * Tax API class
      */
-    class Tax
+    class Tax extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         public function list_classes($request)
         {
         }
         /**
          * Create a tax class with associated rates.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function create_class($request)
         {
@@ -2365,8 +1488,8 @@ namespace EasyCommerce\API {
         /**
          * Update a tax class with associated rates.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function update_class($request)
         {
@@ -2374,8 +1497,8 @@ namespace EasyCommerce\API {
         /**
          * Delete a tax class and its associated rates.
          *
-         * @param \WP_REST_Request $request
-         * @return \WP_REST_Response
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
          */
         public function delete_class($request)
         {
@@ -2386,8 +1509,8 @@ namespace EasyCommerce\API {
          * This REST API endpoint uses the Tax_Model to search the plugin's /taxes folder
          * for CSV files matching the provided country codes. Only existing files are returned.
          *
-         * @param \WP_REST_Request $request The current REST API request containing 'countries' parameter.
-         * @return \WP_REST_Response JSON response containing an array of matched country codes.
+         * @param WP_REST_Request $request The current REST API request containing 'countries' parameter.
+         * @return WP_REST_Response JSON response containing an array of matched country codes.
          */
         public function get_tax_files($request)
         {
@@ -2398,68 +1521,15 @@ namespace EasyCommerce\API {
          * This endpoint uses the Tax_Model to read tax rates from the CSV file
          * and formats them for API consumption.
          *
-         * @param \WP_REST_Request $request The current REST API request.
-         * @return \WP_REST_Response JSON response containing tax rates or an error message.
+         * @param WP_REST_Request $request The current REST API request.
+         * @return WP_REST_Response JSON response containing tax rates or an error message.
          */
         public function get_tax_rates($request)
         {
         }
     }
-}
-namespace EasyCommerce\Models {
-    /**
-     * Class Taxonomy
-     * Handles product taxonomy operations.
-     *
-     * @package EasyCommerce\Model
-     */
-    class Taxonomy
+    class Taxonomy extends \EasyCommerce\Abstracts\API
     {
-        /**
-         * Lists terms and their children
-         *
-         * @param int    $parent_id The parent term ID
-         * @param string $taxonomy The taxonomy name
-         *
-         * @return array
-         */
-        public function list_terms($parent_id = 0, $taxonomy = 'product_cat', $limit = 10, $offset = 0)
-        {
-        }
-        /**
-         * Adds a new term to the specified taxonomy
-         *
-         * @param string   $name The name of the term
-         * @param string   $slug The slug of the term (optional)
-         * @param string   $taxonomy The taxonomy name
-         * @param int|null $parent The parent term ID (optional)
-         *
-         * @return array
-         */
-        public function add_term($name, $taxonomy, $slug = null, $parent = null)
-        {
-        }
-        /**
-         * Updates a term in the specified taxonomy
-         * @param int      $term_id The ID of the term to update
-         * @param string   $name The new name of the term ( optional )
-         * @param string   $taxonomy The taxonomy name
-         * @param int|null $parent The new parent term ID (optional)
-         *
-         * @return array
-         */
-        public function update_term($term_id, $name, $taxonomy, $slug = null, $parent = null)
-        {
-        }
-        public function delete_term($term_id, $taxonomy)
-        {
-        }
-    }
-}
-namespace EasyCommerce\API {
-    class Taxonomy extends \EasyCommerce\Models\Taxonomy
-    {
-        use \EasyCommerce\Traits\Rest;
         use \EasyCommerce\Traits\Cleaner;
         public function get_categories($request)
         {
@@ -2498,13 +1568,12 @@ namespace EasyCommerce\API {
         {
         }
     }
-    class Transaction
+    class Transaction extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Rest;
         /**
          * List transactions with optional filters like order ID, status, and pagination.
          *
-         * @param \WP_REST_Request $request
+         * @param WP_REST_Request $request
          * @return WP_REST_Response
          */
         public function list($request)
@@ -2939,7 +2008,7 @@ namespace EasyCommerce\Models {
          *
          * @var wpdb
          */
-        protected $db;
+        public $db;
         /**
          * The common prefix for the tables.
          *
@@ -3191,7 +2260,7 @@ namespace EasyCommerce\Models {
         public function get_prefix()
         {
         }
-        public function exec($sql)
+        public function exec($sql, $output = OBJECT)
         {
         }
         /**
@@ -3267,6 +2336,33 @@ namespace EasyCommerce\Abstracts {
          * @return bool
          */
         public function delete($unique_id, $key)
+        {
+        }
+    }
+    /**
+     * Abstract Model Class
+     * Provides a base for all model classes with Database dependency injection.
+     */
+    abstract class Model
+    {
+        /**
+         * @var \EasyCommerce\Models\Database Instance for handling DB operations
+         */
+        public $db;
+        /**
+         * @var string Table name (without prefix)
+         */
+        protected $table;
+        /**
+         * @var string Primary key column
+         */
+        protected $primary_key = 'id';
+        /**
+         * Constructor for the Model class.
+         *
+         * @param \EasyCommerce\Models\Database|null $db Optional. Database instance for dependency injection.
+         */
+        public function __construct(\EasyCommerce\Models\Database $db = null)
         {
         }
     }
@@ -3427,6 +2523,9 @@ namespace EasyCommerce\Abstracts {
         {
         }
         public function refund($order_id, $reason, $amount)
+        {
+        }
+        public function supports_refund()
         {
         }
         /**
@@ -3781,6 +2880,10 @@ namespace EasyCommerce\Bootstrap\Activator {
         public function register()
         {
         }
+        // Set default content for new products
+        public function insert_default_content($post_id, $post, $update)
+        {
+        }
     }
     class Taxonomy
     {
@@ -4090,6 +3193,7 @@ namespace EasyCommerce\Controllers\Admin {
     {
         use \EasyCommerce\Traits\Hook;
         use \EasyCommerce\Traits\Asset;
+        use \EasyCommerce\Traits\Cache;
         use \EasyCommerce\Traits\Queue;
         use \EasyCommerce\Traits\Cleaner;
         /**
@@ -4115,13 +3219,7 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         /**
-         * Handles the AJAX request to dismiss the notice and record the time
-         */
-        public function dismiss_pro_notice()
-        {
-        }
-        /**
-         * Show the EasyCommerce Pro admin notice for BFCM campaign
+         * Show the EasyCommerce Pro admin notice for Year End campaign
          */
         private function show_easycommerce_pro_notice()
         {
@@ -4162,6 +3260,24 @@ namespace EasyCommerce\Controllers\Admin {
          * Add button to TinyMCE toolbar
          */
         public function register_tinymce_dropdown_button(array $buttons): array
+        {
+        }
+        /**
+         * Add migration button in the admin secondary top bar
+         */
+        public function add_migration_btn_in_admin_bar($wp_admin_bar)
+        {
+        }
+        /**
+         * Add migration popup for installing 'Migration Addon'
+         */
+        public function add_migration_popup()
+        {
+        }
+        /*
+         * Intercept theme query to show custom themes
+         */
+        public function intercept_theme_query()
         {
         }
     }
@@ -4452,15 +3568,27 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         /**
+         * Register Importer-related API endpoints
+         */
+        private function register_importer_endpoints()
+        {
+        }
+        /**
+         * Register Log-related API endpoints
+         */
+        private function register_log_endpoints()
+        {
+        }
+        /**
          * Register Notice-related API endpoints
          */
         private function register_notice_endpoints()
         {
         }
         /**
-         * Register Importer-related API endpoints
+         * Register Refund-related API endpoints
          */
-        private function register_importer_endpoints()
+        private function register_refund_endpoints()
         {
         }
     }
@@ -4589,10 +3717,57 @@ namespace EasyCommerce\Controllers\Common {
         public function restrict_media_access($query)
         {
         }
-        public function add_order_status_change_note($order_id, $new_status, $old_status)
+        /**
+         * Add a log entry to the database.
+         *
+         * This method is hooked to the 'easycommerce_log' action and handles logging
+         * various activities within the e-commerce system such as order creation,
+         * product updates, coupon usage, etc.
+         *
+         * @param array $data Log data array with the following keys:
+         *   - object (string, required): The object type being logged ('order', 'product', 'coupon', etc.)
+         *   - action (string, required): The action performed ('created', 'updated', 'deleted', etc.)
+         *   - object_id (int, required): The ID of the object being logged
+         *   - user_id (int, optional): User ID who performed the action. Defaults to current user
+         *   - note (string, optional): Additional notes or description of the action
+         *   - ip_address (string, optional): IP address of the client. Auto-detected if not provided
+         *   - type (string, optional): Log level/type ('info', 'warning', 'error'). Defaults to 'info'
+         *   - meta (string|array, optional): Additional meta. Can be JSON string or array (will be JSON encoded)
+         *
+         * @return bool|int Log ID on success, false on failure or validation error.
+         *
+         * @example
+         * do_action( 'easycommerce_log', array(
+         *     'object'    => 'order',
+         *     'action'    => 'created',
+         *     'object_id' => 123,
+         *     'note'      => 'Order placed via checkout',
+         *     'type'      => 'info',
+         *     'meta'  	   => array('amount' => 99.99, 'currency' => 'USD')
+         * ) );
+         */
+        public function add_log($data)
         {
         }
-        public function add_fulfillment_status_change_note($order_id, $new_status, $old_status)
+        public function add_notices()
+        {
+        }
+        /**
+         * Register EasyCommerce Full Width page template
+         *
+         * @param array $templates Existing page templates.
+         * @return array Modified page templates.
+         */
+        public function register_full_width_template($templates)
+        {
+        }
+        /**
+         * Load EasyCommerce Full Width page template from plugin
+         *
+         * @param string $template Current template path.
+         * @return string Modified template path.
+         */
+        public function load_full_width_template($template)
         {
         }
     }
@@ -4610,6 +3785,9 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         public function process_import_batch($import_id, $offset)
+        {
+        }
+        public function import_sample_products()
         {
         }
         /**
@@ -4710,6 +3888,12 @@ namespace EasyCommerce\Controllers\Front {
          * Check if required elements are present on setup wizard pages
          */
         public function check_required_elements($content)
+        {
+        }
+        /**
+         * Show notices
+         */
+        public function show_notices()
         {
         }
     }
@@ -4833,33 +4017,48 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
     class PaymentIntent
     {
         use \EasyCommerce\Traits\Rest;
-        protected \EasyCommerce\Models\Cart $cart;
-        protected \Stripe\StripeClient $api_client;
-        protected \EasyCommerce\Controllers\Payment\Stripe\Helpers\PaymentMethods $payment_methods_helper;
+        protected $api_client;
+        protected $payment_methods_helper;
         public function __construct()
         {
         }
         /**
-         * Create a Payment Intent for the current cart.
+         * Get or create a Stripe customer for the current user.
+         *
+         * @return string|\WP_Error Customer ID or error.
+         */
+        protected function get_or_create_customer()
+        {
+        }
+        /**
+         * Prepare metadata for Stripe.
+         *
+         * @param array $cart Cart data.
+         * @param string $customer_email Customer email.
+         *
+         * @return array Metadata array.
+         */
+        protected function prepare_metadata($cart, $customer_email)
+        {
+        }
+        /**
+         * Create a Payment Intent OR Setup Intent based on cart contents.
          *
          * @param \WP_REST_Request $request The REST request.
          *
-         * @return array|\WP_Error The Payment Intent data or error.
+         * @return array|\WP_Error The intent data or error.
          */
         public function create(\WP_REST_Request $request)
         {
         }
         /**
-         * Update a Payment Intent with the current cart amount.
+         * Update Payment Intent or SetupIntent with current cart amount.
          *
          * @param \WP_REST_Request $request The REST request.
          *
          * @return array|\WP_Error The update result or error.
          */
         public function update(\WP_REST_Request $request)
-        {
-        }
-        public function clear()
         {
         }
     }
@@ -4890,28 +4089,23 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
         {
         }
         /**
-         * Handles successful payment of an invoice, ensuring subscription renewal and transaction recording.
+         * Handle successful payment intent
          *
-         * This method is triggered when a payment for an invoice succeeds. It checks the billing reason
-         * and processes subscription renewals, creates a corresponding order, and records the payment as a transaction.
-         * If a subscription has a recurrence limit, it validates the order count against the limit and updates
-         * the subscription status accordingly.
-         *
-         * @param \Stripe\Event $event The event object containing the invoice and associated data.
+         * @param \Stripe\Event $event The event object.
          *
          * @return void
          */
-        public function invoice_payment_succeeded($event)
+        public function payment_intent_succeeded($event)
         {
         }
         /**
-         * Handles the deletion of a customer subscription by updating its status based on metadata and recurrence limits.
+         * Handle failed payment intent
          *
-         * @param \Stripe\Event $event The event object containing subscription data and metadata.
+         * @param \Stripe\Event $event The event object.
          *
          * @return void
          */
-        public function customer_subscription_deleted($event)
+        public function payment_intent_failed($event)
         {
         }
     }
@@ -4986,14 +4180,39 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Controllers\Common {
         public function manage_webhook($option)
         {
         }
+        /**
+         * Ensures payment methods are in sync when admin loads
+         *
+         * @return void
+         */
+        public function ensure_payment_methods_sync()
+        {
+        }
     }
 }
 namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
     class PaymentMethods
     {
-        protected \Stripe\StripeClient $api_client;
+        protected $api_client;
         protected array $payment_method_configs = array();
+        protected string $cache_key = 'easycommerce_stripe_payment_methods_cache';
         public function __construct()
+        {
+        }
+        /**
+         * Force sync payment methods from Stripe API and save to database
+         *
+         * @return void
+         */
+        public function force_sync_payment_methods(): void
+        {
+        }
+        /**
+         * Fetch payment methods directly from Stripe API
+         *
+         * @return array Array of payment method data
+         */
+        private function fetch_payment_methods_from_api(): array
         {
         }
         /**
@@ -5013,8 +4232,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
         {
         }
         /**
-         * Gets payment method options for the settings multiselect field.
-         * Only shows options when a payment method configuration is selected.
+         * Gets payment method options from Stripe's default configuration.
          *
          * @return array Array of payment method options with labels.
          */
@@ -5022,7 +4240,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
         {
         }
         /**
-         * Gets enabled payment methods from settings.
+         * Gets enabled payment methods from Stripe's default configuration.
          *
          * @return array Array of enabled payment method types.
          */
@@ -5045,6 +4263,22 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
          * @return string The human-readable label.
          */
         private function get_payment_method_label(string $method_type): string
+        {
+        }
+        /**
+         * Get all available payment methods from Stripe's default configuration
+         *
+         * @return array Array of payment method data
+         */
+        public function get_all_available_payment_methods(): array
+        {
+        }
+        /**
+         * Get all possible payment method labels
+         *
+         * @return array Array of payment method labels
+         */
+        private function get_all_payment_method_labels(): array
         {
         }
     }
@@ -5111,8 +4345,9 @@ namespace EasyCommerce\Controllers\Payment\Stripe\PaymentMethods {
     {
         use \EasyCommerce\Traits\Hook;
         protected $id;
-        protected \Stripe\StripeClient $api_client;
-        protected \EasyCommerce\Controllers\Payment\Stripe\Helpers\PaymentMethods $payment_methods_helper;
+        protected $api_client;
+        protected $payment_methods_helper;
+        protected $refund_transaction_id;
         public function __construct()
         {
         }
@@ -5167,6 +4402,12 @@ namespace EasyCommerce\Controllers\Payment\Stripe\PaymentMethods {
         {
         }
         /**
+         * Process one-time payment with existing PaymentIntent
+         */
+        private function process_one_time_payment_with_intent($order, $order_id, $payment_intent_id, $payment_method_id, $customer_id, $default_order_status)
+        {
+        }
+        /**
          * Handle payment element redirect flow (3D Secure, etc.)
          *
          * @param \EasyCommerce\Models\Order $order The order object.
@@ -5180,101 +4421,27 @@ namespace EasyCommerce\Controllers\Payment\Stripe\PaymentMethods {
         {
         }
         /**
-         * Checks if the cart contains any recurring/subscription items.
-         *
-         * @param array $cart The cart data containing items and their details.
-         *
-         * @return bool True if cart has recurring items, false otherwise.
-         */
-        private function cart_has_recurring($cart): bool
-        {
-        }
-        /**
-         * Process payment using Payment Intents (new approach)
-         *
-         * @param \EasyCommerce\Models\Order $order The order object.
-         * @param int $order_id The order ID.
-         * @param string $payment_intent_id The Stripe payment intent ID.
-         * @param string|null $payment_method_id The Stripe payment method ID.
-         * @param string $payment_method_type The type of payment method used.
-         * @param float $total_amount The total payment amount.
-         * @param string $currency The payment currency.
-         * @param array $meta_data Additional metadata for the payment.
-         * @param int $customer_id The customer ID.
-         * @param array $params Payment parameters.
-         * @param string $default_order_status The default order status.
-         * @param bool $has_recurring Whether the cart has recurring items.
-         *
-         * @return string The order status after processing.
-         * @throws \Stripe\Exception\ApiErrorException
-         * @throws \Exception
-         */
-        private function process_payment_intent($order, $order_id, $payment_intent_id, $payment_method_id, $payment_method_type, $total_amount, $currency, $meta_data, $customer_id, $params, $default_order_status, $has_recurring): string
-        {
-        }
-        /**
-         * Process one time payment (legacy token approach)
-         *
-         * @param \EasyCommerce\Models\Order $order The order object.
-         * @param int $order_id The order ID.
-         * @param string $stripe_token The Stripe token.
-         * @param float $total_amount The total payment amount.
-         * @param string $currency The payment currency.
-         * @param array $meta_data Additional metadata for the payment.
-         * @param int $customer_id The customer ID.
-         * @param array $params Payment parameters.
-         * @param string $default_order_status The default order status.
-         *
-         * @return string The order status after processing.
-         * @throws \Stripe\Exception\ApiErrorException
-         * @throws \Exception
-         */
-        private function process_one_time_payment($order, $order_id, $stripe_token, $total_amount, $currency, $meta_data, $customer_id, $params, $default_order_status): string
-        {
-        }
-        /**
-         * Processes a subscription payment through Stripe.
-         *
-         * @param \EasyCommerce\Models\Order $order The order object.
-         * @param int $order_id The order ID.
-         * @param string $stripe_token The Stripe payment token.
-         * @param float $total_amount The total payment amount.
-         * @param string $currency The payment currency.
-         * @param array $meta_data Additional metadata for the payment.
-         * @param int $customer_id The customer ID.
-         * @param array $params Payment parameters.
-         * @param string $default_order_status The default order status.
-         * @param array $cart The cart data.
-         *
-         * @return string The order status after processing.
-         * @throws \Stripe\Exception\ApiErrorException
-         * @throws \Exception
-         */
-        private function process_subscription_payment($order, $order_id, $stripe_token, $total_amount, $currency, $meta_data, $customer_id, $params, $default_order_status, $cart): string
-        {
-        }
-        /**
          * Creates a new Stripe customer or retrieves an existing one.
          *
          * @param int $customer_id The EasyCommerce customer ID.
-         * @param string $stripe_token The Stripe payment token.
+         * @param string $payment_intent_id The Stripe payment token.
          * @param array $params Additional customer parameters.
          *
          * @return \Stripe\Customer The Stripe customer object.
          * @throws \Stripe\Exception\ApiErrorException
          * @throws \Exception
          */
-        private function create_or_get_stripe_customer($customer_id, $stripe_token, $params): \Stripe\Customer
+        private function create_or_get_stripe_customer($customer_id, $payment_intent_id, $params): \Stripe\Customer
         {
         }
         /**
          * Retrieves a Stripe payment method from a token.
          *
-         * @param string $stripe_token The Stripe token to retrieve payment method from.
+         * @param string $payment_intent_id The Stripe token to retrieve payment method from.
          *
          * @return \Stripe\PaymentMethod|null The payment method object or null if not found.
          */
-        private function retrieve_payment_method_from_token($stripe_token): ?\Stripe\PaymentMethod
+        private function retrieve_payment_method_from_token($payment_intent_id): ?\Stripe\PaymentMethod
         {
         }
         /**
@@ -5286,40 +4453,6 @@ namespace EasyCommerce\Controllers\Payment\Stripe\PaymentMethods {
          * @return void
          */
         private function attach_payment_method_to_customer($customer_id, $payment_method_id): void
-        {
-        }
-        /**
-         * Prepares subscription items for Stripe subscription creation.
-         *
-         * @param array $cart The cart data containing items.
-         *
-         * @return array Array of subscription items formatted for Stripe API.
-         */
-        private function prepare_subscription_items($cart): array
-        {
-        }
-        /**
-         * Creates a recurring price in Stripe for additional fees.
-         *
-         * @param string $type The type of fee (e.g., 'shipping', 'tax').
-         * @param float $amount The amount for the recurring fee.
-         * @param string $interval The billing interval (e.g., 'month', 'year').
-         * @param int $interval_count The number of intervals between billings.
-         *
-         * @return \Stripe\Price|null The created price object or null on failure.
-         */
-        private function create_recurring_price($type, $amount, $interval, $interval_count): ?\Stripe\Price
-        {
-        }
-        /**
-         * Creates a Stripe price for a product variation.
-         *
-         * @param mixed $variation The product variation object.
-         * @param array $item The cart item data.
-         *
-         * @return \Stripe\Price|null The created price object or null on failure.
-         */
-        private function create_stripe_price_for_product($variation, $item): ?\Stripe\Price
         {
         }
         /**
@@ -5337,30 +4470,6 @@ namespace EasyCommerce\Controllers\Payment\Stripe\PaymentMethods {
         {
         }
         /**
-         * Determines if Stripe should be shown as a payment option for subscription carts.
-         *
-         * @param bool $supports Whether Stripe supports the current cart.
-         * @param string $payment_id The payment method ID.
-         * @param mixed $cart The cart object.
-         *
-         * @return bool True if Stripe should be shown for subscriptions, false otherwise.
-         */
-        public function show_if_subscription($supports, $payment_id, $cart): bool
-        {
-        }
-        /**
-         * Inserts a transaction record for a subscription payment.
-         *
-         * @param \Stripe\Subscription $subscription The Stripe subscription object.
-         * @param int $order_id The order ID.
-         * @param int $customer_id The customer ID.
-         *
-         * @return void
-         */
-        public function insert_subscription_transaction($subscription, $order_id, $customer_id)
-        {
-        }
-        /**
          * Processes a refund through the Stripe payment gateway.
          *
          * @param int $order_id The order ID to refund.
@@ -5372,51 +4481,44 @@ namespace EasyCommerce\Controllers\Payment\Stripe\PaymentMethods {
         public function refund($order_id, $reason, $amount)
         {
         }
-        /**
-         * Cancels a Stripe subscription.
-         *
-         * @param int $order_id The order ID associated with the subscription.
-         * @param string $reason The reason for cancellation.
-         *
-         * @return bool True on successful cancellation, false otherwise.
-         */
-        public function cancel_subscription($order_id, $reason = ''): bool
+        public function refund_transaction_id()
         {
         }
         /**
          * Creates and returns a Customer object based on the provided details.
          *
-         * @param string $stripe_token A token generated by Stripe to associate the customer with a payment source.
+         * @param string $payment_intent_id A token generated by Stripe to associate the customer with a payment source.
          * @param int|string $customer_id The ID of the customer in the EasyCommerce system.
          * @param array $params Additional parameters including billing address and other metadata.
          *
          * @return \Stripe\Customer The created Customer object.
          * @throws \Exception If an error occurs during the customer creation process.
          */
-        public function create_new_customer(string $stripe_token, $customer_id, array $params): \Stripe\Customer
+        public function create_new_customer(string $payment_intent_id, $customer_id, array $params): \Stripe\Customer
         {
         }
         /**
          * Creates a new Stripe customer and assigns it to the EasyCommerce customer.
          *
-         * @param string $stripe_token The Stripe payment token.
+         * @param string $payment_intent_id The Stripe payment token.
          * @param int $customer_id The EasyCommerce customer ID.
          * @param array $params Additional customer parameters.
          *
          * @return \Stripe\Customer The created Stripe customer object.
          * @throws \Exception
          */
-        public function create_and_assign_customer($stripe_token, $customer_id, $params): \Stripe\Customer
+        public function create_and_assign_customer($payment_intent_id, $customer_id, $params): \Stripe\Customer
         {
         }
         /**
-         * Retrieves the Payment Intent ID associated with the given subscription.
+         * Get Stripe API client
          *
-         * @param \Stripe\Subscription $subscription The subscription object from which to extract the Payment Intent ID.
-         *
-         * @return string The Payment Intent ID derived from the subscription data.
+         * @return \Stripe\StripeClient
          */
-        public function get_payment_intent_id(\Stripe\Subscription $subscription): string
+        public function get_api_client()
+        {
+        }
+        public function supports_refund()
         {
         }
     }
@@ -5892,6 +4994,12 @@ namespace EasyCommerce\Helpers {
         {
         }
         /**
+         * Error Log
+         */
+        public static function el($message, $log_file = 'debug.log')
+        {
+        }
+        /**
          * Prints information about a variable in a more readable format.
          *
          * @param mixed $data The variable you want to display.
@@ -6047,21 +5155,84 @@ namespace EasyCommerce\Models {
         }
     }
     /**
+     * Class Attribute
+     * Handles product attributes operations.
+     *
+     * @package EasyCommerce\Model
+     */
+    class Attribute extends \EasyCommerce\Abstracts\Model
+    {
+        use \EasyCommerce\Traits\Cleaner;
+        protected $table = 'attributes';
+        /**
+         * Add an attribute.
+         *
+         * @param string $name
+         * @param string $slug
+         * @return bool
+         */
+        public function add($name, $type = 'Text', $slug = null)
+        {
+        }
+        /**
+         * Get an attribute.
+         *
+         * @param int $id
+         * @return object|null
+         */
+        public function get($id)
+        {
+        }
+        /**
+         * Get an attribute by slug.
+         *
+         * @param string $slug
+         * @return object|null
+         */
+        public function get_by_slug($slug)
+        {
+        }
+        /**
+         * Get all attributes.
+         *
+         * @return array
+         */
+        public function get_all($args = array(), $limit = 0, $offset = 0, $order = 'DESC', $orderby = 'id')
+        {
+        }
+        public function count()
+        {
+        }
+        /**
+         * Update an attribute.
+         *
+         * @param int   $id
+         * @param array $data
+         * @return bool
+         */
+        public function update($id, $data)
+        {
+        }
+        /**
+         * Delete an attribute.
+         *
+         * @param int $id
+         * @return bool
+         */
+        public function delete($id)
+        {
+        }
+    }
+    /**
      * Class Attribute_Value
      * Handles attribute values operations.
      *
      * @package EasyCommerce\Model
      */
-    class Attribute_Value
+    class Attribute_Value extends \EasyCommerce\Abstracts\Model
     {
         use \EasyCommerce\Traits\Cleaner;
-        /**
-         * @var Database Database instance for handling DB operations
-         */
-        protected $db;
-        public function __construct()
-        {
-        }
+        protected $table = 'attribute_values';
         /**
          * Add an attribute value.
          *
@@ -6135,10 +5306,435 @@ namespace EasyCommerce\Models {
         }
     }
     /**
+     * Cart Model
+     *
+     * @package EasyCommerce
+     */
+    class Cart extends \EasyCommerce\Abstracts\Model
+    {
+        use \EasyCommerce\Traits\Cleaner;
+        /**
+         * Cart data
+         *
+         * @var array
+         */
+        public $cart;
+        /**
+         * Cart hash
+         *
+         * @var string
+         */
+        protected $hash;
+        /**
+         * User ID
+         *
+         * @var int
+         */
+        protected $user_id = null;
+        protected $table = 'cart_sessions';
+        /**
+         * Constructor
+         *
+         * @param string $hash The cart hash.
+         */
+        public function __construct($hash = null)
+        {
+        }
+        /**
+         * Get the user's cart hash.
+         *
+         * @return string The user's cart hash.
+         */
+        private function get_user_hash()
+        {
+        }
+        /**
+         * Set the user's cart hash.
+         *
+         * @param string $hash The cart hash.
+         * @return string The cart hash.
+         */
+        public function set_user_hash($hash = '')
+        {
+        }
+        /**
+         * Save the cart data to the database.
+         */
+        public function save()
+        {
+        }
+        /**
+         * Load the cart data from the database using the hash.
+         *
+         * @param string $hash The cart hash.
+         */
+        public function load_cart_by_hash($hash = null)
+        {
+        }
+        /**
+         * Get the items in the cart.
+         *
+         * @return array The items in the cart.
+         */
+        public function get_items()
+        {
+        }
+        /**
+         * Get the item count in the cart.
+         *
+         * @return int The item count in the cart.
+         */
+        public function get_item_count()
+        {
+        }
+        /**
+         * Get the selected shipping method ID
+         *
+         * @return int|bool
+         */
+        public function get_shipping_method_id()
+        {
+        }
+        /**
+         * Get the selected shipping method
+         *
+         * @return array|null
+         */
+        public function get_shipping_method()
+        {
+        }
+        /**
+         * Get the selected shipping cost
+         *
+         * @return array|null
+         */
+        public function get_shipping_cost()
+        {
+        }
+        /**
+         * Get the shipping methods in the cart.
+         *
+         * @return array The shipping methods in the cart.
+         */
+        public function get_shipping_methods()
+        {
+        }
+        /**
+         * Get the tax applicable on the cart items
+         *
+         * @return float The tax ammount
+         */
+        public function get_item_tax()
+        {
+        }
+        /**
+         * Get the tax applicable on shipping
+         *
+         * @return float The tax ammount
+         */
+        public function get_shipping_tax()
+        {
+        }
+        /**
+         * Get the tax applicable on shipping
+         *
+         * @return float The tax ammount
+         */
+        public function get_tax()
+        {
+        }
+        /**
+         * Get the data from the cart.
+         *
+         * @param string $column The column to get the data from.
+         * @return mixed The data from the cart.
+         */
+        public function get_data($column)
+        {
+        }
+        /**
+         * If it's from a logged in user/customer
+         * 
+         * @return \EasyCommerce\Models\Customer object | false
+         */
+        public function get_customer()
+        {
+        }
+        /**
+         * Get the cart data.
+         *
+         * @param bool $formatted Whether to format the cart data.
+         * @param bool $formatted_price Whether to format the price.
+         * @return array The cart data.
+         */
+        public function get($formatted = false, $formatted_price = true)
+        {
+        }
+        /**
+         * Get the payment intent ID for a specific payment method.
+         *
+         * @param string $method The payment method.
+         * @return string|null The payment intent ID or null if not found.
+         */
+        public function get_payment_intent($method)
+        {
+        }
+        /**
+         * Set the payment intent ID for a specific payment method.
+         *
+         * @param string $method The payment method.
+         * @param string $payment_intent_id The payment intent ID.
+         */
+        public function set_payment_intent($method, $payment_intent_id)
+        {
+        }
+        public function clear_payment_intent($method)
+        {
+        }
+        /**
+         * Get the customer name from the cart.
+         *
+         * @return string The customer name.
+         */
+        public function get_customer_name()
+        {
+        }
+        /**
+         * Get the customer email from the cart.
+         *
+         * @return string The customer email.
+         */
+        public function get_customer_email()
+        {
+        }
+        /**
+         * Get the amounts from the cart.
+         *
+         * @return array The amounts from the cart.
+         */
+        public function get_amounts()
+        {
+        }
+        /**
+         * Get the amount from the cart.
+         *
+         * @param string $segment The segment to get the amount from.
+         * @return mixed The amount from the cart.
+         */
+        public function get_amount($segment = 'total')
+        {
+        }
+        /**
+         * Get the quantity from the cart.
+         *
+         * @return int The quantity from the cart.
+         */
+        public function get_quantity()
+        {
+        }
+        /**
+         * Get the weight from the cart.
+         *
+         * @return float The weight from the cart.
+         */
+        public function get_weight()
+        {
+        }
+        /**
+         * Adds product data to the cart, now storing more detailed information.
+         *
+         * @param int       $product_id The ID of the product.
+         * @param int|array $price_id The price_id or an associative array of attributes.
+         * @param int       $quantity The quantity to add.
+         * @param int       $user_id The user ID.
+         * @param bool      $is_free Whether this is a free product from coupon.
+         */
+        public function add($product_id, $price_id = 1, $quantity = 1, $user_id = null, $is_free = false)
+        {
+        }
+        /**
+         * Updates a product quantity in the cart.
+         *
+         * @param int $product_id The ID of the product.
+         * @param int $quantity The new quantity to set.
+         */
+        public function update_qty($product_id, $price_id = 0, $quantity = 1)
+        {
+        }
+        /**
+         * Checks if the cart contains a given product_id and price_id
+         *
+         * @return bool
+         */
+        public function has_product($product_id, $price_id = 1)
+        {
+        }
+        /**
+         * Get the current status of the cart.
+         *
+         * @return string|null The cart status if found, null if the cart doesn't exist.
+         */
+        public function get_status()
+        {
+        }
+        /**
+         * Set the status of the cart.
+         *
+         * @param string $status The new status for the cart.
+         * @return bool True if status is updated, False if failure.
+         */
+        public function set_status($status)
+        {
+        }
+        /**
+         * Check if the cart contains at least 1 item of the given type.
+         *
+         * @param string $type The type of item to check for (e.g., 'physical').
+         * @return bool True if the cart contains an item of the given type, false otherwise.
+         */
+        public function has_item_type($type = 'physical')
+        {
+        }
+        /**
+         * Removes a product from the cart.
+         *
+         * @param int $product_id The ID of the product to remove.
+         * @param int $price_id The price ID. Default 1.
+         * @param bool $is_free Whether this is a free product removal.
+         */
+        public function remove($product_id, $price_id = 1, $is_free = false)
+        {
+        }
+        public function add_coupon($code = null)
+        {
+        }
+        /**
+         * Adds fee to the cart
+         * 
+         * @param array $fee An associative array of `name => amount` pair
+         * 
+         * @since 0.9.20
+         */
+        public function add_fee($fee = [])
+        {
+        }
+        /**
+         * Empties the cart.
+         */
+        public function empty()
+        {
+        }
+        /**
+         * Remove reference from the user meta or session.
+         */
+        public function remove_flag()
+        {
+        }
+        /**
+         * Reset the cart hash and store the new hash in the database.
+         *
+         * @return string The new cart hash.
+         */
+        public function reset()
+        {
+        }
+        /**
+         * Completely erase the cart session.
+         *
+         * @return bool True if the cart session is successfully deleted, false otherwise.
+         */
+        public function delete()
+        {
+        }
+        /**
+         * Get the billing address from the cart.
+         *
+         * @return array The billing address from the cart.
+         */
+        public function get_billing_address()
+        {
+        }
+        /**
+         * Get the shipping address from the cart.
+         *
+         * @return array The shipping address from the cart.
+         */
+        public function get_shipping_address()
+        {
+        }
+        /**
+         * Retrieve a specific field from the billing or shipping address.
+         *
+         * @param string $field The field name to retrieve.
+         * @param string $type  The address type ('billing' or 'shipping'). Default is 'billing'.
+         * @return string The value of the requested field or an empty string if not set.
+         */
+        public function get_address_field($field, $type = 'billing')
+        {
+        }
+        public function get_phone($type = 'billing')
+        {
+        }
+        public function get_address_1($type = 'billing')
+        {
+        }
+        public function get_address_2($type = 'billing')
+        {
+        }
+        public function get_country($type = 'billing')
+        {
+        }
+        public function get_state($type = 'billing')
+        {
+        }
+        public function get_city($type = 'billing')
+        {
+        }
+        public function get_postcode($type = 'billing')
+        {
+        }
+        /**
+         * Get abandoned carts
+         *
+         * @param int $period The time delay to consider as abandoned, in minutes. Default is 30 minutes.
+         * @return array Array of abandoned carts.
+         */
+        public function get_abandoned($period, $range = null, $from = null, $to = null)
+        {
+        }
+        /**
+         * Retrieves the current cart hash.
+         *
+         * @return string The cart hash.
+         */
+        public function get_hash()
+        {
+        }
+        /**
+         * Retrieves the current cart link.
+         *
+         * @return string The cart link.
+         */
+        public function get_link()
+        {
+        }
+        /**
+         * Handle free products discount (BXGY functionality)
+         *
+         * @param \EasyCommerce\Models\Coupon $coupon The coupon object
+         * @param array $cart_items All cart items
+         * @param array $applicable_items Applicable item indices
+         * @return float The discount amount
+         */
+        private function handle_free_products($coupon, $cart_items, $applicable_items)
+        {
+        }
+    }
+    /**
      * Coupon Class
      * Handles coupon-related operations in the database.
      */
-    class Coupon
+    class Coupon extends \EasyCommerce\Abstracts\Model
     {
         protected $id;
         protected $name;
@@ -6147,7 +5743,7 @@ namespace EasyCommerce\Models {
         protected $offer = 0.0;
         protected $active = 1;
         protected $exists = false;
-        protected $db;
+        protected $table = 'coupons';
         /**
          * Constructor for the Coupon class.
          *
@@ -6315,6 +5911,9 @@ namespace EasyCommerce\Models {
         public function get_last_name($type = '')
         {
         }
+        public function get_name($type = '')
+        {
+        }
         public function get_email($type = '')
         {
         }
@@ -6381,6 +5980,297 @@ namespace EasyCommerce\Models {
         }
     }
     /**
+     * Location Class
+     * Handles loading country, state, city, and other location-related data from a static JSON file.
+     */
+    class Location
+    {
+        /**
+         * @var array Cached data from the JSON file
+         */
+        protected static $data = array();
+        /**
+         * Load data from the JSON file if not already loaded.
+         */
+        protected static function load_data()
+        {
+        }
+        /**
+         * Retrieve the list of all countries.
+         *
+         * @return array List of countries with basic details.
+         */
+        public static function get_countries()
+        {
+        }
+        /**
+         * Retrieve the list of states for a given country.
+         *
+         * @param string $country_code ISO-2 code of the country.
+         * @return array List of states for the given country.
+         */
+        public static function get_states($country_code)
+        {
+        }
+        /**
+         * Retrieve the list of cities for a given state within a country.
+         * If no state code is provided, return all cities in the country.
+         *
+         * @param string      $country_code ISO-2 code of the country.
+         * @param string|null $state_code Optional. State code within the country.
+         * @return array List of cities for the given state or all cities for the country if state code is not provided.
+         */
+        public static function get_cities($country_code, $state_code = null)
+        {
+        }
+        /**
+         * Retrieve the list of currencies.
+         * If a country is specified, return only the currency for that country.
+         *
+         * @param string|null $country ISO-2 code of the country.
+         * @return array List of all currencies or a single currency for the specified country.
+         */
+        public static function get_currencies($country = null)
+        {
+        }
+        /**
+         * Retrieve the list of ISD codes.
+         * If a country is specified, return only the ISD code for that country.
+         *
+         * @param string|null $country ISO-2 code of the country.
+         * @return array List of ISD codes for all countries or a single ISD code for the specified country.
+         */
+        public static function get_isd_codes($country = null)
+        {
+        }
+        /**
+         * Retrieve the list of timezones.
+         * If a country is specified, return only the timezones for that country.
+         *
+         * @param string|null $country ISO-2 code of the country.
+         * @return array List of timezones for all countries or specific timezones for the specified country.
+         */
+        public static function get_timezones($country = null)
+        {
+        }
+    }
+    /**
+     * Class Log
+     * Handles log records in the database.
+     *
+     * @package EasyCommerce\Model
+     */
+    class Log extends \EasyCommerce\Abstracts\Model
+    {
+        protected $table = 'logs';
+        /**
+         * @var int
+         */
+        protected $id = 0;
+        /**
+         * @var string
+         */
+        protected $object = '';
+        /**
+         * @var string
+         */
+        protected $action = '';
+        /**
+         * @var int
+         */
+        protected $object_id = 0;
+        /**
+         * @var int|null
+         */
+        protected $user_id = null;
+        /**
+         * @var string|null
+         */
+        protected $note = null;
+        /**
+         * @var string|null
+         */
+        protected $ip_address = null;
+        /**
+         * @var int
+         */
+        protected $seen = 0;
+        /**
+         * @var string
+         */
+        protected $type = 'info';
+        /**
+         * @var string|null
+         */
+        protected $meta = null;
+        /**
+         * @var int
+         */
+        protected $is_public = 1;
+        /**
+         * @var string
+         */
+        protected $created_at = '';
+        /**
+         * Log constructor.
+         * Initializes the class with the 'logs' table and optionally loads a log by ID.
+         *
+         * @param int $id The log ID to load.
+         */
+        public function __construct($id = 0)
+        {
+        }
+        /**
+         * Load log data from database.
+         */
+        protected function load()
+        {
+        }
+        /**
+         * Check if the log exists.
+         *
+         * @return bool True if exists, false otherwise.
+         */
+        public function exists()
+        {
+        }
+        /**
+         * Get the log ID.
+         *
+         * @return int
+         */
+        public function get_id()
+        {
+        }
+        /**
+         * Get the object.
+         *
+         * @return string
+         */
+        public function get_object()
+        {
+        }
+        /**
+         * Get the action.
+         *
+         * @return string
+         */
+        public function get_action()
+        {
+        }
+        /**
+         * Get the object ID.
+         *
+         * @return int
+         */
+        public function get_object_id()
+        {
+        }
+        /**
+         * Get the user ID.
+         *
+         * @return int|null
+         */
+        public function get_user_id()
+        {
+        }
+        /**
+         * Get the note.
+         *
+         * @return string|null
+         */
+        public function get_note()
+        {
+        }
+        /**
+         * Get the IP address.
+         *
+         * @return string|null
+         */
+        public function get_ip_address()
+        {
+        }
+        /**
+         * Get the seen status.
+         *
+         * @return int
+         */
+        public function get_seen()
+        {
+        }
+        /**
+         * Get the log type.
+         *
+         * @return string
+         */
+        public function get_type()
+        {
+        }
+        /**
+         * Get the is_public status.
+         *
+         * @return int
+         */
+        public function get_is_public()
+        {
+        }
+        /**
+         * Get the meta.
+         *
+         * @return string|null
+         */
+        public function get_meta()
+        {
+        }
+        /**
+         * Get the created at timestamp.
+         *
+         * @return string
+         */
+        public function get_created_at()
+        {
+        }
+        /**
+         * Get all logs based on filters like object, action, user ID, date range, pagination.
+         *
+         * @param array $args Filters for querying logs (e.g., object, action, user_id, from_date, to_date).
+         * @param int   $per_page Number of records per page.
+         * @param int   $offset Offset for pagination.
+         * @param string $sort Sort order (asc/desc).
+         * @return array List of logs with total count.
+         */
+        public static function list($args = array(), $per_page = 10, $offset = 0, $sort = 'desc')
+        {
+        }
+        /**
+         * Add a new log entry to the database.
+         *
+         * @param array $data The log data (object, action, object_id, user_id, note, ip_address, seen).
+         * @return bool|int Log ID on success, false on failure.
+         */
+        public function add($data)
+        {
+        }
+        /**
+         * Delete a log entry by its ID.
+         *
+         * @param int $log_id The log ID.
+         * @return bool True on success, false on failure.
+         */
+        public function delete($log_id)
+        {
+        }
+        /**
+         * Get a specific log entry by its ID.
+         *
+         * @param int $id The log ID.
+         * @return array|null The log data if found, otherwise null.
+         */
+        public function get($id)
+        {
+        }
+    }
+    /**
      * Concrete Manager Class
      */
     class Manager extends \EasyCommerce\Abstracts\User
@@ -6390,23 +6280,476 @@ namespace EasyCommerce\Models {
         {
         }
     }
+    /**
+     * Concrete Notice Class
+     */
     class Notice
     {
-        use \EasyCommerce\Traits\Hook;
         /**
-         * Checks if the current date is within the notice display period
+         * Get a list of notices, optionally filtered by type and screen.
+         *
+         * @param  string|null $type   Filter notices by type (e.g., 'error', 'success').
+         * @param  string|null $screen Filter notices by screen context (e.g., '#/orders').
+         * @param  int|null $limit Number of notices to return
          * 
-         * @return bool True if current date is within the display period, false otherwise
+         * @return array Array of notice arrays, each with structure:
+         * 	array(
+         * 		'id'			=> 'my-notice',
+         * 		'type'			=> 'error',
+         * 		'screen'		=> '#/orders',
+         * 		'title'			=> 'This is notice',
+         * 		'message'		=> 'Please notice this notice',
+         * 		'dismissible'	=> true,
+         * 		'button'		=> 'Click here',
+         * 		'url'			=> 'https://easycommerce.dev'
+         * 	)
          */
-        public function is_pro_notice_date_range_active()
+        public static function list($type = null, $screen = null, $limit = null)
         {
         }
         /**
-         * Check if the notice has been dismissed and if it's time to show it again
-         * 
-         * @return bool True if notice should be shown, false if dismissed and not time to re-show
+         * @param array Array of notice arrays, each with structure:
+         * 	array(
+         * 		'id'			=> 'my-notice',
+         * 		'type'			=> 'error',
+         * 		'screen'		=> '#/orders',
+         * 		'title'			=> 'This is notice',
+         * 		'message'		=> 'Please notice this notice',
+         * 		'dismissible'	=> true,
+         * 		'button'		=> 'Click here',
+         * 		'url'			=> 'https://easycommerce.dev'
+         * 	)														   
          */
-        public function should_show_pro_notice()
+        public function add($data)
+        {
+        }
+        public function remove($id)
+        {
+        }
+    }
+    /**
+     * Concrete Order Class
+     * Handles order-related operations in the database.
+     */
+    class Order extends \EasyCommerce\Abstracts\Model
+    {
+        /**
+         * @var int Order ID
+         */
+        protected $id;
+        /**
+         * @var int Customer ID
+         */
+        protected $customer_id = 0;
+        /**
+         * @var float Order total amount
+         */
+        protected $total = 0.0;
+        /**
+         * @var float Order subtotal amount
+         */
+        protected $subtotal = 0.0;
+        /**
+         * @var string Order status
+         */
+        protected $status = 'pending';
+        /**
+         * @var string Fulfillment status
+         */
+        protected $fulfill_status = '';
+        /**
+         * @var string Payment method
+         */
+        protected $payment_method = '';
+        /**
+         * @var string Order creation date
+         */
+        protected $created_at = '';
+        /**
+         * @var string Last modified date
+         */
+        protected $updated_at = '';
+        /**
+         * @var bool Order existence flag
+         */
+        protected $exists = false;
+        /**
+         * @var \EasyCommerce\Models\Order_Meta Instance for handling order meta data
+         */
+        protected $meta;
+        /**
+         * @var \EasyCommerce\Models\Order_Item Instance for handling order items
+         */
+        protected $items;
+        protected $table = 'orders';
+        /**
+         * Constructor for the Order class.
+         *
+         * @param int|null $id Optional. The order ID.
+         */
+        public function __construct($id = null)
+        {
+        }
+        /**
+         * Get the order ID.
+         *
+         * @return int|null
+         */
+        public function get_id()
+        {
+        }
+        /**
+         * Check if the order exists.
+         *
+         * @return bool
+         */
+        public function exists()
+        {
+        }
+        /**
+         * Get the customer ID for the order.
+         *
+         * @return int
+         */
+        public function get_customer_id()
+        {
+        }
+        public function get_customer_name()
+        {
+        }
+        /**
+         * Get the total amount of the order.
+         *
+         * @return float
+         */
+        public function get_total()
+        {
+        }
+        /**
+         * Get the subtotal amount of the order.
+         *
+         * @return float
+         */
+        public function get_subtotal()
+        {
+        }
+        /**
+         * Get the tax amount of the order.
+         *
+         * @return float
+         */
+        public function get_tax_total()
+        {
+        }
+        /**
+         * Get the shipping amount of the order.
+         *
+         * @return float
+         */
+        public function get_shipping_total()
+        {
+        }
+        /**
+         * Get the coupon discount amount of the order.
+         *
+         * @return float
+         */
+        public function get_discount_total()
+        {
+        }
+        /**
+         * Get the status of the order.
+         *
+         * @return string
+         */
+        public function get_status()
+        {
+        }
+        /**
+         * Set the status of the order.
+         *
+         * @return bool|int
+         */
+        public function set_status($status)
+        {
+        }
+        /**
+         * Get the fulfillment status of the order.
+         *
+         * @return string
+         */
+        public function get_fulfillment_status()
+        {
+        }
+        /**
+         * Set the fulfillment status of the order.
+         *
+         * @return bool|int
+         */
+        public function set_fulfillment_status($fulfill_status)
+        {
+        }
+        /**
+         * Get the payment method for the order.
+         *
+         * @return string
+         */
+        public function get_payment_method()
+        {
+        }
+        public function get_created_at()
+        {
+        }
+        public function get_updated_at()
+        {
+        }
+        public function get_transactions($formatted = false)
+        {
+        }
+        public function get_refunds($formatted = false)
+        {
+        }
+        /**
+         * Get the total refunded amount for the order.
+         *
+         * @return float
+         */
+        public function get_total_refunded()
+        {
+        }
+        /**
+         * Create a new order.
+         *
+         * @param array $args Order data.
+         * @return bool|int Order ID on success, false on failure.
+         */
+        public function create($args)
+        {
+        }
+        /**
+         * Update the order.
+         *
+         * @param array $data Updated order data.
+         * @return bool|int Number of affected rows on success, false on failure.
+         */
+        public function update($data)
+        {
+        }
+        /**
+         * Delete the order.
+         *
+         * @return bool True on success, false on failure.
+         */
+        public function delete()
+        {
+        }
+        /**
+         * Add order meta data using the Order_Meta class.
+         *
+         * @param string $key Meta key.
+         * @param mixed  $value Meta value.
+         * @return bool True on success, false on failure.
+         */
+        public function add_meta($key, $value)
+        {
+        }
+        /**
+         * Get order meta data using the Order_Meta class.
+         *
+         * @param string $key Meta key.
+         * @param bool   $single Whether to return a single value.
+         * @return mixed Meta value or null if not found.
+         */
+        public function get_meta($key, $single = true)
+        {
+        }
+        /**
+         * Update order meta data using the Order_Meta class.
+         *
+         * @param string $key Meta key.
+         * @param mixed  $value Meta value.
+         * @return bool True on success, false on failure.
+         */
+        public function update_meta($key, $value)
+        {
+        }
+        /**
+         * Delete order meta data using the Order_Meta class.
+         *
+         * @param string $key Meta key.
+         * @return bool True on success, false on failure.
+         */
+        public function delete_meta($key)
+        {
+        }
+        /**
+         * Get all items for the order using the Order_Item class.
+         *
+         * @return array List of order items.
+         */
+        public function get_items($formatted = false)
+        {
+        }
+        /**
+         * Add an item to the order using the Order_Item class.
+         *
+         * @param array $item_data Item data (product ID, quantity, price, etc.).
+         * @return bool True on success, false on failure.
+         */
+        public function add_item($item_data)
+        {
+        }
+        /**
+         * Remove an item from the order using the Order_Item class.
+         *
+         * @param int $item_id The order item ID.
+         * @return bool True on success, false on failure.
+         */
+        public function remove_item($item_id)
+        {
+        }
+        /**
+         * Update an item in the order using the Order_Item class.
+         *
+         * @param int   $item_id The order item ID.
+         * @param array $data    Updated item data.
+         * @return bool True on success, false on failure.
+         */
+        public function update_item($item_id, $data)
+        {
+        }
+        /**
+         * Static method to list orders with optional filters such as per_page, page, status, and search_query.
+         *
+         * @param array $args Arguments that may include 'per_page', 'page', 'status', and 'search_query'.
+         * @return array List of orders and pagination info.
+         */
+        public static function list($args = array(), $formatted = false)
+        {
+        }
+    }
+    /**
+     * Class Order_Item
+     * Handles order items and their metadata operations in the database.
+     *
+     * @package EasyCommerce\Model
+     */
+    class Order_Item extends \EasyCommerce\Abstracts\Model
+    {
+        /**
+         * @var Order Item ID
+         */
+        protected $id;
+        protected $table = 'order_items';
+        /**
+         * @var Order_Item_Meta Instance for handling order item metadata
+         */
+        protected $meta;
+        /**
+         * Order_Item constructor.
+         * Initializes the class with the 'order_items' table and metadata handler.
+         */
+        public function __construct($id = null)
+        {
+        }
+        /**
+         * Get all items for a specific order by order ID.
+         *
+         * @param int $order_id The order ID.
+         * @return array List of order items.
+         */
+        public function get_by_order_id($order_id)
+        {
+        }
+        /**
+         * Add a new item to the order.
+         *
+         * @param int   $order_id The order ID.
+         * @param array $item_data The item data (product ID, quantity, price, etc.).
+         * @return bool|int Item ID on success, false on failure.
+         */
+        public function add($order_id, $item_data)
+        {
+        }
+        /**
+         * Update an existing order item.
+         *
+         * @param int   $item_id The item ID.
+         * @param array $data    Updated item data (quantity, price, etc.).
+         * @return bool True on success, false on failure.
+         */
+        public function update($data)
+        {
+        }
+        /**
+         * Delete an order item by its item ID.
+         * The associated metadata will be automatically deleted by the database.
+         *
+         * @param int $item_id The item ID.
+         * @return bool True on success, false on failure.
+         */
+        public function delete()
+        {
+        }
+        /**
+         * Get a specific order item by its ID.
+         *
+         * @param int $item_id The item ID.
+         * @return object|null The order item object if found, otherwise null.
+         */
+        public function get_by_id($item_id)
+        {
+        }
+        /**
+         * Get a specific order item by its ID.
+         *
+         * @param int $item_id The item ID.
+         * @return object|null The order item object if found, otherwise null.
+         */
+        public function get_by($value, $key = 'order_id')
+        {
+        }
+        /**
+         * Add metadata to a specific order item using Order_Item_Meta.
+         *
+         * @param int    $item_id The item ID.
+         * @param string $key     The meta key.
+         * @param mixed  $value   The meta value.
+         * @return bool True on success, false on failure.
+         */
+        public function add_meta($key, $value)
+        {
+        }
+        /**
+         * Get metadata for a specific order item using Order_Item_Meta.
+         *
+         * @param int    $item_id The item ID.
+         * @param string $key     The meta key.
+         * @param bool   $single  Whether to return a single value.
+         * @return mixed The meta value or null if not found.
+         */
+        public function get_meta($key, $single = true)
+        {
+        }
+        /**
+         * Update metadata for a specific order item using Order_Item_Meta.
+         *
+         * @param int    $item_id The item ID.
+         * @param string $key     The meta key.
+         * @param mixed  $value   The meta value.
+         * @return bool True on success, false on failure.
+         */
+        public function update_meta($key, $value)
+        {
+        }
+        /**
+         * Delete metadata for a specific order item using Order_Item_Meta.
+         *
+         * @param int    $item_id The item ID.
+         * @param string $key     The meta key.
+         * @return bool True on success, false on failure.
+         */
+        public function delete_meta($key)
         {
         }
     }
@@ -6449,105 +6792,11 @@ namespace EasyCommerce\Models {
         public function __construct()
         {
         }
-        /**
-         * Get the total amount of an order.
-         *
-         * @param int $order_id The order ID.
-         *
-         * @return float The total amount of the order.
-         */
-        public function get_tax_total($order_id)
-        {
-        }
-        /** Get shipping total amount of an order.
-         *
-         * @param int $order_id The order ID.
-         *
-         * @return float The shipping total amount of the order.
-         */
-        public function get_shiping_total($order_id)
-        {
-        }
-        /** Get discount total amount of an order.
-         *
-         * @param int $order_id The order ID.
-         *
-         * @return float The coupon total amount of the order.
-         */
-        public function get_total_discount($order_id)
-        {
-        }
-    }
-    /**
-     * Class Order_Notes
-     * Handles order notes operations.
-     */
-    class Order_Notes
-    {
-        /**
-         * @var \EasyCommerce\Models\Database Instance for handling DB operations
-         */
-        protected $db;
-        /**
-         * Constructor.
-         */
-        public function __construct()
-        {
-        }
-        /**
-         * Add a new order note.
-         *
-         * @param int    $order_id The order ID.
-         * @param string $type     The note type.
-         * @param string $content  The note content.
-         * @return int|null The inserted note ID or null on failure.
-         */
-        public function add($order_id, $type, $content)
-        {
-        }
-        /**
-         * Get order notes by order ID.
-         *
-         * @param int $order_id The order ID.
-         * @return array List of order notes.
-         */
-        public function get_by_order_id($order_id)
-        {
-        }
-        /**
-         * Delete an order note by ID.
-         *
-         * @param int $note_id The note ID.
-         * @return bool True on success, false on failure.
-         */
-        public function delete($note_id)
-        {
-        }
-        /**
-         * Update an order note.
-         *
-         * @param int    $note_id The note ID.
-         * @param array  $data    The data to update.
-         * @return bool True on success, false on failure.
-         */
-        public function update($note_id, $data)
-        {
-        }
-        /**
-         * Check if a note belongs to a specific order.
-         *
-         * @param int $note_id  The note ID.
-         * @param int $order_id The order ID.
-         * @return bool True if the note belongs to the order, false otherwise.
-         */
-        public function note_belongs_to_order($note_id, $order_id)
-        {
-        }
     }
     /**
      * Concrete Product Class
      */
-    class Product
+    class Product extends \EasyCommerce\Abstracts\Model
     {
         use \EasyCommerce\Traits\Cleaner;
         /**
@@ -6594,10 +6843,7 @@ namespace EasyCommerce\Models {
          * @var Product_Meta Product_Meta instance
          */
         protected $meta;
-        /**
-         * @var \EasyCommerce\Models\Database Database instance for handling DB operations
-         */
-        protected $db;
+        protected $table = 'products';
         public function __construct($id = null)
         {
         }
@@ -7004,7 +7250,13 @@ namespace EasyCommerce\Models {
         /**
          * Get product reviews.
          */
-        public function get_reviews()
+        public function get_reviews($limit = '')
+        {
+        }
+        /**
+         * Get related products.
+         */
+        public function get_related($number = 5, $detailed = false)
         {
         }
     }
@@ -7099,7 +7351,7 @@ namespace EasyCommerce\Models {
     /**
      * Concrete Variation Class
      */
-    class Product_Variation
+    class Product_Variation extends \EasyCommerce\Abstracts\Model
     {
         /**
          * @var int Variation ID
@@ -7161,10 +7413,7 @@ namespace EasyCommerce\Models {
          * @var Product_Variation_Attribute Variation attributes instance
          */
         public $attributes;
-        /**
-         * @var Database Database instance for handling DB operations
-         */
-        protected $db;
+        protected $table = 'product_variations';
         public function __construct($id = null)
         {
         }
@@ -7586,12 +7835,9 @@ namespace EasyCommerce\Models {
      *
      * @package EasyCommerce\Model
      */
-    class Product_Variation_Attribute
+    class Product_Variation_Attribute extends \EasyCommerce\Abstracts\Model
     {
-        /**
-         * @var Database Database instance for handling DB operations
-         */
-        protected $db;
+        protected $table = 'product_variation_attributes';
         public function __construct()
         {
         }
@@ -7643,12 +7889,9 @@ namespace EasyCommerce\Models {
      *
      * @package EasyCommerce\Model
      */
-    class Product_Variation_Download
+    class Product_Variation_Download extends \EasyCommerce\Abstracts\Model
     {
-        /**
-         * @var Database Database instance for handling DB operations
-         */
-        protected $db;
+        protected $table = 'product_variation_downloads';
         public function __construct()
         {
         }
@@ -7715,10 +7958,256 @@ namespace EasyCommerce\Models {
         }
     }
     /**
+     * Class Refund
+     * Handles refund records in the database.
+     *
+     * @package EasyCommerce\Model
+     */
+    class Refund extends \EasyCommerce\Abstracts\Model
+    {
+        /**
+         * @var int Refund ID
+         */
+        protected $id;
+        /**
+         * @var int Order ID
+         */
+        protected $order_id;
+        /**
+         * @var float Refund amount
+         */
+        protected $amount = 0.0;
+        /**
+         * @var string Currency
+         */
+        protected $currency = '';
+        /**
+         * @var string Reason for refund
+         */
+        protected $reason = '';
+        /**
+         * @var string Refund status
+         */
+        protected $status = 'pending';
+        /**
+         * @var string Transaction ID from gateway
+         */
+        protected $transaction_id = '';
+        /**
+         * @var string Payment gateway
+         */
+        protected $payment_gateway = '';
+        /**
+         * @var string Notes
+         */
+        protected $notes = '';
+        /**
+         * @var int Refunded by user ID
+         */
+        protected $refunded_by;
+        /**
+         * @var string Created at
+         */
+        protected $created_at = '';
+        /**
+         * @var string Updated at
+         */
+        protected $updated_at = '';
+        /**
+         * @var bool Refund existence flag
+         */
+        protected $exists = false;
+        protected $table = 'refunds';
+        /**
+         * Constructor for the Refund class.
+         *
+         * @param int|null $id Optional. The refund ID.
+         */
+        public function __construct($id = null)
+        {
+        }
+        /**
+         * Get the refund ID.
+         *
+         * @return int|null
+         */
+        public function get_id()
+        {
+        }
+        /**
+         * Check if the refund exists.
+         *
+         * @return bool
+         */
+        public function exists()
+        {
+        }
+        /**
+         * Get the order ID.
+         *
+         * @return int
+         */
+        public function get_order_id()
+        {
+        }
+        /**
+         * Get the refund amount.
+         *
+         * @return float
+         */
+        public function get_amount()
+        {
+        }
+        /**
+         * Get the currency.
+         *
+         * @return string
+         */
+        public function get_currency()
+        {
+        }
+        /**
+         * Get the refund reason.
+         *
+         * @return string
+         */
+        public function get_reason()
+        {
+        }
+        /**
+         * Get the refund status.
+         *
+         * @return string
+         */
+        public function get_status()
+        {
+        }
+        /**
+         * Set the refund status.
+         *
+         * @param string $status
+         * @return bool|int
+         */
+        public function set_status($status)
+        {
+        }
+        /**
+         * Get the transaction ID.
+         *
+         * @return string
+         */
+        public function get_transaction_id()
+        {
+        }
+        /**
+         * Get the payment gateway.
+         *
+         * @return string
+         */
+        public function get_payment_gateway()
+        {
+        }
+        /**
+         * Get the notes.
+         *
+         * @return string
+         */
+        public function get_notes()
+        {
+        }
+        /**
+         * Get the refunded by user ID.
+         *
+         * @return int
+         */
+        public function get_refunded_by()
+        {
+        }
+        /**
+         * Get the created at timestamp.
+         *
+         * @return string
+         */
+        public function get_created_at()
+        {
+        }
+        /**
+         * Get the updated at timestamp.
+         *
+         * @return string
+         */
+        public function get_updated_at()
+        {
+        }
+        /**
+         * Get the associated order object.
+         *
+         * @return Order|null
+         */
+        public function get_order()
+        {
+        }
+        /**
+         * Create a new refund.
+         *
+         * @param array $args Refund data.
+         * @return bool|int Refund ID on success, false on failure.
+         */
+        public function create($args)
+        {
+        }
+        /**
+         * Update the refund.
+         *
+         * @param array $data Updated refund data.
+         * @return bool|int Number of affected rows on success, false on failure.
+         */
+        public function update($data)
+        {
+        }
+        /**
+         * Delete the refund.
+         *
+         * @return bool True on success, false on failure.
+         */
+        public function delete()
+        {
+        }
+        /**
+         * Get all refunds based on filters like order ID, status, pagination.
+         *
+         * @param array $filters Filters for querying refunds (e.g., order_id, status).
+         * @param int   $per_page Number of records per page.
+         * @param int   $offset Offset for pagination.
+         * @return array List of refunds.
+         */
+        public static function list($args = array(), $per_page = 10, $offset = 0, $sort = 'desc')
+        {
+        }
+        /**
+         * Get all refunds for a specific order by order ID.
+         *
+         * @param int $order_id The order ID.
+         * @return array List of refunds.
+         */
+        public function get_by_order_id($order_id)
+        {
+        }
+        /**
+         * Get a specific refund by its ID (static method).
+         *
+         * @param int $refund_id The refund ID.
+         * @return Refund|null The refund object if found, otherwise null.
+         */
+        public static function get_by_id($refund_id)
+        {
+        }
+    }
+    /**
      * Shipping Plan Class
      * Handles shipping plan-related operations in the database.
      */
-    class Shipping_Plan
+    class Shipping_Plan extends \EasyCommerce\Abstracts\Model
     {
         /**
          * @var int Shipping Plan ID
@@ -7748,10 +8237,7 @@ namespace EasyCommerce\Models {
          * @var bool Shipping plan existence flag
          */
         protected $exists = false;
-        /**
-         * @var Database Instance for handling DB operations
-         */
-        protected $db;
+        protected $table = 'shipping_plans';
         /**
          * Constructor for the Shipping_Plan class.
          *
@@ -7949,6 +8435,9 @@ namespace EasyCommerce\Models {
         public static function get_by_location($region_code, $limit = -1)
         {
         }
+        public static function get_by_location_address($country, $state, $city, $zip_code = '')
+        {
+        }
         /**
          * Static method to get a shipping method by its ID.
          *
@@ -7956,6 +8445,9 @@ namespace EasyCommerce\Models {
          * @return object|null The shipping method data if found, otherwise null.
          */
         public static function get_method_by_id($method_id)
+        {
+        }
+        public static function get_shipping_plan_by_id($method_id)
         {
         }
     }
@@ -8137,6 +8629,18 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Get tax rate for a location by finding any matching active tax class.
+         * This is used when product doesn't have a specific tax class.
+         * 
+         * @param string      $country Country code.
+         * @param string|null $state   State code.
+         * @param string|null $city    City name.
+         * @return float Tax rate percentage.
+         */
+        public function get_rate_for_location($country, $state = null, $city = null)
+        {
+        }
+        /**
          * Static method to list tax classes.
          *
          * @return array List of tax classes.
@@ -8146,17 +8650,62 @@ namespace EasyCommerce\Models {
         }
     }
     /**
+     * Class Taxonomy
+     * Handles product taxonomy operations.
+     *
+     * @package EasyCommerce\Model
+     */
+    class Taxonomy
+    {
+        /**
+         * Lists terms and their children
+         *
+         * @param int    $parent_id The parent term ID
+         * @param string $taxonomy The taxonomy name
+         *
+         * @return array
+         */
+        public function list_terms($parent_id = 0, $taxonomy = 'product_cat', $limit = 10, $offset = 0)
+        {
+        }
+        /**
+         * Adds a new term to the specified taxonomy
+         *
+         * @param string   $name The name of the term
+         * @param string   $slug The slug of the term (optional)
+         * @param string   $taxonomy The taxonomy name
+         * @param int|null $parent The parent term ID (optional)
+         *
+         * @return array
+         */
+        public function add_term($name, $taxonomy, $slug = null, $parent = null)
+        {
+        }
+        /**
+         * Updates a term in the specified taxonomy
+         * @param int      $term_id The ID of the term to update
+         * @param string   $name The new name of the term ( optional )
+         * @param string   $taxonomy The taxonomy name
+         * @param int|null $parent The new parent term ID (optional)
+         *
+         * @return array
+         */
+        public function update_term($term_id, $name, $taxonomy, $slug = null, $parent = null)
+        {
+        }
+        public function delete_term($term_id, $taxonomy)
+        {
+        }
+    }
+    /**
      * Class Transaction
      * Handles transaction records in the database.
      *
      * @package EasyCommerce\Model
      */
-    class Transaction
+    class Transaction extends \EasyCommerce\Abstracts\Model
     {
-        /**
-         * @var Database
-         */
-        protected $db;
+        protected $table = 'transactions';
         /**
          * Transaction constructor.
          * Initializes the class with the 'transactions' table.
@@ -8376,40 +8925,271 @@ namespace EasyCommerce\Traits {
 namespace EasyCommerce\Services {
     /**
      * Class AI
-     * Handles AI related operations
+     * Handles AI related operations for the EasyCommerce plugin.
+     *
+     * Provides integration with external AI services for features like:
+     * - Product description generation
+     * - Image generation and editing
+     * - Report analysis from natural language queries
+     * - Product attribute generation
+     * - Spelling correction
+     * - Block template design
      *
      * @package EasyCommerce\Services
+     * @since 1.16
      */
     class AI
     {
         use \EasyCommerce\Traits\Cleaner;
         use \EasyCommerce\Traits\Request;
+        /**
+         * HTTP headers to include in API requests.
+         *
+         * @since 1.16
+         * @var array
+         */
         private $headers = array();
+        /**
+         * Base URL for the AI API endpoint.
+         *
+         * @since 1.16
+         * @var string
+         */
         private $api_base;
+        /**
+         * Constructor.
+         *
+         * Initializes the AI service. No initialization needed as credentials
+         * are fetched dynamically from WordPress options.
+         *
+         * @since 1.16
+         */
         public function __construct()
         {
         }
+        /**
+         * Checks if the AI service is ready to use.
+         *
+         * Verifies that API credentials are configured in WordPress options.
+         *
+         * @since 1.16
+         *
+         * @return bool True if API credentials are configured, false otherwise.
+         */
         private function prepare()
         {
         }
+        /**
+         * Makes an API call to the external AI service.
+         *
+         * Sends a request to the EasyCommerce AI API endpoint with the provided
+         * data and configuration. Includes API credentials from WordPress options.
+         *
+         * @since 1.16
+         *
+         * @param string $path   The API endpoint path (e.g., 'ask', 'write', 'paint').
+         * @param array  $data   The data to send with the request.
+         * @param string $method The HTTP method to use. Default 'POST'.
+         * @param array  $config  Optional. Additional configuration options.
+         *                        - timeout: Request timeout in seconds (default 60)
+         *                        - ssl: Enable SSL verification (default true)
+         *                        - headers: Additional headers to include.
+         *
+         * @return object|\WP_Error The response from the API as an object, or WP_Error on failure.
+         */
+        private function call($path, $data, $method = 'POST', $config = [])
+        {
+        }
+        /**
+         * Asks a question to the AI chatbot.
+         *
+         * Uses the external RAG (Retrieval Augmented Generation) system to answer
+         * user questions about the e-commerce store.
+         *
+         * @since 1.16
+         *
+         * @param string $question The question to ask the AI chatbot.
+         *
+         * @return array {
+         *     Response from the AI service.
+         *
+         *     @type bool   $success Whether the request was successful.
+         *     @type string $message The response message or error message.
+         * }
+         */
         public function ask($question)
         {
         }
         /**
-         * Fixes a missspelled word
+         * Analyzes data and generates reports from natural language queries.
          *
-         * @todo Change the external API
+         * Converts a user query into an SQL query, executes it against the database,
+         * and then uses AI to generate a human-readable report from the results.
+         *
+         * This method performs the following steps:
+         * 1. Checks if API credentials are configured
+         * 2. Verifies user has enough AI credits (costs 2 credits)
+         * 3. Sends query to AI to generate SQL
+         * 4. Executes the SQL query against the database
+         * 5. Sends results back to AI for analysis and report generation
+         *
+         * @since 1.16
+         *
+         * @param string $query The natural language query describing the report needed.
+         *
+         * @return array {
+         *     Response from the AI service.
+         *
+         *     @type bool   $success Whether the request was successful.
+         *     @type string $message The generated report or error message.
+         * }
+         */
+        public function analyze($query)
+        {
+        }
+        /**
+         * Generates product description or summary using AI.
+         *
+         * Creates compelling product descriptions based on the product name,
+         * optional custom prompt, and desired length.
+         *
+         * @since 1.16
+         *
+         * @param string $product The name of the product to generate description for.
+         * @param string $prompt  Optional. Custom instructions to customize the output.
+         *                        Default empty string.
+         * @param string $length  Optional. Desired length of output. Accepts 'short' or 'long'.
+         *                        Default 'short'.
+         *
+         * @return array {
+         *     Response from the AI service.
+         *
+         *     @type bool   $success Whether the request was successful.
+         *     @type string $message The generated description or error message.
+         * }
+         */
+        public function write($product, $prompt = '', $length = 'short')
+        {
+        }
+        /**
+         * Generates product attributes based on product name.
+         *
+         * Uses AI to create relevant product attributes (e.g., Color, Size, Material)
+         * along with their possible values based on the product name.
+         *
+         * @since 1.16
+         *
+         * @param string $product        The name of the product to generate attributes for.
+         * @param string $num_attributes Optional. Number of attributes to generate (e.g., "1-3").
+         *                                Default "1-3".
+         * @param string $num_values     Optional. Number of values per attribute (e.g., "2-5").
+         *                                Default "2-5".
+         *
+         * @return array {
+         *     Response from the AI service.
+         *
+         *     @type bool   $success Whether the request was successful.
+         *     @type string $message The generated attributes or error message.
+         * }
+         */
+        public function generate_attributes($product, $num_attributes = "1-3", $num_values = "2-5")
+        {
+        }
+        /**
+         * Designs a block template using AI.
+         *
+         * Generates a Gutenberg block template based on the provided prompt
+         * and optionally based on a specific product.
+         *
+         * @since 1.16
+         *
+         * @param string $prompt  The instruction describing the desired block design.
+         * @param string $product Optional. The product name to base the design on.
+         *                        Default empty string.
+         *
+         * @return array {
+         *     Response from the AI service.
+         *
+         *     @type bool   $success Whether the request was successful.
+         *     @type string $message The generated block template or error message.
+         * }
+         */
+        public function design($prompt, $product = '')
+        {
+        }
+        /**
+         * Fixes misspelled words in a phrase.
+         *
+         * Uses AI to correct spelling errors in the given phrase while
+         * considering the context from existing product names in the store.
+         *
+         * @since 1.16
+         *
+         * @param string $phrase The phrase containing potentially misspelled words.
+         *
+         * @return array {
+         *     Response from the AI service.
+         *
+         *     @type bool   $success Whether the request was successful.
+         *     @type string $message The corrected phrase or error message.
+         * }
          */
         public function fix_spelling($phrase)
         {
         }
-        public function write($product, $prompt = '', $length = 'short')
+        /**
+         * Generates an image based on a text prompt.
+         *
+         * Uses AI image generation to create a new image based on the provided
+         * text description. This operation costs 10 AI credits.
+         *
+         * @since 1.16
+         *
+         * @param string $prompt   Optional. The text description of the image to generate.
+         *                         Default empty string.
+         * @param string $size     Optional. The dimensions of the image. Accepts '1024x1024',
+         *                         '1024x1792', or '1792x1024'. Default '1024x1024'.
+         * @param string $quality  Optional. The quality of the image. Accepts 'standard' or
+         *                         'hd'. Default 'standard'.
+         * @param mixed  $product   Optional. Product context for the image generation.
+         *                         Default null.
+         *
+         * @return array {
+         *     Response from the AI service.
+         *
+         *     @type bool   $success Whether the request was successful.
+         *     @type string $message The response message or error message.
+         *     @type string $url     The URL of the generated image (if successful).
+         * }
+         */
+        public function draw($prompt = '', $size = '1024x1024', $quality = 'standard', $product = null)
         {
         }
-        public function draw($prompt = '', $ratio = '1:1', $product = null, $format = 'png')
-        {
-        }
-        public function design($prompt, $product = '')
+        /**
+         * Edits an existing image based on a text prompt.
+         *
+         * Uses AI image editing to modify an existing image according to the
+         * provided text description. This operation costs 10 AI credits.
+         *
+         * @since 1.16
+         *
+         * @param string $image   The image to edit (URL or base64 encoded).
+         * @param string $prompt  The text description of how to edit the image.
+         * @param string $size     Optional. The dimensions of the output image.
+         *                         Accepts '1024x1024', '1024x1792', or '1792x1024'.
+         *                         Default '1024x1024'.
+         * @param string $quality  Optional. The quality of the output image.
+         *                         Accepts 'standard' or 'hd'. Default 'standard'.
+         *
+         * @return array {
+         *     Response from the AI service.
+         *
+         *     @type bool   $success Whether the request was successful.
+         *     @type string $message The response message or error message.
+         *     @type string $url     The URL of the edited image (if successful).
+         * }
+         */
+        public function edit_image($image, $prompt, $size = '1024x1024', $quality = 'standard')
         {
         }
     }
@@ -8450,8 +9230,8 @@ namespace EasyCommerce\Traits {
  * Plugin URI: https://wordpress.org/plugins/easycommerce/
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
- * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.15
+ * Description: AI-Powered Ecommerce To Digital Physical & Sell Products
+ * Version: 1.20
  * Requires at least: 6.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
@@ -8564,9 +9344,30 @@ namespace {
     /**
      * Retrieves or creates a singleton instance of the Stripe API client.
      *
-     * @return \Stripe\StripeClient The configured Stripe API client instance.
+     * @return \Stripe\StripeClient|null The configured Stripe API client instance or null if API key is empty.
      */
-    function easycommerce_stripe_get_api_client(): \Stripe\StripeClient
+    function easycommerce_stripe_get_api_client()
+    {
+    }
+    /**
+     * Filter payment methods based on currency compatibility.
+     *
+     * @param array  $payment_methods List of payment method types.
+     * @param string $currency        Currency code (lowercase).
+     *
+     * @return array Filtered payment methods compatible with the currency.
+     */
+    function easycommerce_stripe_filter_payment_methods_by_currency($payment_methods, $currency)
+    {
+    }
+    /**
+     * Filter out wallet payment methods that are automatically handled by Stripe Elements.
+     *
+     * @param array $payment_methods List of payment method types.
+     *
+     * @return array Filtered payment methods without wallet types.
+     */
+    function easycommerce_stripe_filter_wallet_payment_methods($payment_methods)
     {
     }
     function easycommerce_dev_store($path = '')
@@ -8698,7 +9499,7 @@ namespace {
     {
     }
     // get_range_dates
-    function get_range_dates($range, $custom_from = \null, $custom_to = \null)
+    function easycommerce_get_range_dates($range, $custom_from = \null, $custom_to = \null)
     {
     }
     /**
@@ -8707,11 +9508,6 @@ namespace {
     function easycommerce_cache()
     {
     }
-    /**
-     * Get an associative list of countries
-     *
-     * @return []
-     */
     /**
      * Get an associative list of countries
      *
@@ -8823,7 +9619,15 @@ namespace {
      *
      * @return bool
      */
-    function easycommerce_is_account_page(): bool
+    function easycommerce_is_dashboard(): bool
+    {
+    }
+    /**
+     * Returns true if the current page is one of the EasyCommerce pages.
+     *
+     * @return bool
+     */
+    function is_easycommerce_page(): bool
     {
     }
     /**
@@ -8848,16 +9652,31 @@ namespace {
     function easycommerce_import_image($url, $post_id = 0, $desc = '')
     {
     }
+    function easycommerce_import_encoded_image($data, $post_id = 0, $desc = '')
+    {
+    }
     function easycommerce_is_paid_addon_active()
     {
     }
-    function easycommerce_get_ai_credits($type = 'description')
+    function easycommerce_get_ai_credits()
     {
     }
-    function easycommerce_update_ai_credits($prompt_type, $used)
+    function easycommerce_deduct_ai_credits($deduct = 1, $credits = \null)
     {
     }
     function easycommerce_get_conflicting_plugins()
+    {
+    }
+    function easycommerce_detect_external_plugins_for_migration()
+    {
+    }
+    function easycommerce_is_compatible_theme_active()
+    {
+    }
+    function easycommerce_compatible_themes()
+    {
+    }
+    function easycommerce_get_user_country()
     {
     }
 }
