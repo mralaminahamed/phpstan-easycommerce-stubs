@@ -2009,11 +2009,17 @@ namespace EasyCommerce\Abstracts {
          */
         protected $class = '';
         /**
-         * Additional field attributes.
+         * Field attributes.
          *
          * @var array
          */
         protected $atts = array();
+        /**
+         * Additional field args.
+         *
+         * @var array
+         */
+        protected $args = array();
         /**
          * Whether the field supports multiple selections.
          *
@@ -2254,7 +2260,7 @@ namespace EasyCommerce\Abstracts {
         {
         }
         /**
-         * Set additional attributes.
+         * Set attributes.
          *
          * @param array $atts
          */
@@ -2275,6 +2281,30 @@ namespace EasyCommerce\Abstracts {
          * @return string
          */
         protected function render_atts()
+        {
+        }
+        /**
+         * Set args.
+         *
+         * @param array $args
+         */
+        public function set_args($args = array())
+        {
+        }
+        /**
+         * Get args.
+         *
+         * @return array
+         */
+        public function get_args()
+        {
+        }
+        /**
+         * Get a single arg.
+         *
+         * @return mix
+         */
+        public function get_arg($key, $default = '')
         {
         }
         /**
@@ -4040,18 +4070,28 @@ namespace EasyCommerce\Helpers {
     {
         use \EasyCommerce\Traits\Cleaner;
         private $title = '';
+        private $header = '';
         private $body = '';
         private $footer = '';
         private $subject = '';
         private $headers = array('Content-Type: text/html; charset=UTF-8');
         private $attachments = array();
         private $recipients = array();
+        private $placeholders = array();
         /**
          * Sets the title of the email.
          *
          * @param string $title The title for the email.
          */
         public function set_title($title)
+        {
+        }
+        /**
+         * Sets the header of the email.
+         *
+         * @param string $header The HTML content for the email header section.
+         */
+        public function set_header($header)
         {
         }
         /**
@@ -4068,6 +4108,30 @@ namespace EasyCommerce\Helpers {
          * @param string $footer The content for the email footer.
          */
         public function set_footer($footer)
+        {
+        }
+        /**
+         * Gets the header of the email.
+         *
+         * @return string $header The HTML content for the email header section.
+         */
+        public function get_header()
+        {
+        }
+        /**
+         * Gets the body of the email.
+         *
+         * @return string $body The HTML content for the email body section.
+         */
+        public function get_body()
+        {
+        }
+        /**
+         * Gets the footer of the email.
+         *
+         * @param string $footer The HTML content for the email footer section.
+         */
+        public function get_footer()
         {
         }
         /**
@@ -4147,7 +4211,7 @@ namespace EasyCommerce\Helpers {
          *
          * @return string The header HTML content for the email.
          */
-        public function get_header_part()
+        public function get_header_content()
         {
         }
         /**
@@ -4155,7 +4219,7 @@ namespace EasyCommerce\Helpers {
          *
          * @return string The HTML content for the email body.
          */
-        public function get_body_part()
+        public function get_body_content()
         {
         }
         /**
@@ -4163,7 +4227,7 @@ namespace EasyCommerce\Helpers {
          *
          * @return string The HTML content for the email footer.
          */
-        public function get_footer_part()
+        public function get_footer_content()
         {
         }
         /**
@@ -4171,7 +4235,7 @@ namespace EasyCommerce\Helpers {
          *
          * @return string The complete HTML content of the email.
          */
-        private function get_content()
+        public function get_content()
         {
         }
         /**
@@ -4184,11 +4248,14 @@ namespace EasyCommerce\Helpers {
         {
         }
         /**
-         * Applies placeholders to the email content (title, body, footer, and subject).
+         * Sets placeholders for the email content (title, body, footer, and subject).
          *
          * @param array $placeholders Associative array of placeholders and their values.
          */
-        public function apply_placeholders($placeholders = array())
+        public function set_placeholders($placeholders = array())
+        {
+        }
+        public function apply_placeholders($content)
         {
         }
         /**
@@ -6537,7 +6604,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.11-beta
+ * Version: 0.9.12-beta
  * Requires at least: 6.0
  * Tested up to: 6.8
  * Requires PHP: 7.4
@@ -6606,10 +6673,7 @@ namespace {
     function easycommerce_email_events()
     {
     }
-    function easycommerce_email_defaults_contents()
-    {
-    }
-    function easycommerce_email_defaults()
+    function easycommerce_email_default($event)
     {
     }
     function easycommerce_order_statuses()
@@ -6709,6 +6773,12 @@ namespace {
     function easycommerce_currency_symbol()
     {
     }
+    /**
+     * Formats price
+     */
+    function easycommerce_price($price)
+    {
+    }
     function easycommerce_secure_download($media_id)
     {
     }
@@ -6716,6 +6786,12 @@ namespace {
     {
     }
     function easycommerce_get_product($product_id)
+    {
+    }
+    function easycommerce_order_placeholders($order_id)
+    {
+    }
+    function easycommerce_cart_placeholders($cart)
     {
     }
 }
