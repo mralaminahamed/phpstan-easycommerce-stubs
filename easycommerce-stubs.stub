@@ -1284,6 +1284,8 @@ namespace EasyCommerce\API {
     class Email_Placeholder
     {
         use \EasyCommerce\Traits\Hook;
+        use \EasyCommerce\Traits\Rest;
+        use \EasyCommerce\Traits\Cleaner;
         /**
          * Get general email placeholders (available for all emails)
          */
@@ -1317,7 +1319,7 @@ namespace EasyCommerce\API {
          *
          * @param \WP_REST_Request $request The REST request object.
          *
-         * @return \WP_REST_Response|\WP_Error The response or error.
+         * @return void Uses Rest trait response methods.
          */
         public function get_placeholders(\WP_REST_Request $request)
         {
@@ -1838,25 +1840,6 @@ namespace EasyCommerce\API {
         {
         }
         public function bulk_delete($request)
-        {
-        }
-        /**
-         * Create a failed order and notify the admin via email.
-         *
-         * This method ensures that whenever an order cannot be processed 
-         * (e.g., invalid cart, empty items, DB insert failure), a record 
-         * is still saved in the database with status "failed". 
-         * It also triggers an email notification to the store admin with 
-         * the failed order details.
-         *
-         * @param string $reason         Reason why the order failed (saved as order meta).
-         * @param int    $customer_id    Optional. The customer ID associated with the order. Default 0.
-         * @param string $payment_method Optional. The payment method attempted. Default empty string.
-         * @param array  $items          Optional. List of order items. Default empty array.
-         *
-         * @return int|false The failed order ID on success, or false on failure.
-         */
-        protected function create_failed_order($reason, $customer_id = 0, $payment_method = '', $items = array())
         {
         }
     }
@@ -7444,7 +7427,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.5.0
+ * Version: 1.5.1
  * Requires at least: 6.0
  * Tested up to: 6.8.2
  * Requires PHP: 7.4
