@@ -765,6 +765,9 @@ namespace EasyCommerce\API {
         public function remind_abandoned($request)
         {
         }
+        private function sanitize_address($address)
+        {
+        }
     }
 }
 namespace EasyCommerce\Traits {
@@ -853,7 +856,62 @@ namespace EasyCommerce\API {
         public function reset_password_confirm($request)
         {
         }
+        /**
+         * Authenticate a user for the React auth screens.
+         *
+         * Mirrors the native wp_login_form behaviour (which posts to wp-login.php)
+         * but returns JSON so the storefront can log in without a full page reload
+         * being driven by the browser's form submit. On success wp_signon sets the
+         * auth cookies, and the client redirects to the dashboard.
+         */
+        public function login($request)
+        {
+        }
+        /**
+         * Best-effort client IP for login throttling.
+         *
+         * Uses REMOTE_ADDR only (proxy headers are spoofable and must not be trusted
+         * for a security control); sites behind a trusted proxy can override via the
+         * easycommerce_client_ip filter.
+         *
+         * @return string
+         */
+        private function client_ip()
+        {
+        }
+        /**
+         * Transient key holding the failed-login count for the current client.
+         *
+         * @return string
+         */
+        private function login_throttle_key()
+        {
+        }
         public function get_setup_wizard($request)
+        {
+        }
+        /**
+         * Apply a ready-made store design from the setup wizard (#3174).
+         *
+         * By default this only *creates* the design's pages and leaves the site's
+         * front page untouched — safest for existing/live sites. The new home page
+         * is set as the static front page ONLY when the store owner explicitly opts
+         * in (`set_homepage`), so we never silently clobber a live homepage.
+         *
+         * @param \WP_REST_Request $request Request object.
+         * @return \WP_REST_Response
+         */
+        public function apply_design($request)
+        {
+        }
+        /**
+         * Set a page as the static front page (used to confirm an overwrite from the
+         * wizard after the user opts in). #3174.
+         *
+         * @param \WP_REST_Request $request Request object.
+         * @return \WP_REST_Response
+         */
+        public function set_front_page($request)
         {
         }
         public function check($request)
@@ -980,15 +1038,6 @@ namespace EasyCommerce\API {
         {
         }
         /**
-         * Update an existing customer.
-         *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
-         */
-        public function update($request)
-        {
-        }
-        /**
          * Delete a customer.
          *
          * @param WP_REST_Request $request
@@ -1012,6 +1061,8 @@ namespace EasyCommerce\API {
      */
     class Dashboard extends \EasyCommerce\Abstracts\API
     {
+        use \EasyCommerce\Traits\Cache;
+        const CACHE_DURATION_HOUR = 3600;
         /**
          * The dashboard stats
          *
@@ -1100,14 +1151,6 @@ namespace EasyCommerce\API {
         {
         }
         /**
-         * Reports
-         *
-         * @param WP_REST_Request $request The request object.
-         */
-        public function reports($request)
-        {
-        }
-        /**
          * Returns a date key based on the given timestamp and range.
          *
          * The format of the date key depends on the range:
@@ -1177,6 +1220,39 @@ namespace EasyCommerce\API {
         {
         }
         private function get_total_products()
+        {
+        }
+        /**
+         * Delete all cache entries for a given key prefix across every known range.
+         *
+         * Pass $with_ranges = false for range-independent keys (e.g. 'dashboard_low_stock').
+         *
+         * @param string $prefix      Cache key prefix, e.g. 'dashboard_stats'.
+         * @param bool   $with_ranges Whether to iterate over all date ranges.
+         */
+        private static function purge_cache(string $prefix, bool $with_ranges = true)
+        {
+        }
+        /**
+         * Delete order-related dashboard caches.
+         *
+         * Call when order, refund, or customer data changes.
+         */
+        public static function delete_orders_cache()
+        {
+        }
+        /**
+         * Delete product-related dashboard caches (stats, low stock, top sellers).
+         *
+         * Call when product or variation data changes.
+         */
+        public static function delete_products_cache()
+        {
+        }
+        /**
+         * Delete all dashboard caches.
+         */
+        public static function delete_dashboard_cache()
         {
         }
         /**
@@ -1378,7 +1454,56 @@ namespace EasyCommerce\API {
         public function import_sample_products($request)
         {
         }
-        public function create_product($row)
+        public function create_product($row, $is_demo = false)
+        {
+        }
+        /**
+         * Meta key that flags demo products, their categories and their media.
+         */
+        const DEMO_META_KEY = '_easycommerce_demo';
+        /**
+         * Flag an imported product, its media and its categories as demo content.
+         *
+         * Keyed removal (see remove_demo()) relies on every demo artefact carrying
+         * this meta, so nothing bundled by the demo importer lingers after cleanup.
+         *
+         * @param int   $id         Product ID.
+         * @param array $args       Product args passed to Product::update().
+         * @param array $variations Built variation data (for variation thumbnails + downloads).
+         */
+        private function tag_demo_content($id, $args, $variations)
+        {
+        }
+        /**
+         * REST callback: how many demo products currently exist.
+         *
+         * Drives the Products-page UI (import vs. remove demo content).
+         *
+         * @param \WP_REST_Request $request Request object.
+         * @return \WP_REST_Response
+         */
+        public function demo_status($request)
+        {
+        }
+        /**
+         * REST callback: remove all demo content.
+         *
+         * @param \WP_REST_Request $request Request object.
+         * @return \WP_REST_Response
+         */
+        public function delete_demo($request)
+        {
+        }
+        /**
+         * Remove all demo content created by the demo importer.
+         *
+         * Deletes demo products (and their variations via Product::delete-equivalent
+         * cascade), their sideloaded attachments, and any demo categories left empty —
+         * all keyed off DEMO_META_KEY. Idempotent: safe to run repeatedly.
+         *
+         * @return array Counts of removed products, attachments and categories.
+         */
+        public function remove_demo()
         {
         }
         /**
@@ -1414,26 +1539,50 @@ namespace EasyCommerce\API {
         private function generate_attribute_combinations($attributes)
         {
         }
-        private function get_img_ids($urls)
+        private function get_img_ids($urls, $keep_alignment = false)
+        {
+        }
+        /**
+         * Validate that a remote URL is safe to fetch (SSRF guard).
+         *
+         * Replaces WP's wp_http_validate_url() guard, which is IPv4-only on WP 7.0
+         * (gethostbyname()) and rejects IPv6-only CDN hosts. This resolves both A and
+         * AAAA records and rejects any URL that points at a private, reserved, loopback
+         * or link-local address, while still allowing public IPv6 hosts.
+         *
+         * @param string $url Remote URL.
+         * @return bool True when the URL is safe to request.
+         */
+        private function is_safe_remote_url($url)
         {
         }
         /**
          * Download a remote image and attach it to the media library.
          *
-         * Uses an unsafe wp_remote_get() instead of media_sideload_image()/download_url()
-         * on purpose: those route through wp_safe_remote_get(), which calls
-         * wp_http_validate_url(). On WP 7.0 that helper does an IPv4-only gethostbyname()
-         * and returns false when it can't resolve an A record — so CDN hosts that only
-         * resolve over IPv6 (e.g. Cloudflare-fronted cdn.easycommerce.dev) get rejected
-         * pre-flight with "A valid URL was not provided." on live/IPv6 servers, while
-         * working on IPv4 localhost. The URLs handled here are plugin-controlled sample
-         * assets and operator-supplied CSV image URLs, not arbitrary user input, so
-         * bypassing the safe-URL SSRF guard is acceptable.
+         * Uses wp_remote_get() rather than media_sideload_image()/download_url() because
+         * WP's wp_http_validate_url() guard is IPv4-only on WP 7.0 and rejects IPv6-only
+         * CDN hosts. SSRF protection is provided by is_safe_remote_url() instead, which
+         * resolves both A and AAAA records and blocks private/reserved targets.
          *
          * @param string $url Remote image URL.
          * @return int|\WP_Error Attachment ID on success, WP_Error on failure.
          */
         private function sideload_remote_image($url)
+        {
+        }
+        /**
+         * Sideload a file bundled with the plugin's demo content into the media library.
+         *
+         * Used for the demo importer, which references bundled assets by bare filename
+         * rather than a remote URL. No HTTP request is made, so there is no SSRF surface;
+         * the filename is constrained to the requested demo sub-directory (basename only,
+         * no path traversal).
+         *
+         * @param string $filename Bare filename (e.g. green-shoe.jpg).
+         * @param string $subdir   Demo sub-directory under samples/dummy-data/ ('images' or 'downloads').
+         * @return int|\WP_Error Attachment ID on success, WP_Error on failure.
+         */
+        private function sideload_local_file($filename, $subdir = 'images')
         {
         }
         /**
@@ -1535,10 +1684,6 @@ namespace EasyCommerce\API {
     }
     class Order extends \EasyCommerce\Abstracts\API
     {
-        use \EasyCommerce\Traits\Cache;
-        private function delete_order_cache()
-        {
-        }
         /**
          * Create a new order.
          *
@@ -1621,46 +1766,10 @@ namespace EasyCommerce\API {
          * @param string $type      'billing' or 'shipping'.
          * @return \WP_REST_Response|null Null on success, error response on failure.
          */
+        private function sanitize_address($address)
+        {
+        }
         private function validate_address_fields($address, $type)
-        {
-        }
-    }
-    class Order_Item extends \EasyCommerce\Abstracts\API
-    {
-        /**
-         * Get items for a specific order.
-         *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
-         */
-        public function get_items($request)
-        {
-        }
-        /**
-         * Add an item to an order.
-         *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
-         */
-        public function add_item($request)
-        {
-        }
-        /**
-         * Update an existing item in an order.
-         *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
-         */
-        public function update_item($request)
-        {
-        }
-        /**
-         * Delete an item from an order.
-         *
-         * @param WP_REST_Request $request
-         * @return WP_REST_Response
-         */
-        public function delete_item($request)
         {
         }
     }
@@ -4692,12 +4801,16 @@ namespace EasyCommerce\Bootstrap\Activator {
     }
     class Taxonomy
     {
-        /**
-         * Registers custom taxonomies for the plugin.
-         *
-         * @return void
-         */
         public function register()
+        {
+        }
+        private function registerProductCategory()
+        {
+        }
+        private function registerProductBrand()
+        {
+        }
+        private function registerProductTag()
         {
         }
     }
@@ -4833,11 +4946,31 @@ namespace EasyCommerce\Bootstrap {
         {
         }
         /**
+         * Seeds sensible defaults on a fresh install so the store is usable
+         * even when the setup wizard is skipped.
+         *
+         * Each value is only written if the slot is currently empty, so existing
+         * data is never overwritten (e.g. on upgrades or re-activations).
+         *
+         * @return void
+         */
+        private function setup_defaults()
+        {
+        }
+        /**
          * Prepares the plugin settings and configurations.
          *
          * @return void
          */
         public function prepare()
+        {
+        }
+        /**
+         * Seeds Cash on Delivery as an active payment method on fresh install.
+         *
+         * @return void
+         */
+        protected function seed_default_payment_methods()
         {
         }
         /**
@@ -4904,6 +5037,16 @@ namespace EasyCommerce\Bootstrap {
          * @return void
          */
         public function handle_cart_sessions_data_migration(\EasyCommerce\Models\Database $db, string $table_full_name, array $columns, array $options)
+        {
+        }
+        /**
+         * Migrates the Stripe customer id from the legacy `_stripe_customer_id` user-meta
+         * key to the canonical `stripe_customer_id` so existing customers are reused after
+         * the PaymentIntent helper was standardized onto the canonical key.
+         *
+         * @return void
+         */
+        public function migrate_stripe_customer_meta()
         {
         }
         /**
@@ -5069,15 +5212,10 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         /**
-         * Shows different admin notices
+         * Schedules the locations database download when manually retried
+         * via the "Retry Download" notice button.
          */
-        public function admin_notices()
-        {
-        }
-        /**
-         * Show the EasyCommerce Pro admin notice for Year End campaign
-         */
-        private function show_easycommerce_pro_notice()
+        public function handle_locations_db_retry()
         {
         }
         /**
@@ -5101,6 +5239,22 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         /**
+         * Register the email-placeholders TinyMCE plugin as a real script handle.
+         *
+         * TinyMCE pulls the file in through `mce_external_plugins`, which never goes
+         * through wp_enqueue_script() - so wp_set_script_translations() never ran for
+         * it and its __() strings always rendered in English. Enqueueing it as a
+         * normal handle (after `wp-tinymce`, so `tinymce` is defined) prints the
+         * locale data and self-registers the plugin with TinyMCE's PluginManager;
+         * TinyMCE then skips its own fetch because the plugin is already in its
+         * lookup table, so the external-plugin registration keeps working untouched.
+         *
+         * @return void
+         */
+        public function enqueue_email_placeholders_script(): void
+        {
+        }
+        /**
          * Initialize the TinyMCE plugin and button
          */
         public function tinymce_dropdown_init(): void
@@ -5121,7 +5275,7 @@ namespace EasyCommerce\Controllers\Admin {
         /**
          * Add migration button in the admin secondary top bar
          */
-        public function add_migration_btn_in_admin_bar($wp_admin_bar)
+        public function add_migration_btn_in_admin_bar()
         {
         }
         /**
@@ -5415,7 +5569,51 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         /**
-         * Enqueue block editor assets.
+         * Front-end assets for the store patterns (#3175 — theme compatibility).
+         *
+         * Block themes render the patterns from theme.json tokens as-is. Classic
+         * themes additionally get store-patterns.css — a self-contained, `.ec-pattern`
+         * scoped fallback for spacing, full-width alignment and colour presets. The
+         * applied design's colour/typography preset is layered on both via inline CSS.
+         *
+         * Only loads on pages that actually contain a store pattern.
+         */
+        public function add_pattern_assets()
+        {
+        }
+        /**
+         * Mirror the applied design's token system inside the block editor canvas,
+         * so editing a store page previews its real design (radius, elevation,
+         * spacing rhythm, buttons) rather than the theme's bare block defaults.
+         *
+         * Scoped under `.editor-styles-wrapper` so it only styles the canvas, and
+         * still only bites on `.ec-pattern` elements — inert unless a store pattern
+         * is present. Card rules are frontend-only (the grid block renders a
+         * placeholder in the editor), which is harmless.
+         */
+        public function add_pattern_editor_styles()
+        {
+        }
+        /**
+         * Register JS translations for an EasyCommerce React SPA bundle.
+         *
+         * Points at the plugin's own languages/ directory, where the shipped
+         * easycommerce-{locale}-{md5}.json files live, so the bundle's __() strings
+         * load translations instead of always rendering in English. Without the
+         * explicit path WordPress only looks in the global WP languages directory.
+         *
+         * @param string $handle Registered/enqueued script handle.
+         * @return void
+         */
+        private function set_spa_translations($handle)
+        {
+        }
+        /**
+         * Enqueue block assets.
+         *
+         * Editor: always load so EC blocks can be inserted/previewed in any post
+         * type.  Front-end: skip the 1+ MB bundle on pages that have no EC blocks
+         * (fixes a site-wide performance regression — see GitHub issue #3083).
          */
         public function enqueue_block_assets()
         {
@@ -5482,6 +5680,17 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         /**
+         * Register the store pattern library (section + page patterns).
+         *
+         * Each file under views/patterns/store/ defines a $pattern_meta array
+         * (title/description/categories/keywords/blockTypes/viewportWidth) and
+         * echoes its block markup. The markup is captured via output buffering,
+         * so pattern copy can be translated inline.
+         */
+        public function register_store_patterns()
+        {
+        }
+        /**
          * Registers pattern categories
          */
         public function register_pattern_categories()
@@ -5519,6 +5728,7 @@ namespace EasyCommerce\Controllers\Common {
         use \EasyCommerce\Traits\Asset;
         use \EasyCommerce\Traits\Cache;
         use \EasyCommerce\Traits\Cleaner;
+        use \EasyCommerce\Traits\Queue;
         /**
          * Constructor to add all hooks.
          */
@@ -5526,6 +5736,16 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         public function invalidate_cache()
+        {
+        }
+        /**
+         * Handle the easycommerce_clear_cache action by delegating to the
+         * appropriate Reports cache purge for the given scope.
+         *
+         * @param string $scope Cache scope to clear. Defaults to 'all'.
+         * @param mixed  $arg   Optional scope argument (e.g. product ID for 'single_product').
+         */
+        public function handle_clear_cache($scope = 'all', $arg = null)
         {
         }
         /**
@@ -5611,7 +5831,7 @@ namespace EasyCommerce\Controllers\Common {
          *
          * @param WP_Admin_Bar $wp_admin_bar Admin bar instance.
          */
-        public function add_store_mode_admin_bar($wp_admin_bar)
+        public function add_store_mode_admin_bar()
         {
         }
         /**
@@ -5663,6 +5883,14 @@ namespace EasyCommerce\Controllers\Common {
         public function send_abandoned_cart_reminders()
         {
         }
+        /**
+         * Cron callback: creates the core store pages in the background right after
+         * install. Idempotent — reuses existing pages, so it is a no-op once the
+         * pages exist (e.g. after the setup wizard already created them).
+         */
+        public function create_store_pages()
+        {
+        }
         public function process_import_batch($import_id, $offset)
         {
         }
@@ -5670,7 +5898,10 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         /**
-         * Downloads the `locations.json` database file from the CDN
+         * Downloads the `locations.json` database file from the CDN.
+         *
+         * Retries up to 5 times with exponential backoff (60 s, 120 s, 240 s, 480 s, 960 s).
+         * Validates the HTTP response code and JSON structure before persisting.
          */
         public function download_geo_db()
         {
@@ -5781,6 +6012,26 @@ namespace EasyCommerce\Controllers\Front {
         public function __construct()
         {
         }
+        /**
+         * Markup for the React auth SPA mount point.
+         *
+         * The login/registration/reset-password screens are rendered by the React
+         * `auth` bundle which mounts into this container. The initial screen is
+         * passed via data-screen so a directly-loaded shortcode page still opens on
+         * the expected screen; in-app navigation is handled by the hash router.
+         *
+         * @param string $screen One of `login`, `register`, `reset`.
+         * @return string
+         */
+        private function auth_container($screen = 'login')
+        {
+        }
+        /**
+         * Panel shown when a logged-in user lands on an auth screen.
+         */
+        private function already_logged_in($title, $message)
+        {
+        }
         public function reset_password()
         {
         }
@@ -5790,6 +6041,15 @@ namespace EasyCommerce\Controllers\Front {
         public function register()
         {
         }
+        /**
+         * Render the checkout, dispatching to the template chosen in settings.
+         *
+         * The active template comes from Settings -> Checkout ("checkout_template").
+         * Note that template-2 is the intentionally compact checkout: it collects
+         * only name, email and country and does not gather a full shipping/billing
+         * address (see views/shortcodes/checkout/template-2.php). That is by design
+         * for low-friction / digital-goods stores, not a missing-address bug.
+         */
         public function checkout($atts)
         {
         }
@@ -6754,66 +7014,6 @@ namespace EasyCommerce\Helpers {
         public static function fuzzy_search($search)
         {
         }
-    }
-}
-namespace EasyCommerce\Interfaces {
-    /**
-     * Interface Payment_Gateway
-     *
-     * Defines the standard methods that all payment gateways must implement.
-     */
-    interface Payment_Gateway
-    {
-        /**
-         * Initialize the payment gateway.
-         *
-         * @return void
-         */
-        public function initialize();
-        /**
-         * Process a payment.
-         *
-         * @param array $payment_data
-         * @return array
-         */
-        public function process_payment(array $payment_data);
-        /**
-         * Handle payment webhook.
-         *
-         * @param array $webhook_data
-         * @return void
-         */
-        public function handle_webhook(array $webhook_data);
-        /**
-         * Get the payment gateway ID.
-         *
-         * @return string
-         */
-        public function get_id();
-        /**
-         * Get the payment gateway title.
-         *
-         * @return string
-         */
-        public function get_title();
-        /**
-         * Get the payment gateway description.
-         *
-         * @return string
-         */
-        public function get_description();
-        /**
-         * Check if the payment gateway is enabled.
-         *
-         * @return bool
-         */
-        public function is_enabled();
-        /**
-         * Get the settings fields for the payment gateway.
-         *
-         * @return array
-         */
-        public function get_settings_fields();
     }
 }
 namespace EasyCommerce\Models {
@@ -8649,6 +8849,12 @@ namespace EasyCommerce\Models {
     {
         use \EasyCommerce\Traits\Cleaner;
         /**
+         * Sort keys backed by a post meta value.
+         *
+         * @var array
+         */
+        protected static $meta_sorts = array('top-rating' => array('key' => 'average_rating', 'order' => 'DESC', 'nulls_last' => true), 'lowest-rating' => array('key' => 'average_rating', 'order' => 'ASC', 'nulls_last' => true), 'best-selling' => array('key' => 'total_sale', 'order' => 'DESC', 'nulls_last' => false), 'lowest-selling' => array('key' => 'total_sale', 'order' => 'ASC', 'nulls_last' => false));
+        /**
          * @var int Product ID
          */
         protected $id;
@@ -9038,6 +9244,16 @@ namespace EasyCommerce\Models {
          *              ( cat1 OR cat2 ) AND ( tag1 OR tag2 ) AND ( color1 OR color2 )
          */
         public static function list($filters = array(), $limit = 10, $offset = 0, $detailed = true, $product_status = false)
+        {
+        }
+        /**
+         * Order a product query by a post meta value without excluding products that lack it.
+         *
+         * @param array     $clauses SQL clauses for the query.
+         * @param \WP_Query $query   The query being run.
+         * @return array
+         */
+        public static function meta_sort_clauses($clauses, $query)
         {
         }
         /**
@@ -10671,13 +10887,10 @@ namespace EasyCommerce\Traits {
      *
      * Normalized response (always returned; won't call wp_send_json_*):
      *  [
-     *    'success'     => (bool),            // true for 2xx responses
-     *    'status_code' => (int),             // HTTP status code (0 on WP_Error)
-     *    'data'        => (mixed|null),      // JSON-decoded data when response is JSON, otherwise raw body
-     *    'raw'         => (string|null),     // raw response body
-     *    'headers'     => (array),           // response headers
-     *    'error'       => (string|null),     // error message on failure
-     *    'response'    => (array|null),      // full wp_remote_* response (for debugging)
+     *    'success' => (bool),            // true for 2xx responses
+     *    'status'  => (int),             // HTTP status code (0 on WP_Error)
+     *    'content' => (mixed|null),      // JSON payload's `data` key when present, else the decoded JSON, else the raw body
+     *    'error'   => (string|null),     // error message on failure ("HTTP <code>", or the WP_Error message)
      *  ]
      *
      * Usage examples:
@@ -11034,26 +11247,6 @@ namespace EasyCommerce\Services {
         {
         }
         /**
-         * Fixes misspelled words in a phrase.
-         *
-         * Uses AI to correct spelling errors in the given phrase while
-         * considering the context from existing product names in the store.
-         *
-         * @since 1.16
-         *
-         * @param string $phrase The phrase containing potentially misspelled words.
-         *
-         * @return array {
-         *     Response from the AI service.
-         *
-         *     @type bool   $success Whether the request was successful.
-         *     @type string $message The corrected phrase or error message.
-         * }
-         */
-        public function fix_spelling($phrase)
-        {
-        }
-        /**
          * Generates an image based on a text prompt.
          *
          * Uses AI image generation to create a new image based on the provided
@@ -11162,7 +11355,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.45
+ * Version: 1.46
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.4
@@ -11365,6 +11558,18 @@ namespace {
     {
     }
     /**
+     * Whether the stock availability badge is enabled in store settings.
+     *
+     * Reads the option array directly rather than Utility::get_option(), which
+     * treats a saved "off" value as empty. Defaults to enabled on a fresh install
+     * where the setting has not been saved yet.
+     *
+     * @return bool
+     */
+    function easycommerce_is_stock_badge_enabled()
+    {
+    }
+    /**
      * Returns the home URL of the WordPress site.
      *
      * @param string $path    Optional. Path relative to the home URL.
@@ -11373,6 +11578,17 @@ namespace {
      * @return string Home URL with optional path appended.
      */
     function easycommerce_home_url($path = '', $blog_id = \null)
+    {
+    }
+    /**
+     * Returns the EasyCommerce community space URL.
+     *
+     * Single source for every community link in the admin (dashboard card, header,
+     * setup wizard, help page), surfaced to the SPA as `EASYCOMMERCE.community_url`.
+     *
+     * @return string Community URL.
+     */
+    function easycommerce_community_url()
     {
     }
     function easycommerce_shop_page($url = \false)
@@ -11397,6 +11613,147 @@ namespace {
     {
     }
     function easycommerce_payment_page($url = \false)
+    {
+    }
+    /**
+     * Ensure the core store pages (dashboard, shop, checkout, payment) exist.
+     *
+     * Idempotent: reuses any already-created pages stored in the
+     * `easycommerce-general-store` option and only creates the missing ones, so
+     * it is safe to run on install (via the background cron) and again from the
+     * setup wizard without producing duplicate pages.
+     *
+     * @param array $overrides Optional page overrides keyed by slug (page ID or 'create').
+     * @return array The resolved store option group.
+     */
+    function easycommerce_ensure_store_pages($overrides = array())
+    {
+    }
+    /**
+     * Resolve a store-pattern image URL (hero backgrounds, promo/category art).
+     *
+     * Centralised + filterable so the image source can be switched between the CDN
+     * and a locally-bundled directory without touching pattern markup. Default is
+     * the CDN; filter `easycommerce_pattern_image_base` to point at bundled assets
+     * (e.g. EASYCOMMERCE_ASSETS_URL . 'public/img/patterns/').
+     *
+     * @param string $file Image filename (e.g. gadget-hero-1.jpg); see PATTERN-IMAGES.md.
+     * @return string Full image URL.
+     */
+    function easycommerce_pattern_image($file)
+    {
+    }
+    /**
+     * Returns the ready-made store designs registry.
+     *
+     * @return array Design id => design definition (see app/Config/store-designs.php).
+     */
+    function easycommerce_store_designs()
+    {
+    }
+    /**
+     * Returns a single store design definition, or null.
+     *
+     * @param string $design_id Design id, e.g. grocery|gadget|furniture.
+     * @return array|null
+     */
+    function easycommerce_get_store_design($design_id)
+    {
+    }
+    /**
+     * Expand nested `wp:pattern` references into their registered block markup.
+     *
+     * Page patterns are composed of section patterns via `wp:pattern` references.
+     * Expanding them into a page's content produces self-contained, individually
+     * editable markup (rather than opaque pattern-reference blocks).
+     *
+     * @param string $content Block markup that may contain wp:pattern references.
+     * @param int    $depth   Internal recursion guard.
+     * @return string Expanded block markup.
+     */
+    function easycommerce_expand_pattern($content, $depth = 0)
+    {
+    }
+    /**
+     * Apply a ready-made store design.
+     *
+     * Creates (or idempotently updates) the design's home and shop pages from its
+     * page patterns, aligns the shop grid to the design's shop
+     * template, persists the applied design id and its colour/typography preset,
+     * and tags the created pages as design content so they can be removed cleanly.
+     *
+     * Does NOT set the static front page — that is handled at wizard completion
+     * (#3174), with an "ask before overwrite" prompt. Theme-aware preset rendering
+     * is handled in #3175; here we only persist the preset and fire an action.
+     *
+     * @param string $design_id Design id, e.g. grocery|gadget|furniture.
+     * @return array|false The updated `easycommerce-general-store` group, or false if unknown.
+     */
+    function easycommerce_apply_store_design($design_id)
+    {
+    }
+    /**
+     * Whether the active theme is a block (FSE) theme.
+     *
+     * @return bool
+     */
+    function easycommerce_is_block_theme()
+    {
+    }
+    /**
+     * Whether the active theme can render the store designs acceptably.
+     *
+     * Both block and classic themes are supported (block themes use theme.json
+     * tokens; classic themes use the scoped store-patterns.css fallback). This is a
+     * hook point so an add-on can flag a specific broken theme and let the wizard
+     * (#3174) show an honest notice instead of shipping something broken.
+     *
+     * @return bool
+     */
+    function easycommerce_is_theme_supported()
+    {
+    }
+    /**
+     * Returns the colour/typography preset of the applied store design, or null.
+     *
+     * @return array|null
+     */
+    function easycommerce_store_design_preset()
+    {
+    }
+    /**
+     * Default design tokens, merged beneath a design's own `tokens`.
+     *
+     * Guarantees the CSS generator always has a complete token set — even for a
+     * custom design registered via the `easycommerce_store_designs` filter without
+     * a full `tokens` array. These defaults reproduce the neutral pre-token look
+     * (medium radius, subtle shadow, 8px rhythm) so custom designs render sanely.
+     *
+     * @return array
+     */
+    function easycommerce_store_design_default_tokens()
+    {
+    }
+    /**
+     * Build the scoped CSS that renders the applied design's full token system onto
+     * the store patterns — a distinct design system per design, not a re-skin.
+     *
+     * Emits: an 8-step spacing scale (redefining the `--wp--preset--spacing--*`
+     * tokens the patterns consume, so rhythm changes with no pattern edits), radius
+     * and elevation custom properties, the button system, product-card treatment,
+     * section transitions and heading scale. Colours/fonts included.
+     *
+     * Scoped to `.ec-pattern` (every pattern's root) and `.ec-product-collection`
+     * (our grid block's wrapper) — both EasyCommerce-only, so the skin never leaks
+     * onto the native shop archive or the rest of the theme. Loads on both block
+     * and classic themes; the applied design is the single source of truth, so
+     * `.ec-pattern` scoping is sufficient (only one design is live per site).
+     *
+     * @param string $scope Optional selector prefix (e.g. `.editor-styles-wrapper `
+     *                      to mirror the design inside the block editor canvas).
+     * @return string CSS, or '' when no design is applied.
+     */
+    function easycommerce_store_design_preset_css($scope = '')
     {
     }
     function send_reset_password_email($user_data, $key)
@@ -11717,6 +12074,9 @@ namespace {
     {
     }
     function easycommerce_detect_external_plugins_for_migration()
+    {
+    }
+    function easycommerce_get_migratable_platforms()
     {
     }
     function easycommerce_is_compatible_theme_active()
