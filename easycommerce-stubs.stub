@@ -387,6 +387,14 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Checks if the cart contains a given product_id and price_id
+         *
+         * @return bool
+         */
+        public function has_product($product_id, $price_id = 1)
+        {
+        }
+        /**
          * Get the current status of the cart.
          *
          * @return string|null The cart status if found, null if the cart doesn't exist.
@@ -3866,6 +3874,36 @@ namespace EasyCommerce\Controllers\Front {
         {
         }
         /**
+         * Processes the [easycommerce-checkout] shortcode in the current post.
+         *
+         * If the shortcode includes a "products" attribute, parses its comma-separated list
+         * of products. Each product should be in the format: product_id|price_id|quantity.
+         * - product_id is required.
+         * - price_id is optional (default: 1).
+         * - quantity is optional (default: 1).
+         *
+         * Examples:
+         *   products="9"
+         *       -> Adds product ID 9 with default price_id (1) and quantity (1).
+         *   products="9|2|4"
+         *       -> Adds product ID 9 with price ID 2 and quantity 4.
+         *   products="9,10|3,11|2|5"
+         *       -> Processes multiple products:
+         *           - Product ID 9 with defaults,
+         *           - Product ID 10 with price ID 3 and default quantity,
+         *           - Product ID 11 with price ID 2 and quantity 5.
+         *
+         * For each product, if it already exists in the cart, its quantity is updated;
+         * otherwise, the product is added to the cart.
+         *
+         * @param object $cart The cart instance to update.
+         *
+         * @return void
+         */
+        public function parse_shortcode_params($cart)
+        {
+        }
+        /**
          * If the cart is empty, return to the shop page
          */
         public function empty_cart_redirect()
@@ -6499,7 +6537,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.4-beta1
+ * Version: 0.9.5-beta
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 7.4
