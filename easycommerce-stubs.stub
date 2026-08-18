@@ -56,6 +56,41 @@ namespace EasyCommerce\Traits {
     }
 }
 namespace EasyCommerce\API {
+    class AI
+    {
+        use \EasyCommerce\Traits\Rest;
+        public $service;
+        public function __construct()
+        {
+        }
+        /**
+         * Write product description or summary
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function write($request)
+        {
+        }
+        /**
+         * Draw an image
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function draw($request)
+        {
+        }
+        /**
+         * Design page template using blocks
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function design($request)
+        {
+        }
+    }
     class Abandoned_Cart
     {
         use \EasyCommerce\Traits\Rest;
@@ -247,7 +282,10 @@ namespace EasyCommerce\Models {
          *
          * @return array
          */
-        public function get_all($args = array())
+        // public function get_all( $args = array() ) {
+        // 	return $this->db->get_rows( $args );
+        // }
+        public function get_all($args = array(), $limit = 0, $offset = 0, $order = 'DESC', $orderby = 'id')
         {
         }
         public function count()
@@ -844,6 +882,18 @@ namespace EasyCommerce\API {
         {
         }
         public function registration($request)
+        {
+        }
+        /**
+         * Handle reset password request
+         */
+        public function reset_password_request($request)
+        {
+        }
+        /**
+         * Handle reset password confirmation
+         */
+        public function reset_password_confirm($request)
         {
         }
         public function get_setup_wizard($request)
@@ -4037,7 +4087,16 @@ namespace EasyCommerce\Controllers\Common {
         private function register_tax_endpoints()
         {
         }
+        /**
+         * Register Abandoned Carts API endpoints.
+         */
         private function register_abandoned_cart_endpoints()
+        {
+        }
+        /**
+         * Register AI API endpoints.
+         */
+        private function register_ai_endpoints()
         {
         }
     }
@@ -4255,6 +4314,9 @@ namespace EasyCommerce\Controllers\Front {
         public function product_head()
         {
         }
+        public function smart_search($result, $filters, $request)
+        {
+        }
     }
     class Shortcode
     {
@@ -4352,7 +4414,7 @@ namespace EasyCommerce\Controllers\Front {
         public function show_excerpt()
         {
         }
-        public function show_shop_products($settings, $products)
+        public function show_shop_products($settings, $products, $shop_name)
         {
         }
         public function show_billing()
@@ -5391,7 +5453,7 @@ namespace EasyCommerce\Models {
          */
         protected $meta;
         /**
-         * @var Database Database instance for handling DB operations
+         * @var \EasyCommerce\Models\Database Database instance for handling DB operations
          */
         protected $db;
         public function __construct($id = null)
@@ -6619,7 +6681,7 @@ namespace EasyCommerce\Models {
          * @param string $region_code Standardized region code.
          * @return bool|int Region ID on success, false on failure.
          */
-        public function add_region($region_code)
+        public function add_region($region)
         {
         }
         /**
@@ -6899,6 +6961,191 @@ namespace EasyCommerce\Models {
     }
 }
 namespace EasyCommerce\Traits {
+    /**
+     * Trait Request
+     *
+     * Outbound HTTP helper using WordPress HTTP API.
+     *
+     * Method signatures:
+     *   call( string $method, string $url, array $body = [], array $headers = [], array $opts = [] )
+     *   get|post|put|delete|patch|head( string $url, array $body = [], array $headers = [], array $opts = [] )
+     *
+     * - All inputs that are applicable (body, headers, opts) must be arrays.
+     * - By default arrays in $body are auto-encoded to JSON for non-GET requests (set $opts['json'] = false to disable).
+     * - For GET requests, $body array is appended as query params.
+     * - $headers is an associative array of header => value.
+     *
+     * Normalized response (always returned; won't call wp_send_json_*):
+     *  [
+     *    'success'     => (bool),            // true for 2xx responses
+     *    'status_code' => (int),             // HTTP status code (0 on WP_Error)
+     *    'data'        => (mixed|null),      // JSON-decoded data when response is JSON, otherwise raw body
+     *    'raw'         => (string|null),     // raw response body
+     *    'headers'     => (array),           // response headers
+     *    'error'       => (string|null),     // error message on failure
+     *    'response'    => (array|null),      // full wp_remote_* response (for debugging)
+     *  ]
+     *
+     * Usage examples:
+     *   $this->post( 'https://api.example.com/items', ['name' => 'x'], ['Authorization' => 'Bearer ...'], ['timeout' => 20] );
+     *   $this->get( 'https://api.example.com/items', ['search' => 'a'] ); // body appended as query
+     */
+    trait Request
+    {
+        /**
+         * Default timeout (seconds) for HTTP calls.
+         *
+         * @var int
+         */
+        public $request_timeout = 300;
+        /**
+         * Perform an HTTP request.
+         *
+         * @param string $method  HTTP method (GET, POST, PUT, DELETE, PATCH, HEAD).
+         * @param string $url     Full request URL.
+         * @param array  $body    Request body. For GET this will be converted to query args. For non-GET arrays are JSON-encoded by default.
+         * @param array  $headers Associative array of headers (header => value).
+         * @param array  $opts    Additional options (array). Supported keys:
+         *                        - json (bool|null) : null = auto (encode arrays to JSON), true = force JSON, false = disable JSON encoding
+         *                        - timeout (int)    : seconds (overrides $this->request_timeout)
+         *                        - sslverify (bool) : whether to verify SSL (default true)
+         *                        - args (array)     : extra args merged into wp_remote_request() args
+         *
+         * @return array Normalized response structure (see trait docblock).
+         */
+        public function call($method, $url, $body = array(), $headers = array(), $opts = array())
+        {
+        }
+        /**
+         * Convenience GET.
+         *
+         * Appends $body as query args (if non-empty array).
+         *
+         * @param string $url     URL.
+         * @param array  $body    Query args as associative array.
+         * @param array  $headers Headers array.
+         * @param array  $opts    Additional options (see call()).
+         * @return array Normalized response.
+         */
+        public function get($url, $body = array(), $headers = array(), $opts = array())
+        {
+        }
+        /**
+         * Convenience POST.
+         *
+         * @param string $url     URL.
+         * @param array  $body    Body as array (auto JSON-encoded by default) or string.
+         * @param array  $headers Headers array.
+         * @param array  $opts    Additional options (see call()).
+         * @return array Normalized response.
+         */
+        public function post($url, $body = array(), $headers = array(), $opts = array())
+        {
+        }
+        /**
+         * Convenience PUT.
+         *
+         * @param string $url     URL.
+         * @param array  $body    Body as array (auto JSON-encoded by default) or string.
+         * @param array  $headers Headers array.
+         * @param array  $opts    Additional options (see call()).
+         * @return array Normalized response.
+         */
+        public function put($url, $body = array(), $headers = array(), $opts = array())
+        {
+        }
+        /**
+         * Convenience DELETE.
+         *
+         * Note: some APIs accept body for DELETE; pass it if needed.
+         *
+         * @param string $url     URL.
+         * @param array  $body    Optional body as array or string.
+         * @param array  $headers Headers array.
+         * @param array  $opts    Additional options (see call()).
+         * @return array Normalized response.
+         */
+        public function delete($url, $body = array(), $headers = array(), $opts = array())
+        {
+        }
+        /**
+         * Convenience PATCH.
+         *
+         * @param string $url     URL.
+         * @param array  $body    Body as array (auto JSON-encoded by default) or string.
+         * @param array  $headers Headers array.
+         * @param array  $opts    Additional options (see call()).
+         * @return array Normalized response.
+         */
+        public function patch($url, $body = array(), $headers = array(), $opts = array())
+        {
+        }
+        /**
+         * Convenience HEAD.
+         *
+         * @param string $url     URL.
+         * @param array  $body    Ignored for HEAD (kept for consistent signature).
+         * @param array  $headers Headers array.
+         * @param array  $opts    Additional options (see call()).
+         * @return array Normalized response.
+         */
+        public function head($url, $body = array(), $headers = array(), $opts = array())
+        {
+        }
+        /**
+         * Attempt to JSON decode a raw response body.
+         *
+         * Returns decoded value when valid JSON, otherwise null.
+         *
+         * @param string $raw Raw response body.
+         * @return mixed|null Decoded JSON (array/object) or null when not JSON.
+         */
+        protected function maybe_json_decode($raw)
+        {
+        }
+    }
+}
+namespace EasyCommerce\Services {
+    /**
+     * Class AI
+     * Handles AI related operations
+     *
+     * @package EasyCommerce\Services
+     */
+    class AI
+    {
+        use \EasyCommerce\Traits\Cleaner;
+        use \EasyCommerce\Traits\Request;
+        public $provider;
+        private $api_key;
+        private $headers = array();
+        private $api_base;
+        public function __construct()
+        {
+        }
+        private function prepare()
+        {
+        }
+        /**
+         * Fixes a missspelled word
+         *
+         * @todo Change the external API
+         */
+        public function fix_spelling($phrase)
+        {
+        }
+        public function write($product, $prompt = '', $length = 'short')
+        {
+        }
+        public function draw($prompt = '', $ratio = '1:1', $product = null, $format = 'png')
+        {
+        }
+        public function design($prompt, $product = '')
+        {
+        }
+    }
+}
+namespace EasyCommerce\Traits {
     trait Limiter
     {
         /**
@@ -6935,7 +7182,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.2.5
+ * Version: 1.3.0
  * Requires at least: 6.0
  * Tested up to: 6.8.2
  * Requires PHP: 7.4
@@ -6987,6 +7234,21 @@ namespace {
     {
     }
     function easycommerce_dashboard_page($url = \false)
+    {
+    }
+    function easycommerce_registration_page($url = \false)
+    {
+    }
+    function easycommerce_terms_of_service_page($url = \false)
+    {
+    }
+    function easycommerce_privacy_policy_page($url = \false)
+    {
+    }
+    function easycommerce_reset_password_page($url = \false)
+    {
+    }
+    function send_reset_password_email($user_data, $key)
     {
     }
     function easycommerce_rest_base()
@@ -7188,6 +7450,28 @@ namespace {
      * @return bool
      */
     function easycommerce_is_account_page(): bool
+    {
+    }
+    /**
+     * Import a remote image URL into WP Media Library.
+     *
+     * @param string $url     Remote image URL.
+     * @param int    $post_id Optional post ID to attach to (0 = unattached).
+     * @param string $desc    Optional attachment description.
+     * @return array|WP_Error {
+     *     On success: [
+     *         'attachment_id' => int,
+     *         'url'           => string,
+     *         'file'          => string, // full path
+     *         'mime'          => string,
+     *         'width'         => int,
+     *         'height'        => int,
+     *         'sizes'         => array,
+     *     ]
+     *     On failure: WP_Error
+     * }
+     */
+    function easycommerce_import_image($url, $post_id = 0, $desc = '')
     {
     }
 }
