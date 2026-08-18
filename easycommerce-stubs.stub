@@ -4317,6 +4317,9 @@ namespace EasyCommerce\Controllers\Front {
         public function show_product_description()
         {
         }
+        public function show_product_summary()
+        {
+        }
         public function show_product_review()
         {
         }
@@ -6892,7 +6895,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Requires at least: 6.0
  * Tested up to: 6.8.2
  * Requires PHP: 7.4
