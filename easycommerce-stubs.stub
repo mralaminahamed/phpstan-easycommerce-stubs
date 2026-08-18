@@ -1202,6 +1202,128 @@ namespace EasyCommerce\API {
         }
     }
 }
+namespace EasyCommerce\Traits {
+    trait Hook
+    {
+        /**
+         * Registers an action hook.
+         *
+         * @param string   $tag The name of the action.
+         * @param callable $callback The callback function.
+         * @param int      $priority The order of execution. Default is 10.
+         * @param int      $accepted_args The number of accepted arguments. Default is 1.
+         */
+        public function add_action($tag, $callback, $priority = 10, $accepted_args = 1)
+        {
+        }
+        /**
+         * Convenience wrapper for add_action.
+         */
+        public function action($tag, $callback, $priority = 10, $accepted_args = 1)
+        {
+        }
+        /**
+         * Registers a filter hook.
+         *
+         * @param string   $tag The name of the filter.
+         * @param callable $callback The callback function.
+         * @param int      $priority The order of execution. Default is 10.
+         * @param int      $accepted_args The number of accepted arguments. Default is 1.
+         */
+        public function add_filter($tag, $callback, $priority = 10, $accepted_args = 1)
+        {
+        }
+        /**
+         * Convenience wrapper for add_filter.
+         */
+        public function filter($tag, $callback, $priority = 10, $accepted_args = 1)
+        {
+        }
+        /**
+         * Registers a shortcode.
+         *
+         * @param string   $tag The shortcode tag.
+         * @param callable $callback The callback function.
+         */
+        public function add_shortcode($tag, $callback)
+        {
+        }
+        /**
+         * Convenience wrapper for add_shortcode.
+         */
+        public function shortcode($tag, $callback)
+        {
+        }
+        /**
+         * Registers an AJAX action for logged-in users.
+         *
+         * @param string   $action The AJAX action.
+         * @param callable $callback The callback function.
+         */
+        public function ajax_priv($action, $callback)
+        {
+        }
+        /**
+         * Registers an AJAX action for non-logged-in users.
+         *
+         * @param string   $action The AJAX action.
+         * @param callable $callback The callback function.
+         */
+        public function ajax_nopriv($action, $callback)
+        {
+        }
+        /**
+         * Registers both logged-in and non-logged-in AJAX actions.
+         */
+        public function ajax($action, $callback)
+        {
+        }
+    }
+}
+namespace EasyCommerce\API {
+    class Email_Placeholder
+    {
+        use \EasyCommerce\Traits\Hook;
+        /**
+         * Get general email placeholders (available for all emails)
+         */
+        public function get_general_placeholders(): array
+        {
+        }
+        /**
+         * Get order-specific email placeholders
+         */
+        public function get_order_placeholders(): array
+        {
+        }
+        /**
+         * Get cart-specific email placeholders
+         */
+        public function get_cart_placeholders(): array
+        {
+        }
+        /**
+         * Get placeholder description based on key
+         *
+         * @param string $placeholder The placeholder key.
+         *
+         * @return string The placeholder description.
+         */
+        private function get_placeholder_description(string $placeholder): string
+        {
+        }
+        /**
+         * REST API handler to get placeholders for Select2
+         *
+         * @param \WP_REST_Request $request The REST request object.
+         *
+         * @return \WP_REST_Response|\WP_Error The response or error.
+         */
+        public function get_placeholders(\WP_REST_Request $request)
+        {
+        }
+    }
+}
 namespace EasyCommerce\Models {
     /**
      * Location Class
@@ -1671,6 +1793,33 @@ namespace EasyCommerce\API {
         {
         }
         /**
+         * Add an order note.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function add_note($request)
+        {
+        }
+        /**
+         * Get order notes.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function get_notes($request)
+        {
+        }
+        /**
+         * Delete an order note.
+         *
+         * @param WP_REST_Request $request
+         * @return WP_REST_Response
+         */
+        public function delete_note($request)
+        {
+        }
+        /**
          * Send an email.
          *
          * @param WP_REST_Request $request
@@ -1689,6 +1838,25 @@ namespace EasyCommerce\API {
         {
         }
         public function bulk_delete($request)
+        {
+        }
+        /**
+         * Create a failed order and notify the admin via email.
+         *
+         * This method ensures that whenever an order cannot be processed 
+         * (e.g., invalid cart, empty items, DB insert failure), a record 
+         * is still saved in the database with status "failed". 
+         * It also triggers an email notification to the store admin with 
+         * the failed order details.
+         *
+         * @param string $reason         Reason why the order failed (saved as order meta).
+         * @param int    $customer_id    Optional. The customer ID associated with the order. Default 0.
+         * @param string $payment_method Optional. The payment method attempted. Default empty string.
+         * @param array  $items          Optional. List of order items. Default empty array.
+         *
+         * @return int|false The failed order ID on success, or false on failure.
+         */
+        protected function create_failed_order($reason, $customer_id = 0, $payment_method = '', $items = array())
         {
         }
     }
@@ -3391,84 +3559,6 @@ namespace EasyCommerce\Abstracts {
         }
     }
 }
-namespace EasyCommerce\Traits {
-    trait Hook
-    {
-        /**
-         * Registers an action hook.
-         *
-         * @param string   $tag The name of the action.
-         * @param callable $callback The callback function.
-         * @param int      $priority The order of execution. Default is 10.
-         * @param int      $accepted_args The number of accepted arguments. Default is 1.
-         */
-        public function add_action($tag, $callback, $priority = 10, $accepted_args = 1)
-        {
-        }
-        /**
-         * Convenience wrapper for add_action.
-         */
-        public function action($tag, $callback, $priority = 10, $accepted_args = 1)
-        {
-        }
-        /**
-         * Registers a filter hook.
-         *
-         * @param string   $tag The name of the filter.
-         * @param callable $callback The callback function.
-         * @param int      $priority The order of execution. Default is 10.
-         * @param int      $accepted_args The number of accepted arguments. Default is 1.
-         */
-        public function add_filter($tag, $callback, $priority = 10, $accepted_args = 1)
-        {
-        }
-        /**
-         * Convenience wrapper for add_filter.
-         */
-        public function filter($tag, $callback, $priority = 10, $accepted_args = 1)
-        {
-        }
-        /**
-         * Registers a shortcode.
-         *
-         * @param string   $tag The shortcode tag.
-         * @param callable $callback The callback function.
-         */
-        public function add_shortcode($tag, $callback)
-        {
-        }
-        /**
-         * Convenience wrapper for add_shortcode.
-         */
-        public function shortcode($tag, $callback)
-        {
-        }
-        /**
-         * Registers an AJAX action for logged-in users.
-         *
-         * @param string   $action The AJAX action.
-         * @param callable $callback The callback function.
-         */
-        public function ajax_priv($action, $callback)
-        {
-        }
-        /**
-         * Registers an AJAX action for non-logged-in users.
-         *
-         * @param string   $action The AJAX action.
-         * @param callable $callback The callback function.
-         */
-        public function ajax_nopriv($action, $callback)
-        {
-        }
-        /**
-         * Registers both logged-in and non-logged-in AJAX actions.
-         */
-        public function ajax($action, $callback)
-        {
-        }
-    }
-}
 namespace EasyCommerce\Bootstrap {
     class Activator
     {
@@ -3828,6 +3918,7 @@ namespace EasyCommerce\Controllers\Admin {
          * Adds custom body class to the admin area.
          *
          * @param string $classes Existing body classes.
+         *
          * @return string Modified body classes with 'easycommerce' class added if conditions met.
          */
         public function add_body_class($classes)
@@ -3860,10 +3951,28 @@ namespace EasyCommerce\Controllers\Admin {
         }
         /**
          * Force using block editor even if the Classic Editor plugin is activated
-         * 
+         *
          * @since 0.9.18-beta
          */
         public function force_block_editor($use_block_editor, $post)
+        {
+        }
+        /**
+         * Initialize the TinyMCE plugin and button
+         */
+        public function tinymce_dropdown_init(): void
+        {
+        }
+        /**
+         * Add TinyMCE plugin
+         */
+        public function add_tinymce_dropdown_plugin(array $plugin_array): array
+        {
+        }
+        /**
+         * Add button to TinyMCE toolbar
+         */
+        public function register_tinymce_dropdown_button(array $buttons): array
         {
         }
     }
@@ -4130,6 +4239,12 @@ namespace EasyCommerce\Controllers\Common {
          * Register AI API endpoints.
          */
         private function register_ai_endpoints()
+        {
+        }
+        /**
+         * Register Email Placeholder-related API endpoints
+         */
+        private function register_email_placeholder_endpoints()
         {
         }
     }
@@ -4453,7 +4568,7 @@ namespace EasyCommerce\Controllers\Front {
         public function show_excerpt()
         {
         }
-        public function show_shop_products($settings, $products, $shop_name)
+        public function show_shop_products($settings, $products, $shop_name, $view)
         {
         }
         public function show_billing()
@@ -5442,6 +5557,72 @@ namespace EasyCommerce\Models {
         }
     }
     /**
+     * Class Order_Notes
+     * Handles order notes operations.
+     */
+    class Order_Notes
+    {
+        /**
+         * @var \EasyCommerce\Models\Database Instance for handling DB operations
+         */
+        protected $db;
+        /**
+         * Constructor.
+         */
+        public function __construct()
+        {
+        }
+        /**
+         * Add a new order note.
+         *
+         * @param int    $order_id The order ID.
+         * @param string $type     The note type.
+         * @param string $content  The note content.
+         * @return int|null The inserted note ID or null on failure.
+         */
+        public function add($order_id, $type, $content)
+        {
+        }
+        /**
+         * Get order notes by order ID.
+         *
+         * @param int $order_id The order ID.
+         * @return array List of order notes.
+         */
+        public function get_by_order_id($order_id)
+        {
+        }
+        /**
+         * Delete an order note by ID.
+         *
+         * @param int $note_id The note ID.
+         * @return bool True on success, false on failure.
+         */
+        public function delete($note_id)
+        {
+        }
+        /**
+         * Update an order note.
+         *
+         * @param int    $note_id The note ID.
+         * @param array  $data    The data to update.
+         * @return bool True on success, false on failure.
+         */
+        public function update($note_id, $data)
+        {
+        }
+        /**
+         * Check if a note belongs to a specific order.
+         *
+         * @param int $note_id  The note ID.
+         * @param int $order_id The order ID.
+         * @return bool True if the note belongs to the order, false otherwise.
+         */
+        public function note_belongs_to_order($note_id, $order_id)
+        {
+        }
+    }
+    /**
      * Concrete Product Class
      */
     class Product
@@ -5745,6 +5926,23 @@ namespace EasyCommerce\Models {
          * @return array List of category objects.
          */
         public function get_categories()
+        {
+        }
+        /**
+         * Set product tags.
+         *
+         * @param array $tags Array of tag IDs, slugs, or names.
+         * @return bool
+         */
+        public function set_tags($tags)
+        {
+        }
+        /**
+         * Get product tags.
+         *
+         * @return array List of tag objects.
+         */
+        public function get_tags()
         {
         }
         /**
@@ -6926,7 +7124,7 @@ namespace EasyCommerce\Models {
          * @param string|null $state The state code (optional).
          * @param string|null $city The city name (optional).
          *
-         * @return array|null The tax rate details or null if no match is found.
+         * @return float
          */
         public function get_rate_by_location($tax_class_id, $country, $state = null, $city = null, $details = false)
         {
@@ -7246,7 +7444,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.4.1
+ * Version: 1.5.0
  * Requires at least: 6.0
  * Tested up to: 6.8.2
  * Requires PHP: 7.4
