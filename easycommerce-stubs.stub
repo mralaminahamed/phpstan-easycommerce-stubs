@@ -6645,7 +6645,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.18.2-beta
+ * Version: 0.9.19-beta
  * Requires at least: 6.0
  * Tested up to: 6.8.1
  * Requires PHP: 7.4
