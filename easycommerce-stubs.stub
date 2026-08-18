@@ -721,6 +721,9 @@ namespace EasyCommerce\API {
         public function feedback($request)
         {
         }
+        public function requests($request)
+        {
+        }
     }
     class Coupon
     {
@@ -6579,7 +6582,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.15-beta
+ * Version: 0.9.16-beta
  * Requires at least: 6.0
  * Tested up to: 6.8
  * Requires PHP: 7.4
