@@ -5526,7 +5526,7 @@ namespace EasyCommerce\Models {
          * @todo improve logic for params of different sets. It should work like this-
          *              ( cat1 OR cat2 ) AND ( tag1 OR tag2 ) AND ( color1 OR color2 )
          */
-        public static function list($filters = array(), $limit = 10, $offset = 0, $detailed = true)
+        public static function list($filters = array(), $limit = 10, $offset = 0, $detailed = true, $product_status = false)
         {
         }
         /**
@@ -6748,7 +6748,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 0.9.25-beta
+ * Version: 0.9.26-beta
  * Requires at least: 6.0
  * Tested up to: 6.8.1
  * Requires PHP: 7.4
