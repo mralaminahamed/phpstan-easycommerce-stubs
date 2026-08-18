@@ -4397,7 +4397,7 @@ namespace EasyCommerce\Controllers\Common {
          * Custom capability mapping for EasyCommerce features
          * This allows editors to access certain store features
          */
-        public function easycommerce_map_meta_cap($caps, $cap, $user_id)
+        public function map_meta_cap($caps, $cap, $user_id)
         {
         }
         public function migrate_old_block_names()
@@ -7595,7 +7595,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.8.1
+ * Version: 1.8.2
  * Requires at least: 6.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
