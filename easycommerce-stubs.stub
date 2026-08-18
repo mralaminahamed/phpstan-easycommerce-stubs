@@ -3452,6 +3452,16 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         /**
+         * What's happening here?
+         *
+         * @since 0.9.14-beta
+         *
+         * temp
+         */
+        public function observe()
+        {
+        }
+        /**
          * Shows different admin notices
          */
         public function admin_notices()
@@ -3778,39 +3788,6 @@ namespace EasyCommerce\Controllers\Common {
          * Registers pattern categories
          */
         public function register_pattern_categories()
-        {
-        }
-    }
-    class Easy_COD
-    {
-        /**
-         * Constructor
-         */
-        public function __construct()
-        {
-        }
-        public function add_payment_method($methods)
-        {
-        }
-        public function check_for_cod($unset, $has_physical)
-        {
-        }
-        public function verify_payment($status, $order_id, $params, $customer_id)
-        {
-        }
-        public function insert_transaction_record($order_id, $total_amount, $customer_id)
-        {
-        }
-        public function refund_payment($is_refunded, $order_id, $amount, $reason)
-        {
-        }
-        public function get_icon()
-        {
-        }
-        public function get_title()
-        {
-        }
-        public function payment_form()
         {
         }
     }
@@ -6604,7 +6581,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.13-beta
+ * Version: 0.9.14-beta
  * Requires at least: 6.0
  * Tested up to: 6.8
  * Requires PHP: 7.4
