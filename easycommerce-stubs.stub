@@ -7724,12 +7724,41 @@ namespace EasyCommerce\Models {
         {
         }
         /**
-         * Get completed orders
+         * Get the customer's orders filtered by one or more statuses.
          *
-         * @param int $count
+         * @param string|array $status One status or a list of statuses.
+         * @param int          $count  Number of orders to return (-1 for all).
          * @return array
          */
-        public function get_orders_by_status($count = -1)
+        public function get_orders_by_status($status, $count = -1)
+        {
+        }
+        /**
+         * Order statuses that entitle a customer to access digital downloads.
+         *
+         * Excludes unpaid (`pending`), aborted (`cancelled`, `on_hold`) and
+         * fully-refunded (`refunded`) orders. A paid order that is still
+         * `processing` counts, so buyers are not blocked before completion.
+         *
+         * @since 1.32
+         * @return array
+         */
+        public static function downloadable_order_statuses()
+        {
+        }
+        /**
+         * Get the customer's downloadable files, keyed by media ID.
+         *
+         * Single source of truth for download entitlement: only orders whose
+         * status is in {@see self::downloadable_order_statuses()} are considered,
+         * and only `digital` variations contribute files. Used by both the
+         * dashboard list (`/me/downloads`) and the secure-download handler so the
+         * two can never disagree.
+         *
+         * @since 1.32
+         * @return array<int,object> media_id => decorated download object.
+         */
+        public function get_downloads()
         {
         }
         /**
@@ -9756,6 +9785,15 @@ namespace EasyCommerce\Models {
         public function delete($id)
         {
         }
+        /**
+         * Delete all downloads belonging to a variation.
+         *
+         * @param int $variation_id
+         * @return bool
+         */
+        public function delete_by_variation($variation_id)
+        {
+        }
     }
     /**
      * Class Product_Variation_Meta
@@ -11124,7 +11162,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.44
+ * Version: 1.45
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.4
@@ -11640,6 +11678,21 @@ namespace {
     {
     }
     function easycommerce_get_ai_credits()
+    {
+    }
+    /**
+     * Server-side onboarding/engagement snapshot for the deactivation survey.
+     *
+     * Every value is derived from existing WordPress state (options, post counts,
+     * the ec_orders table) — nothing is tracked client-side, so it can't be spoofed
+     * and costs the user no effort. Booleans are emitted as 'yes'/'no' strings and
+     * counts are bucketed so the values map cleanly onto FluentCRM custom-field
+     * filters/segments on the hub. Attached to the feedback body by
+     * Connectivity::feedback() and forwarded to the CRM as ec_* custom fields.
+     *
+     * @return array
+     */
+    function easycommerce_onboarding_snapshot()
     {
     }
     function easycommerce_deduct_ai_credits($deduct = 1, $credits = \null)
