@@ -3301,6 +3301,16 @@ namespace EasyCommerce\Controllers\Admin {
         public function intercept_theme_query()
         {
         }
+        /**
+         * Handles data migration for the cart sessions table on admin_init.
+         * Adds missing columns introduced in newer versions.
+         *
+         * @return void
+         * @todo remove it in future
+         */
+        public function handle_cart_sessions_migration()
+        {
+        }
     }
 }
 namespace EasyCommerce\Traits {
@@ -4036,7 +4046,7 @@ namespace EasyCommerce\Controllers\Front {
     }
 }
 namespace EasyCommerce\Controllers\Payment\Stripe\API {
-    class PaymentIntent
+    class Payment_Intent
     {
         use \EasyCommerce\Traits\Rest;
         protected $api_client;
@@ -4132,88 +4142,8 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
         }
     }
 }
-namespace EasyCommerce\Controllers\Payment\Stripe\Controllers\Common {
-    class API
-    {
-        use \EasyCommerce\Traits\Hook;
-        use \EasyCommerce\Traits\Auth;
-        use \EasyCommerce\Traits\Rest;
-        /**
-         * Constructor to add all hooks.
-         */
-        public function __construct()
-        {
-        }
-        /**
-         * Registers all REST API endpoints for the Stripe payment gateway.
-         *
-         * @return void
-         */
-        public function register_endpoints()
-        {
-        }
-        /**
-         * Registers REST API routes for handling webhooks.
-         * This method defines a single route for handling incoming webhooks.
-         *
-         * @see https://docs.stripe.com/webhooks
-         * @see https://docs.stripe.com/webhooks#webhooks-summary:~:text=Create%20a%20webhook%20endpoint%20handler%20to%20receive%20event%20data%20POST%20requests.
-         *
-         * @return void
-         */
-        public function register_webhook_endpoint_routes()
-        {
-        }
-        /**
-         * Registers REST API routes for handling Payment Intents.
-         * This method defines routes for creating and updating Payment Intents.
-         *
-         * @return void
-         */
-        public function register_payment_intent_endpoint_routes()
-        {
-        }
-    }
-    class Init
-    {
-        use \EasyCommerce\Traits\Hook;
-        use \EasyCommerce\Traits\Asset;
-        /**
-         * Constructor to add all hooks.
-         */
-        public function __construct()
-        {
-        }
-        /**
-         * Retrieves the URL of the Stripe payment method logo.
-         *
-         * @return string The URL of the logo image, or empty string if not found or not an image.
-         */
-        public function stripe_logo_url()
-        {
-        }
-        /**
-         * Manages webhook registration when Stripe payment settings are updated.
-         *
-         * @param string $option The option name that was updated.
-         *
-         * @return void
-         */
-        public function manage_webhook($option)
-        {
-        }
-        /**
-         * Ensures payment methods are in sync when admin loads
-         *
-         * @return void
-         */
-        public function ensure_payment_methods_sync()
-        {
-        }
-    }
-}
 namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
-    class PaymentMethods
+    class Payment_Methods
     {
         protected $api_client;
         protected array $payment_method_configs = array();
@@ -4358,189 +4288,6 @@ namespace EasyCommerce\Controllers\Payment\Stripe\Helpers {
          * @return void
          */
         public function deregister(): void
-        {
-        }
-    }
-}
-namespace EasyCommerce\Controllers\Payment\Stripe\PaymentMethods {
-    class Stripe extends \EasyCommerce\Abstracts\Payment_Method
-    {
-        use \EasyCommerce\Traits\Hook;
-        protected $id;
-        protected $api_client;
-        protected $payment_methods_helper;
-        protected $refund_transaction_id;
-        public function __construct()
-        {
-        }
-        /**
-         * Returns the settings configuration for the Stripe payment method.
-         *
-         * @return array Array of settings fields organized by sections.
-         */
-        public function settings(): array
-        {
-        }
-        public function is_available()
-        {
-        }
-        /**
-         * Enqueues the necessary JavaScript files for Stripe payment processing.
-         *
-         * @return void
-         */
-        public function enqueue_scripts()
-        {
-        }
-        /**
-         * Adds localized variables for the Stripe payment method.
-         *
-         * @param array $vars Existing localized variables.
-         *
-         * @return array Updated localized variables including Stripe configuration.
-         */
-        public function localized($vars): array
-        {
-        }
-        /**
-         * Returns the HTML for the Stripe payment form.
-         *
-         * @return string The HTML markup for the payment form.
-         */
-        public function payment_form(): string
-        {
-        }
-        /**
-         * Processes a payment through the Stripe payment gateway.
-         *
-         * @param string $status Current order status.
-         * @param int $order_id The order ID being processed.
-         * @param array $params Payment parameters including payment method and metadata.
-         * @param int $customer_id The customer ID making the payment.
-         *
-         * @return string The updated order status after payment processing.
-         */
-        public function process_payment($status, $order_id, $params, $customer_id)
-        {
-        }
-        /**
-         * Process one-time payment with existing PaymentIntent
-         */
-        private function process_one_time_payment_with_intent($order, $order_id, $payment_intent_id, $payment_method_id, $customer_id, $default_order_status)
-        {
-        }
-        /**
-         * Handle payment element redirect flow (3D Secure, etc.)
-         *
-         * @param \EasyCommerce\Models\Order $order The order object.
-         * @param int $order_id The order ID.
-         * @param string $payment_intent_id The Stripe payment intent ID from URL.
-         * @param int $customer_id The customer ID.
-         *
-         * @return string The order status.
-         */
-        private function handle_payment_element_redirect($order, $order_id, $payment_intent_id, $customer_id, $default_order_status): string
-        {
-        }
-        /**
-         * Creates a new Stripe customer or retrieves an existing one.
-         *
-         * @param int $customer_id The EasyCommerce customer ID.
-         * @param string $payment_intent_id The Stripe payment token.
-         * @param array $params Additional customer parameters.
-         *
-         * @return \Stripe\Customer The Stripe customer object.
-         * @throws \Stripe\Exception\ApiErrorException
-         * @throws \Exception
-         */
-        private function create_or_get_stripe_customer($customer_id, $payment_intent_id, $params): \Stripe\Customer
-        {
-        }
-        /**
-         * Retrieves a Stripe payment method from a token.
-         *
-         * @param string $payment_intent_id The Stripe token to retrieve payment method from.
-         *
-         * @return \Stripe\PaymentMethod|null The payment method object or null if not found.
-         */
-        private function retrieve_payment_method_from_token($payment_intent_id): ?\Stripe\PaymentMethod
-        {
-        }
-        /**
-         * Attaches a payment method to a Stripe customer.
-         *
-         * @param string $customer_id The Stripe customer ID.
-         * @param string $payment_method_id The Stripe payment method ID.
-         *
-         * @return void
-         */
-        private function attach_payment_method_to_customer($customer_id, $payment_method_id): void
-        {
-        }
-        /**
-         * Inserts a transaction record for a successful payment.
-         *
-         * @param \Stripe\PaymentIntent $intent The Stripe payment intent object.
-         * @param int $order_id The order ID.
-         * @param float $total_amount The total payment amount.
-         * @param int $customer_id The customer ID.
-         * @param array $params Additional payment parameters.
-         *
-         * @return void
-         */
-        public function insert_transaction($intent, $order_id, $total_amount, $customer_id, $params)
-        {
-        }
-        /**
-         * Processes a refund through the Stripe payment gateway.
-         *
-         * @param int $order_id The order ID to refund.
-         * @param string $reason The reason for the refund.
-         * @param float $amount The amount to refund.
-         *
-         * @return bool True on successful refund, false otherwise.
-         */
-        public function refund($order_id, $reason, $amount)
-        {
-        }
-        public function refund_transaction_id()
-        {
-        }
-        /**
-         * Creates and returns a Customer object based on the provided details.
-         *
-         * @param string $payment_intent_id A token generated by Stripe to associate the customer with a payment source.
-         * @param int|string $customer_id The ID of the customer in the EasyCommerce system.
-         * @param array $params Additional parameters including billing address and other metadata.
-         *
-         * @return \Stripe\Customer The created Customer object.
-         * @throws \Exception If an error occurs during the customer creation process.
-         */
-        public function create_new_customer(string $payment_intent_id, $customer_id, array $params): \Stripe\Customer
-        {
-        }
-        /**
-         * Creates a new Stripe customer and assigns it to the EasyCommerce customer.
-         *
-         * @param string $payment_intent_id The Stripe payment token.
-         * @param int $customer_id The EasyCommerce customer ID.
-         * @param array $params Additional customer parameters.
-         *
-         * @return \Stripe\Customer The created Stripe customer object.
-         * @throws \Exception
-         */
-        public function create_and_assign_customer($payment_intent_id, $customer_id, $params): \Stripe\Customer
-        {
-        }
-        /**
-         * Get Stripe API client
-         *
-         * @return \Stripe\StripeClient
-         */
-        public function get_api_client()
-        {
-        }
-        public function supports_refund()
         {
         }
     }
@@ -9331,7 +9078,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Digital Physical & Sell Products
- * Version: 1.25
+ * Version: 1.26
  * Requires at least: 6.0
  * Tested up to: 6.9
  * Requires PHP: 7.4
