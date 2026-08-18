@@ -2086,6 +2086,30 @@ namespace EasyCommerce\API {
         public function delete_class($request)
         {
         }
+        /**
+         * Retrieve matching tax CSV files for the given countries and return them in a JSON response.
+         *
+         * This REST API endpoint uses the Tax_Model to search the plugin's /taxes folder
+         * for CSV files matching the provided country codes. Only existing files are returned.
+         *
+         * @param \WP_REST_Request $request The current REST API request containing 'countries' parameter.
+         * @return \WP_REST_Response JSON response containing an array of matched country codes.
+         */
+        public function get_tax_files($request)
+        {
+        }
+        /**
+         * Retrieve tax rates from CSV and return them in a JSON response.
+         *
+         * This endpoint uses the Tax_Model to read tax rates from the CSV file
+         * and formats them for API consumption.
+         *
+         * @param \WP_REST_Request $request The current REST API request.
+         * @return \WP_REST_Response JSON response containing tax rates or an error message.
+         */
+        public function get_tax_rates($request)
+        {
+        }
     }
 }
 namespace EasyCommerce\Models {
@@ -4123,6 +4147,12 @@ namespace EasyCommerce\Controllers\Common {
          * Enqueue block editor assets.
          */
         public function enqueue_block_assets()
+        {
+        }
+        /**
+         * Enqueue block editor only assets.
+         */
+        public function enqueue_block_editor_assets()
         {
         }
         public function add_assets()
@@ -6856,6 +6886,30 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Get tax CSV files that match the given country codes.
+         *
+         * This method searches the plugin's /taxes directory for CSV files
+         * corresponding to the provided country codes. Only existing files
+         * are returned, and the codes are returned in uppercase format.
+         *
+         * @param array $countries Array of country codes to search for.
+         * @return array Array of matched country codes in uppercase.
+         */
+        public function get_tax_files_by_countries(array $countries): array
+        {
+        }
+        /**
+         * Get all states and combined tax rates from a country's CSV file.
+         *
+         * The CSV file should have columns: state, combined tax rate
+         *
+         * @param string $country Country code (e.g., 'us', 'bd').
+         * @return array Array of arrays with keys 'state', 'city', 'country' and 'combined_rate'.
+         */
+        public function get_country_tax_rates_from_csv(string $country): array
+        {
+        }
+        /**
          * Static method to retrieve a tax class with its details.
          *
          * @param int $id Tax class ID.
@@ -7192,7 +7246,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
- * Version: 1.3.3.1
+ * Version: 1.4.0
  * Requires at least: 6.0
  * Tested up to: 6.8.2
  * Requires PHP: 7.4
