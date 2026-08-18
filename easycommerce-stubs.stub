@@ -299,6 +299,9 @@ namespace EasyCommerce\API {
         public function delete_attribute($request)
         {
         }
+        public function bulk_delete_attributes($request)
+        {
+        }
         /**
          * Update an attribute.
          *
@@ -1543,6 +1546,9 @@ namespace EasyCommerce\API {
         public function delete_category($request)
         {
         }
+        public function bulk_delete_categories($request)
+        {
+        }
         public function get_brands($request)
         {
         }
@@ -1555,6 +1561,9 @@ namespace EasyCommerce\API {
         public function delete_brand($request)
         {
         }
+        public function bulk_delete_brands($request)
+        {
+        }
         public function get_tags($request)
         {
         }
@@ -1565,6 +1574,9 @@ namespace EasyCommerce\API {
         {
         }
         public function delete_tag($request)
+        {
+        }
+        public function bulk_delete_tags($request)
         {
         }
     }
@@ -5222,6 +5234,15 @@ namespace EasyCommerce\Models {
         public function delete($id)
         {
         }
+        /**
+         * Bulk delete attributes.
+         *
+         * @param array $ids
+         * @return bool
+         */
+        public function bulk_delete($ids)
+        {
+        }
     }
     /**
      * Class Attribute_Value
@@ -8693,7 +8714,26 @@ namespace EasyCommerce\Models {
         public function update_term($term_id, $name, $taxonomy, $slug = null, $parent = null)
         {
         }
+        /**
+         * Deletes a term from the specified taxonomy
+         *
+         * @param int    $term_id  The ID of the term to delete
+         * @param string $taxonomy The taxonomy name
+         *
+         * @return bool True on success, false on failure
+         */
         public function delete_term($term_id, $taxonomy)
+        {
+        }
+        /**
+         * Bulk deletes multiple terms from the specified taxonomy
+         *
+         * @param array  $term_ids Array of term IDs to delete
+         * @param string $taxonomy The taxonomy name
+         *
+         * @return bool True on completion
+         */
+        public function bulk_delete($term_ids, $taxonomy)
         {
         }
     }
@@ -9231,7 +9271,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Digital Physical & Sell Products
- * Version: 1.20.1
+ * Version: 1.21
  * Requires at least: 6.0
  * Tested up to: 6.9
  * Requires PHP: 7.4
@@ -9534,6 +9574,12 @@ namespace {
      * @see app/Config/settings.php
      */
     function easycommerce_settings_menus()
+    {
+    }
+    function easycommerce_render_sidebar()
+    {
+    }
+    function easycommerce_render_menu_item($item)
     {
     }
     /**
