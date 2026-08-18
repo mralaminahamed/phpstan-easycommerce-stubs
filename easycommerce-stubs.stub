@@ -3754,6 +3754,9 @@ namespace EasyCommerce\Controllers\Common {
         public function add_payment_method($methods)
         {
         }
+        public function check_for_cod($unset, $has_physical)
+        {
+        }
         public function verify_payment($status, $order_id, $params, $customer_id)
         {
         }
@@ -6496,7 +6499,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.3-beta5
+ * Version: 0.9.4-beta1
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 7.4
