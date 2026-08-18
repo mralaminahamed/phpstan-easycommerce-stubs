@@ -4121,7 +4121,7 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         /**
-         * Show the EasyCommerce Pro admin notice for Year End campaign
+         * Show the EasyCommerce Pro admin notice for BFCM campaign
          */
         private function show_easycommerce_pro_notice()
         {
@@ -8451,7 +8451,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.14
+ * Version: 1.15
  * Requires at least: 6.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
