@@ -433,6 +433,16 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Adds fee to the cart
+         * 
+         * @param array $fee An associative array of `name => amount` pair
+         * 
+         * @since 0.9.20
+         */
+        public function add_fee($fee = [])
+        {
+        }
+        /**
          * Empties the cart.
          */
         public function empty()
@@ -6644,8 +6654,8 @@ namespace EasyCommerce\Traits {
  * Plugin URI: https://wordpress.org/plugins/easycommerce/
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
- * Description: WordPress Ecommerce Plugin. Fast, Secure & Beautiful.
- * Version: 0.9.19-beta
+ * Description: WordPress Ecommerce Plugin. Easy, Fast & Secure.
+ * Version: 0.9.20-beta
  * Requires at least: 6.0
  * Tested up to: 6.8.1
  * Requires PHP: 7.4
