@@ -765,6 +765,42 @@ namespace EasyCommerce\API {
         public function remind_abandoned($request)
         {
         }
+        /**
+         * Gift lines of a Buy X Get Y coupon, empty when the offer is not a list.
+         *
+         * @param \EasyCommerce\Models\Coupon $coupon The coupon.
+         * @return array
+         */
+        private function get_free_products($coupon)
+        {
+        }
+        /**
+         * Drop a tier that only starts where another one of the same plan ends.
+         *
+         * @param array $matched Methods whose range covers the value, with min and max.
+         * @param mixed $value   The compared subtotal, weight or quantity.
+         * @return array Methods in the response shape, without the bounds.
+         */
+        private function drop_boundary_duplicates($matched, $value)
+        {
+        }
+        /**
+         * Upper bound of a shipping tier, where empty and zero mean no maximum.
+         *
+         * @param mixed $max The stored maximum.
+         * @return float|int
+         */
+        private function tier_max($max)
+        {
+        }
+        /**
+         * Reject a change when the cart is locked for payment.
+         *
+         * @param \EasyCommerce\Models\Cart $cart The cart being changed.
+         */
+        private function guard_locked($cart)
+        {
+        }
         private function sanitize_address($address)
         {
         }
@@ -936,6 +972,23 @@ namespace EasyCommerce\API {
         {
         }
         public function feedback($request)
+        {
+        }
+        /**
+         * The site diagnostics attached to every telemetry event.
+         *
+         * Every event carries the same payload — wizard completion, deactivation,
+         * feedback and integration request alike — so a CRM contact reads the same
+         * whichever way the store owner arrived.
+         *
+         * Rides along only with consent: what the store owner typed is their own
+         * submission and always goes, the passive site snapshot (active plugin list,
+         * theme, install age, engagement counts) does not.
+         *
+         * @since 1.45
+         * @return array Empty when sharing is declined.
+         */
+        private function diagnostics()
         {
         }
         public function requests($request)
@@ -1993,6 +2046,7 @@ namespace EasyCommerce\API\Reports {
         use \EasyCommerce\Traits\Cache;
         const CACHE_DURATION_HOUR = 3600;
         const CACHE_DURATION_DAY = 86400;
+        const TOP_CUSTOMERS_LIMIT = 10;
         /**
          * Returns a date key based on the given timestamp and range.
          *
@@ -2513,7 +2567,7 @@ namespace EasyCommerce\API\Reports {
          * @param int    $limit     Number of customers to return.
          * @return array
          */
-        private function get_top_customers_by_revenue($date_from, $date_to, $limit = 50)
+        private function get_top_customers_by_revenue($date_from, $date_to, $limit = self::TOP_CUSTOMERS_LIMIT)
         {
         }
     }
@@ -5069,6 +5123,29 @@ namespace EasyCommerce\Bootstrap {
         {
         }
         /**
+         * Handles schema migration for the transactions table during schema updates.
+         *
+         * Adds a UNIQUE(transaction_id) constraint on existing installs so a
+         * duplicate gateway transaction id can never be recorded twice (which would
+         * corrupt the payment audit trail and reconciliation). Existing duplicate
+         * rows are removed first — the earliest row (smallest id) is kept for each
+         * transaction_id — because MySQL rejects the constraint while duplicates
+         * remain. Distinct transactions carry distinct gateway ids, so only true
+         * duplicates are deleted; no distinct transaction is lost. dbDelta does not
+         * add keys to existing tables, so the change is applied explicitly here and
+         * guarded to run at most once.
+         *
+         * @param \EasyCommerce\Models\Database $db              Database instance.
+         * @param string   $table_full_name Full table name with prefix.
+         * @param array    $columns         Current column definitions from config.
+         * @param array    $options         Current table options from config.
+         *
+         * @return void
+         */
+        public function handle_transactions_data_migration(\EasyCommerce\Models\Database $db, string $table_full_name, array $columns, array $options)
+        {
+        }
+        /**
          * Updates or adds the database version in the options table.
          *
          * @return void
@@ -5304,6 +5381,17 @@ namespace EasyCommerce\Controllers\Admin {
          * @todo remove it in future
          */
         public function handle_cart_sessions_migration()
+        {
+        }
+        /**
+         * Truncates the local ec_ai_logs table (Settings > AI > Usage > Reset Logs).
+         *
+         * This only clears the per-action usage history rows; it has no effect on
+         * the hub's authoritative monthly credit ledger (easycommerce_ai_status()).
+         *
+         * @return void
+         */
+        public function reset_ai_logs()
         {
         }
     }
@@ -6053,6 +6141,14 @@ namespace EasyCommerce\Controllers\Front {
         public function checkout($atts)
         {
         }
+        /**
+         * Checkout template slugs that have a file to render.
+         *
+         * @return array
+         */
+        private function checkout_templates()
+        {
+        }
         public function dashboard($atts)
         {
         }
@@ -6202,6 +6298,34 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
     {
         use \EasyCommerce\Traits\Rest;
         /**
+         * Order-meta keys that bind a Stripe payment intent to an order.
+         *
+         * `stripe_payment_intent_id` is written by the synchronous checkout flow
+         * (Stripe.php); `_ec_pending_stripe_intent_id` is written by the order-pay
+         * flow (Payment_Intent.php). Either can resolve an inbound webhook to its order.
+         *
+         * @var string[]
+         */
+        private const INTENT_ORDER_META_KEYS = array('stripe_payment_intent_id', '_ec_pending_stripe_intent_id');
+        /**
+         * Prefix for the per-event dedup mark stored on the order.
+         *
+         * @var string
+         */
+        private const PROCESSED_META_PREFIX = '_ec_processed_evt_';
+        /**
+         * Prefix for the MySQL advisory lock that serialises same-event deliveries.
+         *
+         * @var string
+         */
+        private const LOCK_PREFIX = 'ec_stripe_evt_';
+        /**
+         * Seconds to wait for the advisory lock before giving up (Stripe then retries).
+         *
+         * @var int
+         */
+        private const LOCK_TIMEOUT = 5;
+        /**
          * Validates the incoming request to ensure it is a legitimate webhook event from Stripe.
          * It checks for the presence of required parameters and verifies the request signature.
          *
@@ -6225,7 +6349,81 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
         {
         }
         /**
-         * Handle successful payment intent
+         * Process a payment_intent.* event idempotently.
+         *
+         * Serialises concurrent deliveries of the same event on a MySQL advisory
+         * lock, then dedups on an order-meta mark so a replayed webhook cannot
+         * re-run the completion path. The event is recorded as processed only
+         * after the completion path succeeds, so a mid-processing failure lets
+         * Stripe retry cleanly.
+         *
+         * @param \Stripe\Event|object $event The Stripe event object.
+         *
+         * @return array{code:int,message:string,processed:bool} HTTP code + whether the completion path ran this call.
+         */
+        public function process_event($event)
+        {
+        }
+        /**
+         * Resolve the order bound to a Stripe payment intent.
+         *
+         * Reverse-looks-up order meta on the intent id (the intent's own Stripe
+         * metadata does not carry the order id).
+         *
+         * @param object $payment_intent The Stripe payment intent object (needs ->id).
+         *
+         * @return \EasyCommerce\Models\Order|null The bound order, or null when none is resolvable.
+         */
+        public function resolve_order_from_intent($payment_intent)
+        {
+        }
+        /**
+         * Dispatch the event to its completion handler (fires the completion action).
+         *
+         * @param \Stripe\Event|object $event The Stripe event object.
+         *
+         * @return void
+         */
+        private function dispatch_event($event)
+        {
+        }
+        /**
+         * Build the advisory-lock name for an event, bounded to MySQL's 64-char limit.
+         *
+         * Standard Stripe event ids keep the readable `ec_stripe_evt_{id}` form; an
+         * over-long id (which would otherwise error GET_LOCK and 503 forever) falls
+         * back to a hashed, fixed-width name.
+         *
+         * @param string $event_id The Stripe event id.
+         *
+         * @return string
+         */
+        private function lock_name($event_id)
+        {
+        }
+        /**
+         * Acquire a MySQL advisory lock scoped to this DB connection.
+         *
+         * @param string $lock_name The lock name.
+         * @param int    $timeout   Seconds to wait.
+         *
+         * @return bool True if the lock was acquired.
+         */
+        private function acquire_lock($lock_name, $timeout = self::LOCK_TIMEOUT)
+        {
+        }
+        /**
+         * Release a previously acquired advisory lock.
+         *
+         * @param string $lock_name The lock name.
+         *
+         * @return void
+         */
+        private function release_lock($lock_name)
+        {
+        }
+        /**
+         * Handle successful payment intent (fires the completion action).
          *
          * @param \Stripe\Event $event The event object.
          *
@@ -6235,7 +6433,7 @@ namespace EasyCommerce\Controllers\Payment\Stripe\API {
         {
         }
         /**
-         * Handle failed payment intent
+         * Handle failed payment intent (fires the completion action).
          *
          * @param \Stripe\Event $event The event object.
          *
@@ -7049,6 +7247,12 @@ namespace EasyCommerce\Models {
          * @var array|null
          */
         protected $formatted_cart = null;
+        /**
+         * Total this cart was loaded with, which the payment form was built from.
+         *
+         * @var float
+         */
+        protected $loaded_total = 0;
         protected $table = 'cart_sessions';
         /**
          * Constructor
@@ -7073,6 +7277,15 @@ namespace EasyCommerce\Models {
          * @return string The cart hash.
          */
         public function set_user_hash($hash = '')
+        {
+        }
+        /**
+         * Free unit count on a cart line, tolerating lines saved before it existed.
+         *
+         * @param array|null $item The cart line.
+         * @return int
+         */
+        protected function get_free_quantity($item)
         {
         }
         /**
@@ -7498,6 +7711,37 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Location a tax lookup should use, falling back to billing.
+         *
+         * An empty shipping address leaves billing as the only known location.
+         *
+         * @param string $type     billing or shipping.
+         * @param bool   $fallback Whether an empty shipping address falls back to billing.
+         * @return array
+         */
+        protected function tax_location($type = 'billing', $fallback = true)
+        {
+        }
+        /**
+         * Whether the active checkout template collects shipping at all.
+         *
+         * template-2 renders no shipping row, so a fee there is never explained.
+         *
+         * @return bool
+         */
+        protected function checkout_collects_shipping()
+        {
+        }
+        /**
+         * Spread an amount across the item totals, proportionally to each total.
+         *
+         * @param array $items    Formatted cart items, by reference.
+         * @param float $discount Amount to take off.
+         */
+        private function distribute_discount(&$items, $discount)
+        {
+        }
+        /**
          * Handle free products discount (BXGY functionality)
          *
          * @param \EasyCommerce\Models\Coupon $coupon The coupon object
@@ -7855,7 +8099,7 @@ namespace EasyCommerce\Models {
         /**
          * Get billing address
          *
-         * @return string
+         * @return array The billing address fields, or an empty array when unset.
          */
         public function get_billing_address()
         {
@@ -7863,7 +8107,7 @@ namespace EasyCommerce\Models {
         /**
          * Get shipping address
          *
-         * @return string
+         * @return array The shipping address fields, or an empty array when unset.
          */
         public function get_shipping_address()
         {
@@ -8921,6 +9165,8 @@ namespace EasyCommerce\Models {
         /**
          * Check if the product is sellable.
          *
+         * A draft, pending or trashed product is not.
+         *
          * @return bool
          */
         public function is_sellable()
@@ -9324,6 +9570,72 @@ namespace EasyCommerce\Models {
         public function get_related($number = 5, $detailed = false)
         {
         }
+        protected static $badge_definitions = array('sale' => array('label' => 'Sale', 'color' => '#EF4444', 'text' => '#FFFFFF'), 'new' => array('label' => 'New Arrival', 'color' => '#22C55E', 'text' => '#FFFFFF'), 'best_seller' => array('label' => 'Best Seller', 'color' => '#F59E0B', 'text' => '#FFFFFF'), 'featured' => array('label' => 'Featured', 'color' => '#3B82F6', 'text' => '#FFFFFF'));
+        // Precedence, highest first. "out_of_stock" is derived from stock, not a
+        // manual/meta badge, so it's handled separately in get_badges().
+        protected static $badge_precedence = array('sale', 'best_seller', 'new', 'featured');
+        // -----------------------------------------------------------------------
+        // 2) Badge methods
+        // -----------------------------------------------------------------------
+        /**
+         * Get the active badges for this product, ordered by display precedence
+         * (Sale > Best Seller > New > Featured > Out of Stock).
+         *
+         * Each entry: array( 'type' => string, 'label' => string, 'color' => string, 'text_color' => string, 'position' => string )
+         *
+         * @return array
+         */
+        public function get_badges()
+        {
+        }
+        /**
+         * Build a badge array from the static definitions.
+         *
+         * @param string $type One of self::$badge_definitions keys.
+         * @return array
+         */
+        protected function build_badge($type)
+        {
+        }
+        /**
+         * Whether the product currently has a genuine sale (sale_price < regular_price)
+         * on at least one variation.
+         *
+         * @return bool
+         */
+        public function has_active_sale_price()
+        {
+        }
+        /**
+         * Whether the manually-set "New" badge is still within its 30-day window.
+         *
+         * @return bool
+         */
+        public function has_active_new_badge()
+        {
+        }
+        /**
+         * Set (or clear) a manual badge on this product.
+         *
+         * Supported $badge_type values: 'new', 'best_seller', 'featured', 'sale'.
+         *
+         * @param string $badge_type
+         * @param bool   $value
+         * @return bool
+         */
+        public function set_badge($badge_type, $value)
+        {
+        }
+        /**
+         * Recompute the auto sale badge from current variation prices. Call this
+         * whenever a variation's regular_price/sale_price changes (e.g. from
+         * Product::update() after variations are saved).
+         *
+         * @return bool Whether the product is currently on sale.
+         */
+        public function auto_set_sale_badge()
+        {
+        }
     }
     /**
      * Class Product_Meta
@@ -9451,9 +9763,9 @@ namespace EasyCommerce\Models {
          */
         public $type = 'digital';
         /**
-         * @var int Variation stock quantity
+         * @var int|null Variation stock quantity. Null means stock is not managed.
          */
-        public $stock_quantity = 0;
+        public $stock_quantity = null;
         /**
          * @var int Variation stock limit
          */
@@ -9635,7 +9947,7 @@ namespace EasyCommerce\Models {
         /**
          * Get variation stock quantity.
          *
-         * @return int
+         * @return int|null
          */
         public function get_stock()
         {
@@ -9643,9 +9955,18 @@ namespace EasyCommerce\Models {
         /**
          * Set variation stock quantity.
          *
-         * @param int $stock_quantity
+         * @param int|null $stock_quantity
          */
         public function set_stock_quantity($stock_quantity)
+        {
+        }
+        /**
+         * Take stock off in one conditional statement, so a race cannot oversell.
+         *
+         * @param int $quantity Units to remove.
+         * @return bool True when the units were taken, false when stock was short.
+         */
+        public function reduce_stock($quantity)
         {
         }
         /**
@@ -10699,7 +11020,7 @@ namespace EasyCommerce\Models {
          *
          * @return float
          */
-        public function get_rate_by_location($tax_class_id, $country, $state = null, $city = null, $details = false)
+        public function get_rate_by_location($tax_class_id, $country, $state = null, $city = null, $postcode = null, $details = false)
         {
         }
         /**
@@ -10711,7 +11032,19 @@ namespace EasyCommerce\Models {
          * @param string|null $city    City name.
          * @return float Tax rate percentage.
          */
-        public function get_rate_for_location($country, $state = null, $city = null)
+        /**
+         * Score how specifically a rate matches: postcode, then city, state, country.
+         *
+         * @param object      $rate     The tax rate row.
+         * @param string|null $state    Customer state.
+         * @param string|null $city     Customer city.
+         * @param string|null $postcode Customer postcode.
+         * @return int|false Specificity level, or false when the rate does not apply.
+         */
+        private function get_match_level($rate, $state, $city, $postcode = null)
+        {
+        }
+        public function get_rate_for_location($country, $state = null, $city = null, $postcode = null)
         {
         }
         /**
@@ -10836,6 +11169,15 @@ namespace EasyCommerce\Models {
          * @return bool|int Transaction ID on success, false on failure.
          */
         public function add($order_id, $data, $order_status = false)
+        {
+        }
+        /**
+         * Get a single transaction by its gateway transaction id.
+         *
+         * @param string $transaction_id The gateway transaction id.
+         * @return object|null The transaction object if found, otherwise null.
+         */
+        public function get_by_transaction_id($transaction_id)
         {
         }
         /**
@@ -11317,6 +11659,128 @@ namespace EasyCommerce\Services {
         {
         }
     }
+    /**
+     * Builds and prints schema.org JSON-LD for the storefront.
+     *
+     * Currently covers the single-product page: Product (with category, tags as
+     * keywords, and brand) + Offer/AggregateOffer + AggregateRating (when review
+     * data exists) + BreadcrumbList. Hooked from Controllers\Front\Init::product_head()
+     * on `wp_head`.
+     *
+     * Defers automatically when a major SEO plugin (Yoast, RankMath, AIOSEO) is
+     * active and configured to output its own Product schema, to avoid duplicate
+     * markup in Search Console.
+     */
+    class Schema
+    {
+        /**
+         * Print the JSON-LD block for the current singular product, if applicable.
+         *
+         * @param \EasyCommerce\Models\Product $product
+         *
+         * @return void
+         */
+        public function output_product(\EasyCommerce\Models\Product $product)
+        {
+        }
+        /**
+         * Product node: category, brand, keywords (tags), offers, rating.
+         *
+         * @param \EasyCommerce\Models\Product $product
+         *
+         * @return array
+         */
+        protected function build_product_node(\EasyCommerce\Models\Product $product)
+        {
+        }
+        /**
+         * Whether the product is digital, physical, or a mix of both, derived
+         * from its variations' actual `type` field rather than assumed — a
+         * product can have both digital and physical variations at once.
+         *
+         * Schema.org has no dedicated enum for this on Product, so it's surfaced
+         * as an additionalProperty PropertyValue, which is the pattern Google's
+         * own structured-data examples use for attributes without a native field.
+         *
+         * @param \EasyCommerce\Models\Product $product
+         *
+         * @return string 'digital', 'physical', 'mixed', or '' if it has no variations yet.
+         */
+        protected function get_product_type(\EasyCommerce\Models\Product $product)
+        {
+        }
+        /**
+         * Offer (single price) or AggregateOffer (variable/ranged price) node.
+         *
+         * Product::get_price( false ) returns either a plain numeric string for a
+         * single-priced product, or a "min-max" range string for a variable one
+         * (see Product::get_price()) — branch on that rather than re-deriving the
+         * range ourselves.
+         *
+         * @param \EasyCommerce\Models\Product $product
+         * @param string  $product_type 'digital', 'physical', 'mixed', or '' — from get_product_type().
+         *                              Used only to decide whether itemCondition applies.
+         *
+         * @return array|null
+         */
+        protected function build_offer_node(\EasyCommerce\Models\Product $product, $product_type = '')
+        {
+        }
+        /**
+         * AggregateRating node, built from Product::get_rating() / get_rating_count().
+         * Omitted entirely when there are no reviews yet — Google penalizes
+         * fabricated/default ratings, so absence is preferable to a fake value.
+         *
+         * @param \EasyCommerce\Models\Product $product
+         *
+         * @return array|null
+         */
+        protected function build_rating_node(\EasyCommerce\Models\Product $product)
+        {
+        }
+        /**
+         * BreadcrumbList node: Shop > category (if any) > Product.
+         *
+         * @param \EasyCommerce\Models\Product $product
+         *
+         * @return array|null
+         */
+        protected function build_breadcrumb_node(\EasyCommerce\Models\Product $product)
+        {
+        }
+        /**
+         * True if an active SEO plugin is already configured to emit Product
+         * schema for this post type, so we don't double up.
+         *
+         * @return bool
+         */
+        protected function is_seo_plugin_handling_schema()
+        {
+        }
+        /**
+         * Best available image URL: gallery-size thumbnail, falling back to the
+         * raw post thumbnail if the product-specific size isn't registered.
+         *
+         * @param \EasyCommerce\Models\Product $product
+         *
+         * @return string
+         */
+        protected function get_image_url(\EasyCommerce\Models\Product $product)
+        {
+        }
+        /**
+         * Plain-text, schema-safe excerpt (JSON-LD strings must not contain markup).
+         * Prefers the merchant-written summary, falls back to the description meta,
+         * then to the post excerpt.
+         *
+         * @param \EasyCommerce\Models\Product $product
+         *
+         * @return string
+         */
+        protected function plain_text_excerpt(\EasyCommerce\Models\Product $product)
+        {
+        }
+    }
 }
 namespace EasyCommerce\Traits {
     trait Limiter
@@ -11355,7 +11819,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.46
+ * Version: 1.48
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.4
@@ -11475,6 +11939,15 @@ namespace {
     }
     /**
      * Filter payment methods based on currency compatibility.
+     *
+     * Used by the SetupIntent (recurring) path and by client-side localisation. The
+     * non-recurring PaymentIntent path no longer calls this — it relies on Stripe's
+     * automatic payment methods to filter by account country, currency and amount,
+     * which is authoritative and self-updating (e.g. Klarna's currency support that
+     * varies by Stripe account country).
+     *
+     * @link https://docs.stripe.com/payments/payment-methods/dynamic-payment-methods
+     * @link https://docs.stripe.com/payments/klarna Klarna currency by account country.
      *
      * @param array  $payment_methods List of payment method types.
      * @param string $currency        Currency code (lowercase).
@@ -11865,6 +12338,27 @@ namespace {
     {
     }
     /**
+     * Resolve a country name to the ISO-2 code regions are stored by.
+     *
+     * @param string $country Country code or name.
+     * @return string ISO-2 country code when resolvable, otherwise the input.
+     */
+    function easycommerce_country_code($country)
+    {
+    }
+    /**
+     * Check a customer postcode against a shipping region postcode expression.
+     *
+     * Accepts `86351`, a comma or newline list, `86300...86399` ranges and `863*` wildcards.
+     *
+     * @param string $expression The postcode expression stored on the region.
+     * @param string $postcode   The postcode supplied by the customer.
+     * @return bool True when the postcode is covered by the expression.
+     */
+    function easycommerce_zip_code_matches($expression, $postcode)
+    {
+    }
+    /**
      * Get an associative list of currencies
      *
      * @return []
@@ -12052,6 +12546,55 @@ namespace {
     function easycommerce_onboarding_snapshot()
     {
     }
+    /**
+     * The telemetry event vocabulary understood by the hub.
+     *
+     * @since 1.45
+     * @return string[]
+     */
+    function easycommerce_telemetry_events()
+    {
+    }
+    /**
+     * Resolve which telemetry event a submission represents.
+     *
+     * An explicit event wins. Anything else falls back to the legacy shape so an
+     * older caller (or a third-party one) still classifies correctly.
+     *
+     * @since 1.45
+     * @param string $event       Explicit event name, if any.
+     * @param int    $deactivated Legacy deactivation flag.
+     * @param string $subject     Submitted subject.
+     * @return string
+     */
+    function easycommerce_telemetry_event($event, $deactivated = 0, $subject = '')
+    {
+    }
+    /**
+     * Whether the store owner consented to sharing diagnostics/usage data.
+     *
+     * Gates the passive site snapshot only — what the owner actually typed into a
+     * feedback or deactivation form is their own submission and always goes.
+     *
+     * Sources, in precedence order:
+     * - `easycommerce_share_data`, the standalone mirror written by the wizard. This
+     *   is authoritative: the `general-business` option group it also lives in gets
+     *   replaced wholesale on every settings save, so the group copy cannot be
+     *   trusted to survive.
+     * - `share_data` in the `easycommerce-general-business` group (the wizard's
+     *   Business step checkbox), for installs saved before the mirror existed.
+     * - `_easycommerce-no_tracking`, written by the wizard's older `dont_share_data`
+     *   field (it was never read anywhere until now).
+     *
+     * Installs that predate the checkbox have none of these; they keep their existing
+     * behaviour rather than silently going dark.
+     *
+     * @since 1.45
+     * @return bool
+     */
+    function easycommerce_can_share_data()
+    {
+    }
     function easycommerce_deduct_ai_credits($deduct = 1, $credits = \null)
     {
     }
@@ -12104,6 +12647,9 @@ namespace {
     {
     }
     function easycommerce_business_country()
+    {
+    }
+    function easycommerce_business_phone()
     {
     }
     function easycommerce_business_full_address(): string
