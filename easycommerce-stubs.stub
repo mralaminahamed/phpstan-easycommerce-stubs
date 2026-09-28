@@ -605,6 +605,36 @@ namespace EasyCommerce\API\Agent {
         private function tool_run_analytics_query(array $args): array
         {
         }
+        /**
+         * Writes alt text for a product's images.
+         *
+         * @param array $args Tool arguments: product_id, optional overwrite.
+         *
+         * @return array
+         */
+        private function tool_generate_alt_text(array $args): array
+        {
+        }
+        /**
+         * Shop-thumbnail of an attachment as a base64 data URI, or its URL as a fallback.
+         *
+         * @param int $attachment_id The attachment.
+         *
+         * @return string Empty when the attachment has neither a readable file nor a URL.
+         */
+        private function image_payload(int $attachment_id): string
+        {
+        }
+        /**
+         * Attachment IDs of a product: featured image first, then gallery images.
+         *
+         * @param \EasyCommerce\Models\Product $product The product.
+         *
+         * @return int[]
+         */
+        private function product_image_ids(\EasyCommerce\Models\Product $product): array
+        {
+        }
         // -------------------------------------------------------------------------
         // Tool definitions & system prompt
         // -------------------------------------------------------------------------
@@ -799,6 +829,18 @@ namespace EasyCommerce\API {
          * @param \EasyCommerce\Models\Cart $cart The cart being changed.
          */
         private function guard_locked($cart)
+        {
+        }
+        /**
+         * Reject a request that targets a cart hash belonging to another session.
+         *
+         * The hash is only usable on the caller's own cart; a hash adopted through
+         * a recovery link is already stored in the session, so it passes the check.
+         *
+         * @param mixed      $hash The hash parameter from the request.
+         * @param \EasyCommerce\Models\Cart $cart The cart instance loaded with that hash.
+         */
+        private function guard_hash_owner($hash, $cart)
         {
         }
         private function sanitize_address($address)
@@ -3365,6 +3407,45 @@ namespace EasyCommerce\API\Reports {
     }
 }
 namespace EasyCommerce\API {
+    class Restock_Request extends \EasyCommerce\Abstracts\API
+    {
+        /**
+         * Capture a shopper's restock-request request.
+         *
+         * @param  \WP_REST_Request $request Request holding product_id, email and an optional variation_id.
+         * @return void
+         */
+        public function subscribe($request)
+        {
+        }
+        /**
+         * Requests for the admin table.
+         *
+         * @param  \WP_REST_Request $request Request holding status, search, from, to, page and per_page.
+         * @return void
+         */
+        public function list($request)
+        {
+        }
+        /**
+         * Drop a single request.
+         *
+         * @param  \WP_REST_Request $request Request holding the request id.
+         * @return void
+         */
+        public function remove($request)
+        {
+        }
+        /**
+         * Drop several requests at once.
+         *
+         * @param  \WP_REST_Request $request Request holding the ids.
+         * @return void
+         */
+        public function bulk_remove($request)
+        {
+        }
+    }
     class Shipping_Plan extends \EasyCommerce\Abstracts\API
     {
         /**
@@ -5640,6 +5721,12 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         /**
+         * Register restock request API endpoints
+         */
+        private function register_restock_request_endpoints()
+        {
+        }
+        /**
          * Register Refund-related API endpoints
          */
         private function register_refund_endpoints()
@@ -5824,6 +5911,14 @@ namespace EasyCommerce\Controllers\Common {
         public function send_abandoned_reminder($hash)
         {
         }
+        /**
+         * Email one shopper that the product they waited for is back.
+         *
+         * @param object $request The restock request row.
+         */
+        public function send_restock_request($request)
+        {
+        }
     }
     class Init
     {
@@ -5836,6 +5931,33 @@ namespace EasyCommerce\Controllers\Common {
          * Constructor to add all hooks.
          */
         public function __construct()
+        {
+        }
+        /**
+         * Statuses that hand an order's units back to the shelf.
+         *
+         * @return array
+         */
+        private function stock_releasing_statuses()
+        {
+        }
+        /**
+         * Release stock when Order::set_status() carries the order somewhere it stops.
+         *
+         * @param string $status The status being set.
+         * @param \EasyCommerce\Models\Order  $order  The order, still holding its previous status.
+         */
+        public function restore_stock_on_set_status($status, $order)
+        {
+        }
+        /**
+         * Release stock when an admin moves an order to a releasing status.
+         *
+         * @param int    $order_id   The order ID.
+         * @param string $new_status The status it moved to.
+         * @param string $old_status The status it came from.
+         */
+        public function restore_stock_on_status_update($order_id, $new_status, $old_status)
         {
         }
         public function invalidate_cache()
@@ -5991,6 +6113,23 @@ namespace EasyCommerce\Controllers\Common {
          * install. Idempotent — reuses existing pages, so it is a no-op once the
          * pages exist (e.g. after the setup wizard already created them).
          */
+        /**
+         * Hand a restock over to the background instead of mailing inline.
+         *
+         * @param \EasyCommerce\Models\Product_Variation $variation The restocked variation.
+         */
+        public function queue_restock_request(\EasyCommerce\Models\Product_Variation $variation)
+        {
+        }
+        /**
+         * Mail one chunk of the shoppers waiting on a restock, then queue the next.
+         *
+         * @param int $product_id   Product that came back in stock.
+         * @param int $variation_id Variation that came back in stock.
+         */
+        public function send_restock_request_batch($product_id, $variation_id)
+        {
+        }
         public function create_store_pages()
         {
         }
@@ -7295,6 +7434,20 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Whether the given hash belongs to the current caller's session.
+         *
+         * A hash may only ever operate on the requester's own cart: for a logged-in
+         * user that is the user-meta hash, for guests the cart cookie. Recovery links
+         * adopt the hash into the session first (see Init::restore_cart()), so they
+         * pass this check while a hash belonging to another customer is rejected.
+         *
+         * @param string $hash The cart hash from the request.
+         * @return bool
+         */
+        public function is_session_hash($hash)
+        {
+        }
+        /**
          * Free unit count on a cart line, tolerating lines saved before it existed.
          *
          * @param array|null $item The cart line.
@@ -8234,9 +8387,11 @@ namespace EasyCommerce\Models {
          * @param string|null $search
          * @param int         $page
          * @param int         $per_page
+         * @param string      $from Registered on or after (Y-m-d).
+         * @param string      $to   Registered on or before (Y-m-d).
          * @return array List of customers with pagination info
          */
-        public static function customer_list($search = null, $page = 1, $per_page = 10)
+        public static function customer_list($search = null, $page = 1, $per_page = 10, $from = '', $to = '')
         {
         }
     }
@@ -8888,6 +9043,14 @@ namespace EasyCommerce\Models {
          * @return bool True on success, false on failure.
          */
         public function delete_meta($key)
+        {
+        }
+        /**
+         * Return this order's units to stock when the order is released.
+         *
+         * @return bool True when the units went back, false when there was nothing to do.
+         */
+        public function restore_stock()
         {
         }
         /**
@@ -9794,6 +9957,10 @@ namespace EasyCommerce\Models {
          */
         public $exists = false;
         /**
+         * @var int|null Stock held in the database when this variation was loaded.
+         */
+        protected $stored_stock = null;
+        /**
          * @var Product_Variation_Meta Variation meta instance
          */
         public $meta;
@@ -9985,6 +10152,15 @@ namespace EasyCommerce\Models {
         {
         }
         /**
+         * Put stock back in one statement, so a release cannot race a sale.
+         *
+         * @param int $quantity Units to return.
+         * @return bool True when the units were returned, false when nothing changed.
+         */
+        public function increase_stock($quantity)
+        {
+        }
+        /**
          * Set variation type.
          *
          * @param string $type
@@ -10014,6 +10190,14 @@ namespace EasyCommerce\Models {
          * @param string $status
          */
         public function set_status($status)
+        {
+        }
+        /**
+         * Whether this save takes the variation from sold out back to available.
+         *
+         * @return bool
+         */
+        protected function is_restocked()
         {
         }
         /**
@@ -10610,6 +10794,114 @@ namespace EasyCommerce\Models {
          * @return Refund|null The refund object if found, otherwise null.
          */
         public static function get_by_id($refund_id)
+        {
+        }
+    }
+    /**
+     * Restock requests raised by shoppers on sold out products.
+     */
+    class Restock_Request extends \EasyCommerce\Abstracts\Model
+    {
+        protected $table = 'restock_requests';
+        /**
+         * A shopper's existing request for a product.
+         *
+         * @param int    $product_id   Product the request belongs to.
+         * @param string $email        Shopper email address.
+         * @param int    $variation_id Variation the request belongs to, 0 for the whole product.
+         * @return object|null Row when the shopper already asked, null otherwise.
+         */
+        public function get_request($product_id, $email, $variation_id = 0)
+        {
+        }
+        /**
+         * Register a shopper's interest in an out of stock product.
+         *
+         * @param int    $product_id   Product the request belongs to.
+         * @param string $email        Shopper email address.
+         * @param int    $variation_id Variation the request belongs to, 0 for the whole product.
+         * @param bool   $consent      Whether the shopper agreed to be emailed.
+         * @param int    $user_id      Logged in user ID, 0 for a guest.
+         * @return int|false Row ID on success, false on failure.
+         */
+        public function subscribe($product_id, $email, $variation_id = 0, $consent = false, $user_id = 0)
+        {
+        }
+        /**
+         * Pending requests waiting on a variation coming back in stock.
+         *
+         * Requests made against the whole product are included, since a shopper who
+         * subscribed on the product page did not pick a variation.
+         *
+         * @param int $product_id   Product ID.
+         * @param int $variation_id Variation that was restocked.
+         * @param int $limit        Rows to return, 0 for all of them.
+         * @return array Rows of pending requests.
+         */
+        public function get_pending($product_id, $variation_id = 0, $limit = 0)
+        {
+        }
+        /**
+         * Claim a request in one conditional statement, so two overlapping batches
+         * cannot both mail the same shopper.
+         *
+         * @param int $id Request ID.
+         * @return bool True when this caller took the request, false when it was already taken.
+         */
+        public function mark_notified($id)
+        {
+        }
+        /**
+         * Delete a request.
+         *
+         * @param int $id Request ID.
+         * @return bool
+         */
+        public function remove($id)
+        {
+        }
+        /**
+         * Requests for the admin table, newest first.
+         *
+         * @param array $args status, search, from, to, limit and offset.
+         * @return array Rows joined with the product title.
+         */
+        public function get_requests($args = array())
+        {
+        }
+        /**
+         * Number of requests matching the same filters, for pagination.
+         *
+         * @param array $args status, search, from and to.
+         * @return int
+         */
+        public function get_total($args = array())
+        {
+        }
+        /**
+         * Request count per status, for the tab pills.
+         *
+         * @return array Status keyed counts plus an `all` total.
+         */
+        public function get_status_counts()
+        {
+        }
+        /**
+         * Delete several requests at once.
+         *
+         * @param array $ids Request IDs.
+         * @return int Rows removed.
+         */
+        public function remove_many($ids)
+        {
+        }
+        /**
+         * Shared WHERE for the request list and its count.
+         *
+         * @param array $args status, search, from and to.
+         * @return array where clause string and its values.
+         */
+        private function build_clause($args)
         {
         }
     }
@@ -11659,6 +11951,17 @@ namespace EasyCommerce\Services {
         {
         }
         /**
+         * Generates accessibility alt text for a single image.
+         *
+         * @param string $image   The image as a publicly reachable URL or a base64 data URI.
+         * @param string $context Optional product title to ground the description.
+         *
+         * @return string|null The alt text, or null when the service is unavailable or declines.
+         */
+        public function describe_image($image, $context = '')
+        {
+        }
+        /**
          * Extracts a product search keyword from a natural-language query.
          *
          * Passes the real product catalog to the AI so it can pick the closest
@@ -11834,7 +12137,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.49
+ * Version: 1.50
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.4
