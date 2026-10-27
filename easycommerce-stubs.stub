@@ -3606,6 +3606,157 @@ namespace EasyCommerce\API {
         {
         }
     }
+    /**
+     * Test order health check.
+     *
+     * The admin popup drives a real guest checkout through the public cart and
+     * order endpoints. This class supplies what those endpoints cannot: the
+     * config checks, a run token, and the cleanup that removes every trace of the
+     * order the run placed (stock, sales counter, customer, cart, logs).
+     */
+    class Test_Order extends \EasyCommerce\Abstracts\API
+    {
+        const TOKEN_PARAM = 'easycommerce-test-token';
+        const PAYMENT_METHOD = 'easycommerce-test';
+        const ORDER_FLAG = '_ec_test_order';
+        const RESULT_OPTION = 'easycommerce_test_order_last_run';
+        const TOKEN_TTL = 1800;
+        /**
+         * Hook the order endpoint so a run carrying a valid token is tagged and silent.
+         */
+        public function __construct()
+        {
+        }
+        /**
+         * Whether the token was issued by start() and has not expired.
+         *
+         * @param mixed $token The token from the request.
+         * @return bool
+         */
+        private function is_valid_token($token)
+        {
+        }
+        /**
+         * The throwaway customer email for a run.
+         *
+         * @param string $token The run token.
+         * @return string
+         */
+        private function test_email($token)
+        {
+        }
+        /**
+         * Block every outgoing mail for the order request of a test run.
+         *
+         * Runs before the order callback, so the new-account and order emails the
+         * request would send to the throwaway customer are both stopped.
+         *
+         * @param mixed            $response Current response.
+         * @param array            $handler  The matched route handler.
+         * @param \WP_REST_Request $request  The request.
+         * @return mixed
+         */
+        public function silence_mail($response, $handler, $request)
+        {
+        }
+        /**
+         * Flag the order a test run just placed, and remember what to undo.
+         *
+         * @param int   $order_id    The order ID.
+         * @param array $params      The request params.
+         * @param int   $customer_id The customer ID.
+         */
+        public function tag_order($order_id, $params, $customer_id)
+        {
+        }
+        /**
+         * Start a run: clear leftovers of earlier runs and issue a token.
+         */
+        public function start($request)
+        {
+        }
+        /**
+         * Run one server-side check.
+         */
+        public function check($request)
+        {
+        }
+        /**
+         * The shop and checkout pages, and the store mode.
+         *
+         * @return array
+         */
+        private function check_store()
+        {
+        }
+        /**
+         * Find the cheapest published, in-stock product to buy.
+         *
+         * @return array
+         */
+        private function check_product()
+        {
+        }
+        /**
+         * Whether payment gateways are switched on and configured.
+         *
+         * This checks configuration only. A real gateway is never charged, because
+         * a card payment needs the customer's browser.
+         *
+         * @return array
+         */
+        private function check_gateways()
+        {
+        }
+        /**
+         * Verify the order a run placed, undo it, and remember the outcome.
+         */
+        public function finish($request)
+        {
+        }
+        /**
+         * The result of the last run.
+         */
+        public function last($request)
+        {
+        }
+        /**
+         * IDs of orders flagged as test orders.
+         *
+         * @param string $token Limit to one run; empty for every leftover.
+         * @return int[]
+         */
+        private function find_test_orders($token = '')
+        {
+        }
+        /**
+         * Undo test orders: stock, sales counter, order, cart, logs and customer.
+         *
+         * Only orders carrying the test flag are touched.
+         *
+         * @param int[] $order_ids Test order IDs.
+         * @return int Number of orders removed.
+         */
+        private function cleanup($order_ids)
+        {
+        }
+        /**
+         * Delete a test cart and the log row its add-to-cart left behind.
+         *
+         * @param string $hash The cart hash.
+         */
+        private function delete_cart($hash)
+        {
+        }
+        /**
+         * Delete the throwaway customer, never a real account.
+         *
+         * @param int $user_id The user ID.
+         */
+        private function delete_test_customer($user_id)
+        {
+        }
+    }
     class Transaction extends \EasyCommerce\Abstracts\API
     {
         /**
@@ -5637,6 +5788,12 @@ namespace EasyCommerce\Controllers\Common {
         {
         }
         /**
+         * Test order health check: the admin popup that dry-runs a checkout.
+         */
+        private function register_test_order_endpoints()
+        {
+        }
+        /**
          * Register Order-related API endpoints
          */
         private function register_order_endpoints()
@@ -5818,6 +5975,31 @@ namespace EasyCommerce\Controllers\Common {
          * @return bool
          */
         private function is_storefront_context($post)
+        {
+        }
+        /**
+         * Whether the block template rendering this request, or a template part it
+         * references, contains an EasyCommerce block.
+         *
+         * Block-theme templates and parts are not part of the post content, so the
+         * post_content check cannot see them. WordPress stores the resolved template
+         * markup in `$_wp_current_template_content` before wp_enqueue_scripts runs;
+         * parts appear in it only as `wp:template-part` references, which are looked up
+         * here. Nesting is followed a few levels deep and the result is cached.
+         *
+         * @return bool
+         */
+        private function template_has_easycommerce_block()
+        {
+        }
+        /**
+         * Look for an EasyCommerce block in block markup, following template-part references.
+         *
+         * @param string $markup Block markup.
+         * @param int    $depth  How many levels of nested template parts to follow.
+         * @return bool
+         */
+        private function markup_has_easycommerce_block($markup, $depth)
         {
         }
         /**
@@ -12137,9 +12319,9 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.50
+ * Version: 1.51
  * Requires at least: 6.0
- * Tested up to: 7.0
+ * Tested up to: 7.1
  * Requires PHP: 7.4
  * Text Domain: easycommerce
  * Domain Path: /languages
@@ -12685,6 +12867,20 @@ namespace {
     {
     }
     function easycommerce_currency_format_options()
+    {
+    }
+    /**
+     * What the admin app's container shows until the JavaScript app mounts.
+     *
+     * React replaces everything inside the container when it renders, so this only
+     * stays on screen when the bundle never starts (a blocked or failed script, a
+     * JavaScript error on load). The first line is the usual "Loading.."; the second
+     * stays invisible for a few seconds and then appears, so a slow load is not
+     * mistaken for a failure but a dead one no longer looks like a blank page.
+     *
+     * @return string Escaped HTML.
+     */
+    function easycommerce_admin_boot_markup()
     {
     }
     function easycommerce_menus()
