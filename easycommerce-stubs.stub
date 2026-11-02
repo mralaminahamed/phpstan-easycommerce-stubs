@@ -2021,6 +2021,23 @@ namespace EasyCommerce\API {
         {
         }
     }
+    /**
+     * The BFCM promotion's one write: remembering that the Pro page banner was dismissed.
+     */
+    class Promo extends \EasyCommerce\Abstracts\API
+    {
+        /**
+         * Hide the Pro page banner for seven days.
+         *
+         * The server stamps the time itself, so the browser cannot store a value or
+         * skew the clock. The option is site-wide and not autoloaded.
+         *
+         * @param \WP_REST_Request $request
+         */
+        public function dismiss_banner($request)
+        {
+        }
+    }
     class Refund extends \EasyCommerce\Abstracts\API
     {
         /**
@@ -5497,6 +5514,50 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         /**
+         * User meta key recording that the current campaign's offer bar was dismissed.
+         *
+         * Each campaign gets its own key, so dismissing one offer does not silently
+         * hide every future one. Bump this when the campaign changes.
+         */
+        protected const OFFER_DISMISSED_META = 'easycommerce_bfcm_offer_dismissed';
+        /**
+         * Whether the BFCM offer should be shown to the current user.
+         *
+         * Hidden when Pro is active, outside the campaign window, when the user
+         * cannot manage options, or once the user has dismissed it.
+         *
+         * @return bool
+         */
+        protected function should_show_offer(): bool
+        {
+        }
+        /**
+         * Add the BFCM offer node to the admin bar.
+         *
+         * @param \WP_Admin_Bar $wp_admin_bar The admin bar instance.
+         * @return void
+         */
+        public function add_offer_admin_bar_node($wp_admin_bar)
+        {
+        }
+        /**
+         * Inline CSS/JS for the offer node: orange styling and dismiss handling
+         * (persisted through admin-ajax so it never returns for that user).
+         *
+         * @return void
+         */
+        public function render_offer_admin_bar_assets()
+        {
+        }
+        /**
+         * AJAX handler: persist dismissal of the BFCM offer for the current user.
+         *
+         * @return void
+         */
+        public function dismiss_offer_admin_bar()
+        {
+        }
+        /**
          * Handles the AI activation magic link from the token email.
          *
          * The link lands in wp-admin carrying the one-time token + email. It does not
@@ -5684,6 +5745,13 @@ namespace EasyCommerce\Controllers\Admin {
         {
         }
         public function hide_menu()
+        {
+        }
+        /**
+         * Put the BFCM badge beside the "Get Pro" row while the promotion runs and
+         * the site is not already on Pro. Only the WP menu label carries the markup.
+         */
+        public function add_promo_badge()
         {
         }
         public function render_settings()
@@ -5875,6 +5943,12 @@ namespace EasyCommerce\Controllers\Common {
          * Register Notice-related API endpoints
          */
         private function register_notice_endpoints()
+        {
+        }
+        /**
+         * Register BFCM promo API endpoints
+         */
+        private function register_promo_endpoints()
         {
         }
         /**
@@ -12319,7 +12393,7 @@ namespace EasyCommerce\Traits {
  * Author: EasyCommerce
  * Author URI: https://easycommerce.dev/
  * Description: AI-Powered Ecommerce To Sell Physical & Digital Products
- * Version: 1.51
+ * Version: 1.52
  * Requires at least: 6.0
  * Tested up to: 7.1
  * Requires PHP: 7.4
@@ -12881,6 +12955,69 @@ namespace {
      * @return string Escaped HTML.
      */
     function easycommerce_admin_boot_markup()
+    {
+    }
+    /**
+     * The instant the BFCM promo starts, as a UTC Unix timestamp (inclusive).
+     *
+     * Read from the `easycommerce_promo_start_date` option (a `Y-m-d H:i:s` string
+     * in UTC), falling back to `2026-10-29 00:00:00 UTC` when unset or malformed.
+     *
+     * @return int
+     */
+    function easycommerce_promo_start_timestamp()
+    {
+    }
+    /**
+     * The instant the BFCM promo ends, as a UTC Unix timestamp (exclusive).
+     *
+     * Read from the `easycommerce_promo_end_date` option (a `Y-m-d H:i:s` string
+     * in UTC), falling back to `2026-12-11 00:00:00 UTC` when unset or malformed,
+     * so the sale stays live through `2026-12-10 23:59:59 UTC`.
+     *
+     * @return int
+     */
+    function easycommerce_promo_end_timestamp()
+    {
+    }
+    /**
+     * Whether the BFCM campaign is running.
+     *
+     * The one gate every promo surface reads (admin bar, menu badge, Pro page
+     * banner). It flips off by itself when the end date passes.
+     *
+     * @return bool
+     */
+    function easycommerce_promo_active()
+    {
+    }
+    /**
+     * Whether the BFCM offer should be shown on this site: the campaign is running
+     * and the site is not already on Pro.
+     *
+     * @return bool
+     */
+    function easycommerce_promo_offer_on()
+    {
+    }
+    /**
+     * The pricing page, tagged for the BFCM 2026 campaign.
+     *
+     * @param string $medium Where the click came from, e.g. `admin-bar`.
+     * @return string
+     */
+    function easycommerce_promo_pricing_url($medium)
+    {
+    }
+    /**
+     * Whether the Pro page banner was dismissed within the last 7 days.
+     *
+     * The dismissal time is stamped by the server, so the banner comes back on its
+     * own once the week is up.
+     *
+     * @return bool
+     */
+    function easycommerce_promo_banner_hidden()
     {
     }
     function easycommerce_menus()
